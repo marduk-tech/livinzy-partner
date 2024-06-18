@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  Button,
-  List,
-  Typography,
-  message,
-  Flex,
-  Popconfirm,
-  Tag,
-} from "antd";
+import { Button, List, Typography, message, Flex, Popconfirm, Tag } from "antd";
 import FixtureDetails from "../fixture-details";
 import {
   useDeleteFixture,
@@ -17,19 +8,12 @@ import {
 } from "../../hooks/use-fixtures";
 import { COLORS } from "../../styles/colors";
 import { Slide } from "../../interfaces/Slide";
-import { InfoCircleOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-
-interface Fixture {
-  _id?: string;
-  fixtureType: {
-    fixtureType: string;
-    description: string;
-    _id: string;
-  };
-  designName: string;
-  description?: string;
-  projectId?: string;
-}
+import {
+  InfoCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { Fixture } from "../../interfaces/Fixture";
 
 interface SlideFixtureMappingProps {
   projectId: string;
@@ -66,7 +50,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
 
   const onDeleteFixture = (fixtureData: Fixture) => {
     deleteFixtureMutation.mutate(fixtureData._id!, {
-      onSuccess: (response: any) => {
+      onSuccess: () => {
         const index = slide.fixtures!.indexOf(fixtureData._id!);
         if (index > -1) {
           slide.fixtures!.splice(index, 1);
@@ -120,12 +104,15 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
           style={{ width: 400 }}
           dataSource={slideFixtures}
           renderItem={(fixture: Fixture) => (
-            <Flex vertical style={{ padding: 16 }}>
-              {fixture.fixtureType.fixtureType} - {fixture.designName}
-              <Flex style={{ marginTop: 16 }}>
+            <Flex style={{ padding: 16 }} align="center">
+              <Typography.Text>
+                {fixture.fixtureType.fixtureType}
+              </Typography.Text>
+              <Flex style={{ marginLeft: "auto" }}>
                 <Button
                   type="link"
                   style={{
+                    cursor: "pointer",
                     padding: 0,
                     marginRight: 16,
                     height: 32,
@@ -163,16 +150,24 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
             </Flex>
           )}
         />
-      ) : (<Tag style={{padding: 8}} icon={<InfoCircleOutlined />}>No fixtures mapped</Tag>)}
+      ) : (
+        <Tag style={{ padding: 8 }} icon={<InfoCircleOutlined />}>
+          No fixtures mapped
+        </Tag>
+      )}
 
       <Button
         type="link"
-        onClick={() => setFixtureModalVisible(true)}
+        onClick={() => {
+          setEditingFixture(null);
+          setFixtureModalVisible(true);
+        }}
         style={{
+          cursor: "pointer",
           marginBottom: 16,
           textAlign: "left",
           color: COLORS.primaryColor,
-          padding: 0
+          padding: 0,
         }}
       >
         Add Fixture

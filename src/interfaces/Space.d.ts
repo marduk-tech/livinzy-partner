@@ -5,6 +5,7 @@ export interface Space {
         w: number,
         h: number
     };
+    name: string;
     spaceType: {
         spaceType: string;
         _id: string;

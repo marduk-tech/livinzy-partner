@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Space, message } from "antd";
+import { Flex, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -33,31 +33,23 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
 
   const fixturesUpdated = (fixtures: string[]) => {
     selectedSlide!.fixtures = fixtures;
-    updateSlideMutation.mutate(
-      selectedSlide!,
-      {
-        onSuccess: async () => {
-          message.success("Changes saved");
-        },
-        onError: () => {
-        },
-      }
-    );
-  }
+    updateSlideMutation.mutate(selectedSlide!, {
+      onSuccess: async () => {
+        message.success("Changes saved");
+      },
+      onError: () => {},
+    });
+  };
 
   const spacesUpdated = (spaces: string[]) => {
     selectedSlide!.spaces = spaces;
-    updateSlideMutation.mutate(
-      selectedSlide!,
-      {
-        onSuccess: async () => {
-          message.success("Changes saved");
-        },
-        onError: () => {
-        },
-      }
-    );
-  }
+    updateSlideMutation.mutate(selectedSlide!, {
+      onSuccess: async () => {
+        message.success("Changes saved");
+      },
+      onError: () => {},
+    });
+  };
 
   /**
    * When thumbnail is clicked
@@ -72,7 +64,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     const slidesData = imgs.map((img: string) => {
       return {
         url: img,
-        projectId: projectData._id,
+        projectId: projectData!._id,
       };
     });
 
@@ -122,7 +114,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             msOverflowStyle: "none" /* IE and Edge */,
           }}
         >
-          {slides.map((slide, index) => (
+          {slides.map((slide) => (
             <Flex
               style={{
                 width: 160,
@@ -135,8 +127,14 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                   cursor: "pointer",
                   width: 160,
                   height: 120,
-                  border: slide._id == selectedSlide?._id ? "4px solid": "0.5px solid",
-                  borderColor: slide._id == selectedSlide?._id ? COLORS.primaryColor : COLORS.borderColor,
+                  border:
+                    slide._id == selectedSlide?._id
+                      ? "4px solid"
+                      : "0.5px solid",
+                  borderColor:
+                    slide._id == selectedSlide?._id
+                      ? COLORS.primaryColor
+                      : COLORS.borderColor,
                   borderRadius: 16,
                   backgroundImage: `url(${slide.url})`,
                   backgroundPosition: "center",

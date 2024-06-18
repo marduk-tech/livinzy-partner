@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -9,6 +9,8 @@ import {
   message,
   Spin,
   Select,
+  Tag,
+  Typography,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -22,23 +24,55 @@ import { queryClient } from "../../libs/react-query/query-client";
 import { queryKeys } from "../../libs/react-query/constants";
 import { getSpaceMeta } from "../../hooks/use-meta";
 import { SpaceMeta } from "../../interfaces/Meta";
-const { Option } = Select;
+import { SyncOutlined } from "@ant-design/icons";
+import { useProcessSpacesLayout } from "../../hooks/use-ai";
+import { COLORS } from "../../styles/colors";
 
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
 }) => {
-  const { data: spaces, isLoading } = useFetchSpacesByProject(
-    projectData!._id!
-  );
+  const {
+    data: spaces,
+    isLoading,
+    refetch: refetchSpaces,
+  } = useFetchSpacesByProject(projectData!._id!);
   const { data: spaceMetaData, isPending: spaceMetaDataPending } =
     getSpaceMeta();
 
   const deleteSpaceMutation = useDeleteSpace();
   const saveSpaceMutation = useSaveSpace();
+  const processSpacesLayoutMutation = useProcessSpacesLayout();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [currentSpace, setCurrentSpace] = useState<Space>();
   const [form] = Form.useForm();
+
+  const [processingSpaces, setProcessingSpaces] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isLoading || (spaces && !!spaces.length)) {
+      return;
+    }
+    async function fetchSpacesInfo() {
+      setProcessingSpaces(true);
+      // const spacesLayoutDetails = await processSpacesLayout(
+      //   projectData!._id!
+      // );
+      processSpacesLayoutMutation.mutate(projectData!._id!, {
+        onSuccess: async () => {
+          setProcessingSpaces(false);
+          refetchSpaces();
+        },
+        onError: () => {
+          setProcessingSpaces(false);
+          refetchSpaces();
+        },
+      });
+    }
+    if (projectData && projectData.homeDetails.layout2D) {
+      fetchSpacesInfo();
+    }
+  }, [projectData, spaces]);
 
   const showModal = (space: Space | undefined) => {
     setIsEdit(!!space);
@@ -47,7 +81,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     if (space) {
       form.setFieldsValue({
         ...space,
-        spaceType: space.spaceType._id
+        spaceType: space.spaceType._id,
       });
     }
     setIsModalVisible(true);
@@ -73,7 +107,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
   /**
    * When form is submitted.
-   * @param updatedSpaceData 
+   * @param updatedSpaceData
    */
   const handleFinish = (updatedSpaceData: Space) => {
     updatedSpaceData.projectId = projectData!._id!;
@@ -94,53 +128,76 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     setIsModalVisible(false);
   };
 
+  if (processingSpaces) {
+    return (
+      <Flex gap={16} style={{ marginTop: 64 }}>
+        <Spin tip="Loading" size="small"></Spin>
+        <Typography.Text>
+          Processing layout for spaces. Please wait..
+        </Typography.Text>
+      </Flex>
+    );
+  }
+
   return (
     <>
       <Flex vertical>
-        <List
-          loading={isLoading}
-          style={{ width: 500 }}
-          dataSource={spaces}
-          itemLayout="horizontal"
-          renderItem={(space: Space) => (
-            <List.Item
-              actions={[
-                <Button
-                  type="link"
-                  icon={<EditOutlined />}
-                  onClick={() => showModal(space)}
-                >
-                  Edit
-                </Button>,
-                <Button
-                  type="link"
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(space._id!)}
-                >
-                  Delete
-                </Button>,
-              ]}
-            >
-              <List.Item.Meta
-                title={`${space.spaceType.spaceType}, ₹${space.cost}`}
-                description={
-                  space.size
-                    ? `Size: L=${space.size.l}, W=${space.size.w}, H=${space.size.h}`
-                    : ""
-                }
-              />
-            </List.Item>
-          )}
-        />
         <Button
           type="default"
           size="small"
-          style={{ width: 150, marginTop: 32 }}
+          style={{ marginBottom: 16, marginLeft: "auto" }}
           onClick={() => showModal(undefined)}
           icon={<PlusOutlined />}
         >
           Add Space
         </Button>
+        <List
+          loading={isLoading}
+          style={{ width: 500, height: 600, overflow: "scroll" }}
+          dataSource={spaces}
+          itemLayout="horizontal"
+          renderItem={(space: Space) => (
+            <Flex
+              align="center"
+              gap={16}
+              style={{
+                borderBottom: "1px solid",
+                borderColor: COLORS.borderColor,
+              }}
+            >
+              <Flex vertical style={{ padding: 16 }}>
+                <Typography.Title level={4} style={{ margin: 0, width: 300 }}>
+                  {space.name}
+                </Typography.Title>
+                  <Typography.Text
+                    style={{
+                      margin: 0,
+                      width: 300,
+                      color: COLORS.textColorLight,
+                    }}
+                  >
+                    {space.spaceType.spaceType}{space.size ? `, ${space.size.l}x${space.size.w} in`: ''}
+                  </Typography.Text>
+              </Flex>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<EditOutlined />}
+                onClick={() => showModal(space)}
+              >
+                Edit
+              </Button>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<DeleteOutlined />}
+                onClick={() => handleDelete(space._id!)}
+              >
+                Delete
+              </Button>
+            </Flex>
+          )}
+        />
       </Flex>
       <Modal
         title={isEdit ? "Edit Space" : "Add Space"}
@@ -154,27 +211,37 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             label="Type"
             rules={[{ required: true, message: "Please input the type!" }]}
           >
+           
             {spaceMetaDataPending ? (
               <Spin />
             ) : (
               <Select
                 showSearch
                 placeholder="Please select a space"
-                filterOption={(input, option) => (`${option?.label}` || '').toLowerCase().includes(input.toLowerCase())}
+                filterOption={(input, option) =>
+                  (`${option?.label}` || "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
                 options={spaceMetaData.map((spaceMeta: SpaceMeta) => {
                   return {
                     value: spaceMeta._id,
                     label: spaceMeta.spaceType,
                   };
                 })}
-              >
-              </Select>
+              ></Select>
             )}
+          </Form.Item>
+          <Form.Item
+            name="name"
+            label="Name for the space"
+            rules={[{ required: true, message: "Please input the name" }]}
+          >
+            <Input/>
           </Form.Item>
           <Form.Item
             name="cost"
             label="Cost"
-            rules={[{ required: true, message: "Please input the cost!" }]}
           >
             <Input type="number" />
           </Form.Item>
@@ -182,21 +249,12 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             <Form.Item
               name={["size", "l"]}
               label="Length"
-              rules={[{ message: "Please input the length!" }]}
             >
               <Input type="number" width={25} />
             </Form.Item>
             <Form.Item
               name={["size", "w"]}
               label="Width"
-              rules={[{ message: "Please input the width!" }]}
-            >
-              <Input type="number" width={25} />
-            </Form.Item>
-            <Form.Item
-              name={["size", "h"]}
-              label="Height"
-              rules={[{ message: "Please input the height!" }]}
             >
               <Input type="number" width={25} />
             </Form.Item>

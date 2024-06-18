@@ -4,7 +4,6 @@ import { COLORS } from "../styles/colors";
 export const antTheme: ThemeConfig = {
   token: {
     colorPrimary: COLORS.primaryColor,
-    colorInfo: COLORS.defaultIdentifier,
     colorSuccess: COLORS.greenIdentifier,
     colorTextBase: COLORS.textColorDark,
     controlHeight: 50,

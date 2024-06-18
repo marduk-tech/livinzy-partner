@@ -5,12 +5,11 @@ import {
   Button,
   Upload,
   message,
-  Space,
   Spin,
   Select,
-  Radio,
-  RadioChangeEvent,
   Flex,
+  Tag,
+  Alert,
 } from "antd";
 import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import { useSaveProject } from "../../hooks/use-projects";
@@ -19,16 +18,18 @@ import { useCookies } from "react-cookie";
 import { cookieKeys } from "../../libs/react-query/constants";
 import { getHomeMeta } from "../../hooks/use-meta";
 import { HomeMeta } from "../../interfaces/Meta";
-import { baseApiUrl } from "../../libs/constants";
+import { IMG_AI_STATUS, baseApiUrl } from "../../libs/constants";
 import { COLORS } from "../../styles/colors";
-import { fetchLayoutDetails, getLayoutDetails } from "../../hooks/use-ai";
+import { fetchLayoutDetails } from "../../hooks/use-ai";
+import {
+  CheckCircleOutlined,
+  SyncOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
+
 const { Option } = Select;
 
 const INPUT_WIDTH = 400;
-const layoutOptions = [
-  { label: "I have the layout of the home", value: "layout" },
-  { label: "Dont have the layout", value: "manual" },
-];
 
 const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -42,27 +43,45 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
 
   const { data: homeMetaData, isPending: homeMetaDataPending } = getHomeMeta();
   const [layoutOption, setLayoutOption] = useState("layout");
+  const [layoutImage, setLayoutImage] = useState<string>();
 
+  const [layoutImageStatus, setLayoutImageStatus] = useState<string>();
 
   const handleFormChange = () => {
     setIsFormChanged(true); // Indicate form has changed
   };
 
-  const handleUploadChange = (info: UploadChangeParam<UploadFile>) => {
-    if (info.file.status === 'uploading') {
+  const handleUploadChange = async (info: UploadChangeParam<UploadFile>) => {
+    if (info.file.status === "uploading") {
+      setLayoutImageStatus(IMG_AI_STATUS.UPLOADING);
       return;
     }
-    if (info.file.status === 'done') {
-      // Assuming the response contains the URL in response.data.url
-      console.log(info.file.response.data.Location);
+    if (info.file.status === "done") {
+      setLayoutImageStatus(IMG_AI_STATUS.PROCESSING);
+      setLayoutImage(info.file.response.data.Location);
 
-      const layoutDetails = fetchLayoutDetails(info.file.response.data.Location);
+      // Fetching layout details using AI
+      const layoutDetails = await fetchLayoutDetails(
+        info.file.response.data.Location
+      );
 
-      
-
-      message.success('File uploaded successfully');
-    } else if (info.file.status === 'error') {
-      message.error('Upload failed');
+      const homeMetaType = homeMetaData.find(
+        (h: HomeMeta) =>
+          h.homeType.toLowerCase() == layoutDetails.type.toLowerCase()
+      );
+      if (homeMetaType) {
+        setLayoutImageStatus(IMG_AI_STATUS.COMPLETED);
+        form.setFieldsValue({
+          homeDetails: {
+            homeType: homeMetaType._id,
+            size: parseFloat(layoutDetails.area),
+          },
+        });
+      } else {
+        setLayoutImageStatus(IMG_AI_STATUS.ERROR);
+      }
+    } else if (info.file.status === "error") {
+      message.error("Upload failed");
     }
   };
 
@@ -89,6 +108,9 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
 
   const handleFinish = (projectUpdatedData: Project) => {
     projectUpdatedData.designerId = cookies[cookieKeys.userId];
+    if (layoutImage) {
+      projectUpdatedData.homeDetails.layout2D = layoutImage;
+    }
     if (projectData && projectData!._id) {
       projectUpdatedData._id = projectData!._id;
     }
@@ -98,14 +120,41 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
         basicDetailsUpdated(updatedProject);
         message.success("Project saved successfully!");
       },
-      onError: (err: any) => {
+      onError: () => {
         message.error("Failed to save project.");
       },
     });
   };
 
-  const onLayoutOptionChange = ({ target: { value } }: RadioChangeEvent) => {
-    setLayoutOption(value);
+  const renderImgStatus = () => {
+    switch (layoutImageStatus) {
+      case IMG_AI_STATUS.UPLOADING:
+        return (
+          <Tag icon={<SyncOutlined spin />} color="processing">
+            Uploading..
+          </Tag>
+        );
+      case IMG_AI_STATUS.PROCESSING:
+        return (
+          <Tag icon={<SyncOutlined spin />} color="processing">
+            Image uploaded, processing..
+          </Tag>
+        );
+      case IMG_AI_STATUS.COMPLETED:
+        return (
+          <Tag icon={<CheckCircleOutlined />} color="success">
+            Processing completed
+          </Tag>
+        );
+      case IMG_AI_STATUS.ERROR:
+        return (
+          <Tag icon={<CloseCircleOutlined />} color="error">
+            Processing completed
+          </Tag>
+        );
+      default:
+        return <></>;
+    }
   };
 
   return (
@@ -122,28 +171,28 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
       >
         <Input style={{ width: INPUT_WIDTH }} />
       </Form.Item>
-      
-      <Flex vertical>
-      {!projectData || !projectData._id ? (
-        <Radio.Group
-          options={layoutOptions}
-          onChange={onLayoutOptionChange}
-          value={layoutOption}
-          optionType="button"
-          buttonStyle="solid"
-          style={{marginBottom: 24}}
-        />
-      ) : null}
 
-      {layoutOption == "layout" ? (<Upload
-                    action={`${baseApiUrl}upload/single`}
-                    name="image"
-                    listType="picture"
-                    onChange={handleUploadChange}
-                    showUploadList={false}
-                  >
-                    <Button type="link" style={{color: COLORS.primaryColor, padding: 0}}>+ Upload Layout</Button>
-                  </Upload>) : (
+      <Flex vertical>
+        <Alert
+          message="You can upload the house layout to autopopulate values"
+          type="info"
+          showIcon
+        />
+        <Upload
+          action={`${baseApiUrl}upload/single`}
+          name="image"
+          listType="picture"
+          onChange={handleUploadChange}
+          showUploadList={false}
+        >
+          {renderImgStatus()}
+          <Button
+            type="link"
+            style={{ color: COLORS.primaryColor, padding: 0, marginBottom: 16 }}
+          >
+            + Upload
+          </Button>
+        </Upload>
         <>
           <Form.Item
             name={["homeDetails", "homeType"]}
@@ -172,8 +221,6 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
             <Input type="number" style={{ width: INPUT_WIDTH }} />
           </Form.Item>
         </>
-      )}
-
       </Flex>
       <Form.Item style={{ marginTop: 48 }}>
         <Button

@@ -1,8 +1,7 @@
-import { HomeOutlined, PoundOutlined, TeamOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Flex, Image, Layout, theme } from "antd";
-import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Image, Layout } from "antd";
+import React, { useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const { Header, Content } = Layout;
@@ -23,53 +22,12 @@ function getItem(
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
-  getItem("Company", "sub1", <HomeOutlined />, [
-    getItem("Products/Services", "1"),
-    getItem("Promotion", "2"),
-    getItem("Settings", "3"),
-  ]),
-  getItem("Stores", "sub2", <PoundOutlined />, [
-    getItem("Orders", "4"),
-    getItem("Staff", "5"),
-    getItem("Settings", "6"),
-  ]),
-  getItem("Customers", "sub3", <TeamOutlined />, [
-    getItem("Customer Data", "7"),
-    getItem("Wallet Recharge", "8"),
-  ]),
-];
-
 // const menuItems: MenuProps["items"] = [
 //   {
-//     label: "Mother Category",
-//     key: "Mother-Category"
-//   },
-
-//   {
-//     label: "Category",
-//     key: "Category"
-//   },
-
-//   {
-//     label: "Sub Category",
-//     key: "Sub-Category"
-//   },
-
-//   {
-//     label: "Items",
-//     key: "Items"
-//   }
-// ];
+//     label: "Mother Catego
 
 export const DashboardLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
-
   const { loginWithRedirect } = useAuth0();
-
 
   const { isLoading, isAuthenticated } = useAuth0();
 
@@ -107,13 +65,19 @@ export const DashboardLayout: React.FC = () => {
         />
       </Sider> */}
       <Layout>
-        <Header style={{ padding: "8px 24px", height: "50px", lineHeight: "50px", background: "transparent" }}>
+        <Header
+          style={{
+            padding: "8px 24px",
+            height: "50px",
+            lineHeight: "50px",
+            background: "transparent",
+          }}
+        >
           <Image
             preview={false}
             src="../../logo-name.png"
             style={{ height: 35, width: "auto" }}
           ></Image>
-         
         </Header>
         <Content style={{ margin: "24px 32px" }}>
           {/* <Menu mode="horizontal" items={menuItems} /> */}

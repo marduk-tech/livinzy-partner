@@ -18,21 +18,19 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({ imgsUploaded }) => {
     setFileList(newFileList);
     const urls: string[] = [];
     setUploadPending(!!newFileList.find((file) => file.status !== "done"));
-
-   
   };
 
   const handleProcessImages = () => {
     const urls: string[] = [];
-     // Read from response and show file link
-     fileList.forEach((file) => {
+    // Read from response and show file link
+    fileList.forEach((file) => {
       if (file.response) {
         // Component will show file.url as link
         urls.push(file.response.results[0].Location);
       }
     });
     imgsUploaded(urls);
-  }
+  };
 
   const beforeUpload = (file: UploadFile) => {
     const isLt3M = file.size! / 1024 / 1024 < MAX_IMAGE_SIZE_MB;

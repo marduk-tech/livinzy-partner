@@ -1,18 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  Upload,
-  message,
-  Avatar,
-  Space,
-  Spin,
-  InputNumber,
-  Flex,
-  Typography,
-} from "antd";
+import { Form, Input, Button, Upload, message, Avatar, Spin, Flex } from "antd";
 import ImgCrop from "antd-img-crop";
 import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import { UserOutlined } from "@ant-design/icons";
@@ -20,8 +7,6 @@ import { useGetDesignerByEmail, useSaveDesigner } from "../hooks/use-designers";
 import { Designer } from "../interfaces/Designer";
 import { useAuth0 } from "@auth0/auth0-react";
 import { baseApiUrl } from "../libs/constants";
-import Title from "antd/es/skeleton/Title";
-import { COLORS } from "../styles/colors";
 
 const { TextArea } = Input;
 
@@ -109,44 +94,45 @@ const AccountDetails: React.FC = () => {
         onFinish={handleFinish}
         onValuesChange={handleFormChange}
       >
-         <Form.Item>
-              <Flex gap={24} align="center">
-                <Avatar
-                  size={100}
-                  icon={<UserOutlined />}
-                  src={
-                    fileList.length > 0 && fileList[0].url
-                      ? fileList[0].url
-                      : undefined
-                  }
-                />
-                <ImgCrop rotationSlider>
-                  <Upload
-                    action={`${baseApiUrl}upload/single`}
-                    name="image"
-                    listType="picture"
-                    fileList={fileList}
-                    onChange={handleUploadChange}
-                    showUploadList={false}
-                  >
-                    <Button>Change picture</Button>
-                  </Upload>
-                </ImgCrop>
-              </Flex>
-            </Form.Item>
-        <Flex style={{marginBottom: 32}}>
-        <Flex vertical style={{ marginRight: 64}}>
-           
-
+        <Form.Item>
+          <Flex gap={24} align="center">
+            <Avatar
+              size={100}
+              icon={<UserOutlined />}
+              src={
+                fileList.length > 0 && fileList[0].url
+                  ? fileList[0].url
+                  : undefined
+              }
+            />
+            <ImgCrop rotationSlider>
+              <Upload
+                action={`${baseApiUrl}upload/single`}
+                name="image"
+                listType="picture"
+                fileList={fileList}
+                onChange={handleUploadChange}
+                showUploadList={false}
+              >
+                <Button>Change picture</Button>
+              </Upload>
+            </ImgCrop>
+          </Flex>
+        </Form.Item>
+        <Flex style={{ marginBottom: 32 }}>
+          <Flex vertical style={{ marginRight: 64 }}>
             <Form.Item
               name="designerName"
               label="Your name or company name"
               rules={[{ required: true, message: "Please enter your name" }]}
             >
-              <Input  style={{width: INPUT_WIDTH}}/>
+              <Input style={{ width: INPUT_WIDTH }} />
             </Form.Item>
-            <Form.Item name="bio" label="Describe your experience & how you are unique">
-              <TextArea rows={4}  style={{width: INPUT_WIDTH}}/>
+            <Form.Item
+              name="bio"
+              label="Describe your experience & how you are unique"
+            >
+              <TextArea rows={4} style={{ width: INPUT_WIDTH }} />
             </Form.Item>
           </Flex>
           <Flex vertical>
@@ -156,7 +142,7 @@ const AccountDetails: React.FC = () => {
               initialValue={user.email}
               rules={[{ required: true, message: "Please enter your name" }]}
             >
-              <Input disabled  style={{width: INPUT_WIDTH}} />
+              <Input disabled style={{ width: INPUT_WIDTH }} />
             </Form.Item>
 
             <Form.Item
@@ -164,14 +150,13 @@ const AccountDetails: React.FC = () => {
               label="Your mobile"
               rules={[{ required: true, message: "Please enter your name" }]}
             >
-              <Input style={{width: INPUT_WIDTH}}/>
+              <Input style={{ width: INPUT_WIDTH }} />
             </Form.Item>
 
             <Form.Item name="address" label="Your address">
-              <Input style={{width: INPUT_WIDTH}}/>
+              <Input style={{ width: INPUT_WIDTH }} />
             </Form.Item>
           </Flex>
-          
         </Flex>
         <Form.Item>
           <Button

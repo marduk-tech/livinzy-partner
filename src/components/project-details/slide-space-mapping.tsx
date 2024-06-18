@@ -54,7 +54,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
             style={{ width: 400 }}
             filterOption={filterOption}
             options={projectSpaces!.map((space: Space) => {
-              return { value: space._id!, label: space.spaceType.spaceType };
+              return { value: space._id!, label: `${space.name} (${space.spaceType.spaceType})` };
             })}
           ></Select>
     </>

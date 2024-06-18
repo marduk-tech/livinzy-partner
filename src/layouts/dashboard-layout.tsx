@@ -1,6 +1,6 @@
 import { HomeOutlined, PoundOutlined, TeamOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Image, Layout, theme } from "antd";
+import { Flex, Image, Layout, theme } from "antd";
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -68,19 +68,19 @@ export const DashboardLayout: React.FC = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const navigate = useNavigate();
+  const { loginWithRedirect } = useAuth0();
+
 
   const { isLoading, isAuthenticated } = useAuth0();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      window.location.href = "https://livinzy.us.auth0.com/u/login?state=hKFo2SBubGRfZGwtemVoSVJoR1hyMXY0T1FLT2FHd2ZsUFRHRKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIDlrMUZuNC1Ld2syZW5FX00wX1ROd0wtT1JwQnF6THk0o2NpZNkgYnA3UEVCWVdHd1NkTXlvV0pTVDJhQmJKN1g2M3NQZHk";
+    if (!isAuthenticated && !isLoading) {
+      loginWithRedirect();
     }
   });
 
-
-  if (isLoading) {
-    return <div>Loading ...</div>;
+  if (isLoading || !isAuthenticated) {
+    return;
   }
 
   return (
@@ -107,13 +107,15 @@ export const DashboardLayout: React.FC = () => {
         />
       </Sider> */}
       <Layout>
-        <Header style={{ padding: "8px 24px", background: "transparent" }}>
+        <Header style={{ padding: "8px 24px", height: "50px", lineHeight: "50px", background: "transparent" }}>
           <Image
+            preview={false}
             src="../../logo-name.png"
             style={{ height: 35, width: "auto" }}
           ></Image>
+         
         </Header>
-        <Content style={{ margin: "60px 60px" }}>
+        <Content style={{ margin: "24px 32px" }}>
           {/* <Menu mode="horizontal" items={menuItems} /> */}
           <Outlet />
         </Content>

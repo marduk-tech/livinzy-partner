@@ -1,22 +1,29 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { queryKeys } from "../libs/react-query/constants";
+import { cookieKeys, queryKeys } from "../libs/react-query/constants";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { Designer } from "../interfaces/Designer";
+import { useCookies } from "react-cookie";
 
-// Define interface for Designer
-interface Designer {
-  id?: string;
-  designerName: string;
-  websiteUrl: string;
-  profileStatus: string;
-  mobile: string;
-}
-
-// Custom hook to fetch list of designers
-export const useGetDesigners = () => {
-  return useQuery<Designer[], Error>({
-    queryKey: [queryKeys.getDesigners],
+// Custom hook to fetch designer by id
+export const useGetDesigner = (id: string) => {
+  return useQuery<Designer, Error>({
+    queryKey: [queryKeys.getDesigner],
     queryFn: async () => {
-      const { data } = await axiosApiInstance.get("/designers");
+      const { data } = await axiosApiInstance.get(`/designers/${id}`);
+      return data;
+    }
+  });
+};
+
+// Custom hook to fetch designer by email
+export const useGetDesignerByEmail = (email: string) => {
+  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
+
+  return useQuery<Designer, Error>({
+    queryKey: [queryKeys.getDesignerByEmail, email],
+    queryFn: async () => {
+      const { data } = await axiosApiInstance.get(`/designers/email/${email}`);
+      setCookie(cookieKeys.userId, data._id, { path: "/" });
       return data;
     }
   });

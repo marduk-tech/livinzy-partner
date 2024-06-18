@@ -1,4 +1,16 @@
 export const queryKeys: { [key: string]: string } = {
   getProjects: "getProjects",
-  getDesigners: "getDesigners"
+  getProject: "getProject",
+  getDesigner: "getDesigner",
+  getDesignerByEmail: "getDesignerByEmail",
+  getSpaces: "getSpaces",
+  getSlides: "getSlides",
+  getFixtures: "getFixtures",
+  getHomeMeta: "getHomeMeta",
+  getSpaceMeta: "getSpaceMeta",
+  getLayoutDetails: "getLayoutDetails"
+};
+
+export const cookieKeys = {
+  userId: "userId",
 };

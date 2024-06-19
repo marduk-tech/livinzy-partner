@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex, Tooltip, message } from "antd";
+import { Flex, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -11,7 +11,6 @@ import { Slide } from "../../interfaces/Slide";
 import SlideSpaceMapping from "./slide-space-mapping";
 import SlideFixtureMapping from "./slide-fixture-mapping";
 import { COLORS } from "../../styles/colors";
-import { DeleteOutlined, UndoOutlined } from "@ant-design/icons";
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -170,7 +169,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                     right: 8,
                   }}
                 >
-                  <Tooltip title="Click to delete">
+                  {/* <Tooltip title="Click to delete">
                     <Button
                       type="link"
                       onClick={onClickDelete}
@@ -197,7 +196,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                         marginRight: 8,
                       }}
                     />
-                  </Tooltip>
+                  </Tooltip> */}
                 </Flex>
               </Flex>
             </Flex>

@@ -1,8 +1,9 @@
 // useFetchProjects.ts
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
+import { FixtureMeta } from "../interfaces/Meta";
 
 // Custom hook to fetch projects using useQuery
 export const getHomeMeta = () => {
@@ -33,6 +34,17 @@ export const getFixtureMeta = () => {
     queryFn: async () => {
       const { data } = await axiosApiInstance.get("/fixturemeta");
       return data;
+    },
+  });
+};
+
+// Custom hook to save designer data
+export const useSaveFixtureMeta = () => {
+  return useMutation({
+    mutationFn: async (fixtureMeta: FixtureMeta) => {
+      let response;
+      response = await axiosApiInstance.post("/fixturemeta", fixtureMeta);
+      return response.data;
     },
   });
 };

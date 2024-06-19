@@ -10,9 +10,9 @@ export interface SpaceMeta {
   description: string;
 }
 
-
 export interface FixtureMeta {
-  _id: string;
+  _id?: string;
   fixtureType: string;
-  description: string;
+  description?: string;
+  addedByDesignerId?: string;
 }

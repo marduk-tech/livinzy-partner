@@ -136,6 +136,21 @@ const AccountDetails: React.FC = () => {
               <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
             </Form.Item>
             <Form.Item
+              name="numYearsExperience"
+              label="Your experience in years"
+            >
+              <Input
+                type="number"
+                style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
+              />
+            </Form.Item>
+            <Form.Item name="numProjects" label="Projects you have completed">
+              <Input
+                type="number"
+                style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
+              />
+            </Form.Item>
+            <Form.Item
               name="bio"
               label="Describe your experience & how you are unique"
             >

@@ -26,6 +26,7 @@ import { getSpaceMeta } from "../../hooks/use-meta";
 import { SpaceMeta } from "../../interfaces/Meta";
 import { useProcessSpacesLayout } from "../../hooks/use-ai";
 import { COLORS } from "../../styles/colors";
+import TextArea from "antd/es/input/TextArea";
 
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -257,6 +258,9 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
           </Form.Item>
           <Form.Item name="cost" label="Cost">
             <Input type="number" />
+          </Form.Item>
+          <Form.Item name="oneLiner" label="One liner about this space">
+            <TextArea rows={4} />
           </Form.Item>
           <Flex gap={8}>
             <Form.Item name={["size", "l"]} label="Length">

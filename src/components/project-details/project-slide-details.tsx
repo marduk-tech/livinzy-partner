@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flex, message } from "antd";
+import { Button, Flex, Tooltip, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -11,6 +11,7 @@ import { Slide } from "../../interfaces/Slide";
 import SlideSpaceMapping from "./slide-space-mapping";
 import SlideFixtureMapping from "./slide-fixture-mapping";
 import { COLORS } from "../../styles/colors";
+import { DeleteOutlined, UndoOutlined } from "@ant-design/icons";
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -49,6 +50,14 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
       },
       onError: () => {},
     });
+  };
+
+  const onClickDelete = (event: any) => {
+    event.stopPropagation();
+  };
+
+  const onClickReplace = (event: any) => {
+    event.stopPropagation();
   };
 
   /**
@@ -128,7 +137,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                 height: 120,
               }}
             >
-              <div
+              <Flex
                 onClick={() => handleThumbnailClick(slide)}
                 style={{
                   cursor: "pointer",
@@ -147,8 +156,50 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                   backgroundPosition: "center",
                   backgroundSize: "cover",
                   backgroundRepeat: "no-repeat",
+                  position: "relative",
                 }}
-              ></div>
+              >
+                <Flex
+                  style={{
+                    padding: 2,
+                    borderRadius: 4,
+                    border: "1px solid",
+                    borderColor: "#ddd",
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                  }}
+                >
+                  <Tooltip title="Click to delete">
+                    <Button
+                      type="link"
+                      onClick={onClickDelete}
+                      icon={<DeleteOutlined></DeleteOutlined>}
+                      style={{
+                        color: "white",
+                        width: 24,
+                        height: 24,
+                        padding: 0,
+                        marginRight: 8,
+                      }}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Click to replace">
+                    <Button
+                      type="link"
+                      onClick={onClickReplace}
+                      icon={<UndoOutlined></UndoOutlined>}
+                      style={{
+                        color: "white",
+                        width: 24,
+                        height: 24,
+                        padding: 0,
+                        marginRight: 8,
+                      }}
+                    />
+                  </Tooltip>
+                </Flex>
+              </Flex>
             </Flex>
           ))}
           <ImgsUpload

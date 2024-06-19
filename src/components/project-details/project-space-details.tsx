@@ -9,8 +9,8 @@ import {
   message,
   Spin,
   Select,
-  Tag,
   Typography,
+  Empty,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -24,7 +24,6 @@ import { queryClient } from "../../libs/react-query/query-client";
 import { queryKeys } from "../../libs/react-query/constants";
 import { getSpaceMeta } from "../../hooks/use-meta";
 import { SpaceMeta } from "../../interfaces/Meta";
-import { SyncOutlined } from "@ant-design/icons";
 import { useProcessSpacesLayout } from "../../hooks/use-ai";
 import { COLORS } from "../../styles/colors";
 
@@ -141,34 +140,36 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
   return (
     <>
-      <Flex vertical>
-        <Button
-          type="default"
-          size="small"
-          style={{ marginBottom: 16, marginLeft: "auto" }}
-          onClick={() => showModal(undefined)}
-          icon={<PlusOutlined />}
-        >
-          Add Space
-        </Button>
-        <List
-          loading={isLoading}
-          style={{ width: 500, height: 600, overflow: "scroll" }}
-          dataSource={spaces}
-          itemLayout="horizontal"
-          renderItem={(space: Space) => (
-            <Flex
-              align="center"
-              gap={16}
-              style={{
-                borderBottom: "1px solid",
-                borderColor: COLORS.borderColor,
-              }}
-            >
-              <Flex vertical style={{ padding: 16 }}>
-                <Typography.Title level={4} style={{ margin: 0, width: 300 }}>
-                  {space.name}
-                </Typography.Title>
+      {spaces && spaces.length ? (
+        <Flex vertical>
+          <Button
+            type="default"
+            size="small"
+            style={{ marginBottom: 16, marginLeft: "auto" }}
+            onClick={() => showModal(undefined)}
+            icon={<PlusOutlined />}
+          >
+            Add Space
+          </Button>
+
+          <List
+            loading={isLoading}
+            style={{ width: 500, height: 600, overflow: "scroll" }}
+            dataSource={spaces}
+            itemLayout="horizontal"
+            renderItem={(space: Space) => (
+              <Flex
+                align="center"
+                gap={16}
+                style={{
+                  borderBottom: "1px solid",
+                  borderColor: COLORS.borderColor,
+                }}
+              >
+                <Flex vertical style={{ padding: 16 }}>
+                  <Typography.Title level={4} style={{ margin: 0, width: 300 }}>
+                    {space.name}
+                  </Typography.Title>
                   <Typography.Text
                     style={{
                       margin: 0,
@@ -176,29 +177,45 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                       color: COLORS.textColorLight,
                     }}
                   >
-                    {space.spaceType.spaceType}{space.size ? `, ${space.size.l}x${space.size.w} in`: ''}
+                    {space.spaceType.spaceType}
+                    {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
                   </Typography.Text>
+                </Flex>
+                <Button
+                  type="link"
+                  style={{ padding: 0 }}
+                  icon={<EditOutlined />}
+                  onClick={() => showModal(space)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="link"
+                  style={{ padding: 0 }}
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(space._id!)}
+                >
+                  Delete
+                </Button>
               </Flex>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<EditOutlined />}
-                onClick={() => showModal(space)}
-              >
-                Edit
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(space._id!)}
-              >
-                Delete
-              </Button>
-            </Flex>
-          )}
-        />
-      </Flex>
+            )}
+          />
+        </Flex>
+      ) : (
+        <Empty
+          image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+          imageStyle={{ height: 60 }}
+          description={
+            <Typography.Text>
+              Add spaces to your project like kitchen, bedroom etc.
+            </Typography.Text>
+          }
+        >
+          <Button type="primary" onClick={() => showModal(undefined)}>
+            Add Now
+          </Button>
+        </Empty>
+      )}
       <Modal
         title={isEdit ? "Edit Space" : "Add Space"}
         visible={isModalVisible}
@@ -211,7 +228,6 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             label="Type"
             rules={[{ required: true, message: "Please input the type!" }]}
           >
-           
             {spaceMetaDataPending ? (
               <Spin />
             ) : (
@@ -237,25 +253,16 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             label="Name for the space"
             rules={[{ required: true, message: "Please input the name" }]}
           >
-            <Input/>
+            <Input />
           </Form.Item>
-          <Form.Item
-            name="cost"
-            label="Cost"
-          >
+          <Form.Item name="cost" label="Cost">
             <Input type="number" />
           </Form.Item>
           <Flex gap={8}>
-            <Form.Item
-              name={["size", "l"]}
-              label="Length"
-            >
+            <Form.Item name={["size", "l"]} label="Length">
               <Input type="number" width={25} />
             </Form.Item>
-            <Form.Item
-              name={["size", "w"]}
-              label="Width"
-            >
+            <Form.Item name={["size", "w"]} label="Width">
               <Input type="number" width={25} />
             </Form.Item>
           </Flex>

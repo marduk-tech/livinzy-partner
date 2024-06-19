@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Button, Form, Spin, Select } from "antd";
+import { Modal, Button, Form, Spin, Select, Input } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { getFixtureMeta } from "../hooks/use-meta";
 import { FixtureMeta } from "../interfaces/Meta";
@@ -81,6 +81,9 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         >
           <Input />
         </Form.Item> */}
+        <Form.Item name="cost" label="Cost (approx)">
+          <Input type="number" />
+        </Form.Item>
         <Form.Item name="description" label="One liner about this fixture">
           <TextArea rows={4} />
         </Form.Item>

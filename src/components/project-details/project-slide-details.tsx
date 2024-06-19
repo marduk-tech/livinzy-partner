@@ -70,8 +70,10 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
 
     bulkSaveSlidesMutation.mutate(slidesData, {
       onSuccess: async (response) => {
-        setSlides(response);
-        setSelectedSlide(response[0]);
+        setSlides([...slides, ...response]);
+        if (!selectedSlide) {
+          setSelectedSlide(response[0]);
+        }
         message.success("Slides saved successfully!");
         // await queryClient.invalidateQueries({queryKey: [queryKeys.getSpaces]});
       },
@@ -86,7 +88,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   }
 
   if (!slidesDataPending && (!slides || !slides.length)) {
-    return <ImgsUpload imgsUploaded={imgsUploaded}></ImgsUpload>;
+    return (
+      <ImgsUpload
+        confirmProcessing={true}
+        imgsUploaded={imgsUploaded}
+      ></ImgsUpload>
+    );
   }
 
   return (
@@ -144,6 +151,10 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               ></div>
             </Flex>
           ))}
+          <ImgsUpload
+            imgsUploaded={imgsUploaded}
+            confirmProcessing={false}
+          ></ImgsUpload>
         </Flex>
       </Flex>
       <Flex vertical>

@@ -2,6 +2,7 @@ interface HomeDetails {
   communityName: string;
   size: number;
   layout2D: string;
+  oneLiner?: string;
   homeType: {
     description: string;
     homeType: string;

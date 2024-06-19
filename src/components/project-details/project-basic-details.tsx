@@ -26,6 +26,7 @@ import {
   SyncOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
+import TextArea from "antd/es/input/TextArea";
 
 const { Option } = Select;
 
@@ -88,6 +89,7 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
   useEffect(() => {
     if (projectData) {
       form.setFieldsValue({
+        ...projectData,
         homeDetails: {
           homeType: projectData.homeDetails.homeType._id,
           communityName: projectData.homeDetails.communityName,
@@ -219,6 +221,9 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
             rules={[{ required: true, message: "Please enter the size" }]}
           >
             <Input type="number" style={{ width: INPUT_WIDTH }} />
+          </Form.Item>
+          <Form.Item name={["oneLiner"]} label="One liner about this project">
+            <TextArea rows={4} style={{ width: INPUT_WIDTH }} />
           </Form.Item>
         </>
       </Flex>

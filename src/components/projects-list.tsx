@@ -83,8 +83,10 @@ const ProjectsList: React.FC = () => {
         <Card
           hoverable
           onClick={() => {
-            message.warning("You can only add or edit designs using desktop");
-            return;
+            if (isMobile) {
+              message.warning("You can only add or edit designs using desktop");
+              return;
+            }
             setSelectedProject(project);
           }}
           style={{ width: isMobile ? "100%" : 320, borderRadius: 16 }}

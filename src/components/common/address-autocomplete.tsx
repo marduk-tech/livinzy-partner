@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Select } from 'antd';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Select } from "antd";
+import axios from "axios";
 
 const { Option } = Select;
 
@@ -17,12 +17,12 @@ const AddressAutocomplete: React.FC = () => {
       setOptions([]);
       return;
     }
-  
+
     try {
       const response = await axios.get<{
         predictions: Prediction[];
       }>(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${value}&key=AIzaSyC6SsowlR-xf9V3yir8qIyBdAMe124fFpk&types=address`
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${value}&key=--&types=address`
       );
 
       if (response.data.predictions) {
@@ -33,7 +33,7 @@ const AddressAutocomplete: React.FC = () => {
         setOptions(addresses);
       }
     } catch (error) {
-      console.error('Error fetching addresses:', error);
+      console.error("Error fetching addresses:", error);
     }
   };
 
@@ -51,9 +51,9 @@ const AddressAutocomplete: React.FC = () => {
       onSearch={handleSearch}
       onChange={handleChange}
       notFoundContent={null}
-      style={{ width: '100%' }}
+      style={{ width: "100%" }}
     >
-      {options.map((option:any) => (
+      {options.map((option: any) => (
         <Option key={option.value} value={option.value}>
           {option.label}
         </Option>

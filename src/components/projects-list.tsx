@@ -110,10 +110,21 @@ const ProjectsList: React.FC = () => {
         >
           <Meta
             title={
-              <Typography.Title level={4} style={{ padding: 0, margin: 0 }}>
-                {project.homeDetails.communityName},{" "}
-                {project.homeDetails.homeType.homeType}
-              </Typography.Title>
+              <Flex vertical>
+                <Typography.Title level={4} style={{ padding: 0, margin: 0 }}>
+                  {project.homeDetails.communityName}
+                </Typography.Title>
+                <Flex>
+                  <Typography.Text>
+                    {project.homeDetails.homeType.homeType}
+                  </Typography.Text>
+                  {project.homeDetails.size ? (
+                    <Typography.Text>
+                      , {project.homeDetails.size} sqft
+                    </Typography.Text>
+                  ) : null}
+                </Flex>
+              </Flex>
             }
           />
         </Card>

@@ -57,8 +57,6 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
     endPoint: { x: number; y: number };
     imageSize: { width: number; height: number };
   }) => {
-    console.log("Bounding Box Data:", data);
-    console.log(editingFixture);
     setIsMapFixtureOpen(false);
     saveFixtureMutation.mutate(
       {
@@ -67,11 +65,12 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
         fixtureType: editingFixture!.fixtureType!._id,
       },
       {
-        onSuccess: (response: any) => {
+        onSuccess: () => {
+          message.success("Mapping updated");
           refetchProjectFixtures();
         },
         onError: () => {
-          message.error("Failed to save project.");
+          message.error("Failed to save mapping. Try again.");
         },
       }
     );

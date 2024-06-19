@@ -12,8 +12,10 @@ import {
   InfoCircleOutlined,
   EditOutlined,
   DeleteOutlined,
+  BorderOuterOutlined,
 } from "@ant-design/icons";
-import { Fixture } from "../../interfaces/Fixture";
+import { Fixture, FixtureFormData } from "../../interfaces/Fixture";
+import ImgMapFixture from "../common/img-map-fixture";
 
 interface SlideFixtureMappingProps {
   projectId: string;
@@ -28,8 +30,10 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
 }) => {
   const [fixtureModalVisible, setFixtureModalVisible] = useState(false);
   const [editingFixture, setEditingFixture] = useState<Fixture | null>(null);
-
+  const [isMapFixtureOpen, setIsMapFixtureOpen] = useState<boolean>(false);
+  const [mapFixtureImg, setMapFixtureImg] = useState<string>();
   const [slideFixtures, setSlideFixtures] = useState<Fixture[]>([]);
+
   const {
     data: projectFixtures,
     isPending: fixturesDataPending,
@@ -48,6 +52,31 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
   const saveFixtureMutation = useSaveFixture();
   const deleteFixtureMutation = useDeleteFixture();
 
+  const handleBoundingBoxComplete = (data: {
+    startPoint: { x: number; y: number };
+    endPoint: { x: number; y: number };
+    imageSize: { width: number; height: number };
+  }) => {
+    console.log("Bounding Box Data:", data);
+    console.log(editingFixture);
+    setIsMapFixtureOpen(false);
+    saveFixtureMutation.mutate(
+      {
+        ...editingFixture,
+        imageBounds: data,
+        fixtureType: editingFixture!.fixtureType!._id,
+      },
+      {
+        onSuccess: (response: any) => {
+          refetchProjectFixtures();
+        },
+        onError: () => {
+          message.error("Failed to save project.");
+        },
+      }
+    );
+  };
+
   const onDeleteFixture = (fixtureData: Fixture) => {
     deleteFixtureMutation.mutate(fixtureData._id!, {
       onSuccess: () => {
@@ -64,26 +93,24 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
     });
   };
 
-  const onSaveFixture = (fixtureData: Fixture) => {
+  const onSaveFixture = (fixtureData: FixtureFormData) => {
     fixtureData.projectId = projectId;
-    saveFixtureMutation.mutate(
-      editingFixture ? { ...editingFixture, ...fixtureData } : fixtureData,
-      {
-        onSuccess: (response: any) => {
-          slide.fixtures = slide.fixtures || [];
-          slide.fixtures.push(response._id);
-          if (!editingFixture) {
-            onFixturesUpdated(slide.fixtures);
-          } else {
-            message.success("Changed saved");
-          }
-          refetchProjectFixtures();
-        },
-        onError: () => {
-          message.error("Failed to save project.");
-        },
-      }
-    );
+    fixtureData._id = editingFixture?._id;
+    saveFixtureMutation.mutate(fixtureData, {
+      onSuccess: (response: any) => {
+        slide.fixtures = slide.fixtures || [];
+        slide.fixtures.push(response._id);
+        if (!editingFixture) {
+          onFixturesUpdated(slide.fixtures);
+        } else {
+          message.success("Changed saved");
+        }
+        refetchProjectFixtures();
+      },
+      onError: () => {
+        message.error("Failed to save project.");
+      },
+    });
 
     setFixtureModalVisible(false);
     setEditingFixture(null);
@@ -95,6 +122,19 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
 
   return (
     <Flex style={{ marginTop: 32 }} vertical>
+      <ImgMapFixture
+        modalClosed={() => {
+          setIsMapFixtureOpen(false);
+        }}
+        imageUrl={mapFixtureImg!}
+        isOpen={!!isMapFixtureOpen}
+        initialBoundingBox={
+          editingFixture && editingFixture.imageBounds
+            ? editingFixture.imageBounds
+            : undefined
+        }
+        onBoundingBoxComplete={handleBoundingBoxComplete}
+      />
       <Typography.Title level={5} style={{ marginTop: 0 }}>
         Fixtures
       </Typography.Title>
@@ -106,11 +146,31 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
           renderItem={(fixture: Fixture) => (
             <Flex style={{ padding: 16 }} align="center">
               <Typography.Text>
-                {fixture.fixtureType.fixtureType}
+                {fixture!.fixtureType!.fixtureType}
               </Typography.Text>
               <Flex style={{ marginLeft: "auto" }}>
                 <Button
                   type="link"
+                  disabled={fixturesDataPending}
+                  style={{
+                    cursor: "pointer",
+                    padding: 0,
+                    marginRight: 16,
+                    height: 32,
+                    color: COLORS.primaryColor,
+                  }}
+                  icon={<BorderOuterOutlined />}
+                  onClick={() => {
+                    setEditingFixture(fixture);
+                    setMapFixtureImg(slide.url);
+                    setIsMapFixtureOpen(true);
+                  }}
+                >
+                  Map
+                </Button>
+                <Button
+                  type="link"
+                  disabled={fixturesDataPending}
                   style={{
                     cursor: "pointer",
                     padding: 0,
@@ -128,6 +188,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
                 </Button>
                 <Popconfirm
                   title="Are you sure to delete this ?"
+                  disabled={fixturesDataPending}
                   onConfirm={() => {
                     onDeleteFixture(fixture);
                   }}

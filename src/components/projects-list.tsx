@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useFetchProjectsByDesigner } from "../hooks/use-projects";
 import { Project } from "../interfaces/Project";
-import { Card, Flex, Typography } from "antd";
+import { Alert, Card, Flex, Typography, message } from "antd";
 import Meta from "antd/es/card/Meta";
 import { cookieKeys } from "../libs/react-query/constants";
 import { useCookies } from "react-cookie";
 import ProjectDetails from "./project-details/project-details";
+import { useDevice } from "../libs/device";
 
 const ProjectsList: React.FC = () => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
@@ -18,6 +19,7 @@ const ProjectsList: React.FC = () => {
   } = useFetchProjectsByDesigner(cookies[cookieKeys.userId]);
   const [selectedProject, setSelectedProject] = useState<Project>();
   const [createNewProject, setCreateNewProject] = useState<boolean>(false);
+  const { isMobile } = useDevice();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -37,50 +39,62 @@ const ProjectsList: React.FC = () => {
 
   return (
     <Flex style={{ width: "100%", flexWrap: "wrap" }} gap={32}>
-      <Card
-        style={{ width: 320 }}
-        hoverable
-        cover={
-          <div
-            style={{
-              cursor: "pointer",
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              width: 320,
-              height: 240,
-              backgroundImage: `url(${"../../new-design.png"})`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-            }}
-          />
-        }
-        onClick={() => {
-          setCreateNewProject(true);
-        }}
-      >
-        <Meta
-          title={
-            <Typography.Title level={4} style={{ padding: 0, margin: 0 }}>
-              Upload New
-            </Typography.Title>
-          }
-        />
-      </Card>
-      {projects?.map((project: Project) => (
+      {!isMobile ? (
         <Card
+          style={{ width: isMobile ? "100%" : 320 }}
           hoverable
-          onClick={() => {
-            setSelectedProject(project);
-          }}
-          style={{ width: 320, borderRadius: 16 }}
           cover={
             <div
               style={{
                 cursor: "pointer",
                 borderTopLeftRadius: 16,
                 borderTopRightRadius: 16,
-                width: 320,
+                width: isMobile ? "100%" : 320,
+                height: 240,
+                backgroundImage: `url(${"../../new-design.png"})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+          }
+          onClick={() => {
+            setCreateNewProject(true);
+          }}
+        >
+          <Meta
+            title={
+              <Typography.Title level={4} style={{ padding: 0, margin: 0 }}>
+                Upload New
+              </Typography.Title>
+            }
+          />
+        </Card>
+      ) : (
+        <Alert
+          message="Use desktop browser to add or edit designs"
+          style={{ width: "100%" }}
+          type="warning"
+          showIcon
+        />
+      )}
+
+      {projects?.map((project: Project) => (
+        <Card
+          hoverable
+          onClick={() => {
+            message.warning("You can only add or edit designs using desktop");
+            return;
+            setSelectedProject(project);
+          }}
+          style={{ width: isMobile ? "100%" : 320, borderRadius: 16 }}
+          cover={
+            <div
+              style={{
+                cursor: "pointer",
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16,
+                width: isMobile ? "100%" : 320,
                 height: 240,
                 backgroundImage: `url(${
                   project.previewImageUrl || "../../img-plchlder.png"

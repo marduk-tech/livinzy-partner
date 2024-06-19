@@ -1,8 +1,9 @@
 import type { MenuProps } from "antd";
-import { Image, Layout } from "antd";
+import { Button, Dropdown, Flex, Image, Layout, Popconfirm } from "antd";
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { UserOutlined } from "@ant-design/icons";
 
 const { Header, Content } = Layout;
 
@@ -28,6 +29,7 @@ function getItem(
 
 export const DashboardLayout: React.FC = () => {
   const { loginWithRedirect } = useAuth0();
+  const { logout } = useAuth0();
 
   const { isLoading, isAuthenticated } = useAuth0();
 
@@ -73,11 +75,54 @@ export const DashboardLayout: React.FC = () => {
             background: "transparent",
           }}
         >
-          <Image
-            preview={false}
-            src="../../logo-name.png"
-            style={{ height: 35, width: "auto" }}
-          ></Image>
+          <Flex align="center">
+            <Image
+              preview={false}
+              src="../../logo-name.png"
+              style={{ height: 35, width: "auto" }}
+            ></Image>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "1",
+                    label: (
+                      <Popconfirm
+                        title="Logout"
+                        description="Are you sure you want to logout ?"
+                        onConfirm={() => {
+                          logout({
+                            logoutParams: { returnTo: window.location.origin },
+                          });
+                        }}
+                        okText="Yes"
+                        cancelText="No"
+                        okButtonProps={{
+                          type: "link",
+                        }}
+                        cancelButtonProps={{
+                          type: "link",
+                        }}
+                      >
+                        <Button type="link">Logout</Button>
+                      </Popconfirm>
+                    ),
+                  },
+                ],
+              }}
+              placement="bottomRight"
+            >
+              <Button
+                shape="circle"
+                size="small"
+                icon={<UserOutlined />}
+                style={{
+                  marginRight: 16,
+                  marginLeft: "auto",
+                }}
+              ></Button>
+            </Dropdown>
+          </Flex>
         </Header>
         <Content style={{ margin: "24px 32px" }}>
           {/* <Menu mode="horizontal" items={menuItems} /> */}

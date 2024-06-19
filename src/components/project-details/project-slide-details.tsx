@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flex, message } from "antd";
+import { Flex, Tooltip, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -169,8 +169,8 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                     right: 8,
                   }}
                 >
-                  {/* <Tooltip title="Click to delete">
-                    <Button
+                  <Tooltip title="Click to delete">
+                    {/* <Button
                       type="link"
                       onClick={onClickDelete}
                       icon={<DeleteOutlined></DeleteOutlined>}
@@ -181,10 +181,10 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                         padding: 0,
                         marginRight: 8,
                       }}
-                    />
+                    /> */}
                   </Tooltip>
                   <Tooltip title="Click to replace">
-                    <Button
+                    {/* <Button
                       type="link"
                       onClick={onClickReplace}
                       icon={<UndoOutlined></UndoOutlined>}
@@ -195,8 +195,8 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                         padding: 0,
                         marginRight: 8,
                       }}
-                    />
-                  </Tooltip> */}
+                    /> */}
+                  </Tooltip>
                 </Flex>
               </Flex>
             </Flex>

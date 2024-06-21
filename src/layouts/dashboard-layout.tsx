@@ -1,9 +1,14 @@
 import type { MenuProps } from "antd";
 import { Button, Dropdown, Flex, Image, Layout, Popconfirm } from "antd";
 import React, { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserOutlined } from "@ant-design/icons";
+import {
+  LogoutOutlined,
+  UserOutlined,
+  WalletOutlined,
+} from "@ant-design/icons";
+import { COLORS } from "../styles/colors";
 
 const { Header, Content } = Layout;
 
@@ -31,6 +36,7 @@ export const DashboardLayout: React.FC = () => {
   const { loginWithRedirect } = useAuth0();
   const { logout } = useAuth0();
 
+  const navigate = useNavigate();
   const { isLoading, isAuthenticated } = useAuth0();
 
   useEffect(() => {
@@ -78,14 +84,59 @@ export const DashboardLayout: React.FC = () => {
           <Flex align="center">
             <Image
               preview={false}
-              src="../../logo-name.png"
-              style={{ height: 35, width: "auto" }}
+              onClick={() => {
+                window.location.href = "/";
+              }}
+              src="../../logo-studio.png"
+              style={{ height: 35, width: "auto", cursor: "pointer" }}
             ></Image>
             <Dropdown
               menu={{
                 items: [
                   {
                     key: "1",
+                    label: (
+                      <Button
+                        icon={<UserOutlined />}
+                        style={{
+                          color: COLORS.textColorDark,
+                          padding: 0,
+                          height: 32,
+                          width: 150,
+                          textAlign: "left",
+                        }}
+                        type="link"
+                        onClick={() => {
+                          navigate("/account");
+                        }}
+                      >
+                        Account
+                      </Button>
+                    ),
+                  },
+                  {
+                    key: "2",
+                    label: (
+                      <Button
+                        icon={<WalletOutlined />}
+                        style={{
+                          color: COLORS.textColorDark,
+                          padding: 0,
+                          height: 32,
+                          width: 150,
+                          textAlign: "left",
+                        }}
+                        type="link"
+                        onClick={() => {
+                          navigate("/wallet");
+                        }}
+                      >
+                        Wallet
+                      </Button>
+                    ),
+                  },
+                  {
+                    key: "3",
                     label: (
                       <Popconfirm
                         title="Logout"
@@ -104,7 +155,19 @@ export const DashboardLayout: React.FC = () => {
                           type: "link",
                         }}
                       >
-                        <Button type="link">Logout</Button>
+                        <Button
+                          icon={<LogoutOutlined />}
+                          style={{
+                            color: COLORS.textColorDark,
+                            padding: 0,
+                            height: 32,
+                            width: 150,
+                            textAlign: "left",
+                          }}
+                          type="link"
+                        >
+                          Logout
+                        </Button>
                       </Popconfirm>
                     ),
                   },

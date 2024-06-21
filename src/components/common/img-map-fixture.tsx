@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, MouseEvent } from "react";
-import { Button, Flex, Modal } from "antd";
+import { Button, Flex, Modal, Typography } from "antd";
 
 interface Point {
   x: number;
@@ -33,8 +33,8 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const modalWidth = 800; // Set your desired modal width
-  const modalHeight = 600; // Set your desired modal height
+  const modalWidth = 640; // Set your desired modal width
+  const modalHeight = 480; // Set your desired modal height
 
   const drawInitialBoundingBox = (ctx: CanvasRenderingContext2D) => {
     if (!initialBoundingBox) {
@@ -145,7 +145,11 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
       <Modal
         open={isOpen}
         footer={null}
-        title="Map fixture to a bounding Box"
+        title={
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            Locate Fixture
+          </Typography.Title>
+        }
         width={modalWidth + 50}
         onCancel={() => {
           handleClearBoundingBox();

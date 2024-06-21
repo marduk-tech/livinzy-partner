@@ -85,9 +85,8 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
           </Button>
         </Upload>
       </Flex>
-      {confirmProcessing ? (
+      {confirmProcessing && fileList && !!fileList.length ? (
         <Button
-          disabled={!fileList || !fileList.length}
           type="primary"
           onClick={handleProcessImages}
           style={{ marginTop: 32, width: 200 }}

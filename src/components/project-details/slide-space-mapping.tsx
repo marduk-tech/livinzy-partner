@@ -76,7 +76,10 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
         value={selectedSpaces}
         placeholder="Select spaces"
         onChange={handleSpacesChange}
-        style={{ width: 250, fontSize: 14 }}
+        style={{
+          width: 250,
+          fontSize: 14,
+        }}
         filterOption={filterOption}
         options={projectSpaces!.map((space: Space) => {
           return {

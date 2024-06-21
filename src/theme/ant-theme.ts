@@ -18,7 +18,6 @@ export const antTheme: ThemeConfig = {
     },
     Select: {
       borderRadius: 16,
-      colorBorder: "transparent",
     },
   },
 };

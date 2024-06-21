@@ -164,9 +164,8 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
             <Flex
               vertical
               style={{
-                borderBottomColor: COLORS.borderColor,
-                borderBottom: "1px solid",
                 paddingBottom: 8,
+                marginBottom: 8,
               }}
             >
               <Flex>
@@ -190,7 +189,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
                   {fixture!.fixtureType!.fixtureType}
                 </Typography.Text>
               </Flex>
-              <Flex>
+              <Flex style={{ marginTop: -9 }}>
                 <Button
                   type="link"
                   disabled={fixturesDataPending}

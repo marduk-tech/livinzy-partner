@@ -75,20 +75,24 @@ export const DashboardLayout: React.FC = () => {
       <Layout>
         <Header
           style={{
-            padding: "8px 24px",
-            height: "50px",
-            lineHeight: "50px",
+            height: 48,
+            padding: "12px",
+            marginBottom: 16,
             background: "transparent",
           }}
         >
-          <Flex align="center">
+          <Flex align="center" style={{ height: 48, paddingLeft: 16 }}>
             <Image
               preview={false}
               onClick={() => {
                 window.location.href = "/";
               }}
               src="../../logo-studio.png"
-              style={{ height: 35, width: "auto", cursor: "pointer" }}
+              style={{
+                height: "36px",
+                width: "auto",
+                cursor: "pointer",
+              }}
             ></Image>
             <Dropdown
               menu={{

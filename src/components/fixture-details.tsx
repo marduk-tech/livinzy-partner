@@ -95,7 +95,11 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 
   return (
     <Modal
-      title={fixture ? "Edit Fixture" : "Add Fixture"}
+      title={
+        <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
+          {fixture ? "Edit Fixture" : "Add Fixture"}
+        </Typography.Title>
+      }
       footer={null}
       open={isOpen}
       onCancel={onCancel}

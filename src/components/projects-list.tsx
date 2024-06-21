@@ -41,16 +41,16 @@ const ProjectsList: React.FC = () => {
     <Flex style={{ width: "100%", flexWrap: "wrap" }} gap={32}>
       {!isMobile ? (
         <Card
-          style={{ width: isMobile ? "100%" : 320 }}
+          style={{ width: isMobile ? "100%" : 240 }}
           hoverable
           cover={
             <div
               style={{
                 cursor: "pointer",
-                borderTopLeftRadius: 16,
-                borderTopRightRadius: 16,
-                width: isMobile ? "100%" : 320,
-                height: 240,
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+                width: isMobile ? "100%" : 240,
+                height: 180,
                 backgroundImage: `url(${"../../new-design.png"})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
@@ -89,15 +89,15 @@ const ProjectsList: React.FC = () => {
             }
             setSelectedProject(project);
           }}
-          style={{ width: isMobile ? "100%" : 320, borderRadius: 16 }}
+          style={{ width: isMobile ? "100%" : 240, borderRadius: 16 }}
           cover={
             <div
               style={{
                 cursor: "pointer",
-                borderTopLeftRadius: 16,
-                borderTopRightRadius: 16,
-                width: isMobile ? "100%" : 320,
-                height: 240,
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+                width: isMobile ? "100%" : 240,
+                height: 180,
                 backgroundImage: `url(${
                   project.previewImageUrl || "../../img-plchlder.png"
                 })`,

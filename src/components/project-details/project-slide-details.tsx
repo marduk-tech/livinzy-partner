@@ -109,8 +109,8 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
       <Flex vertical>
         <div
           style={{
-            width: 800,
-            height: 600,
+            width: 640,
+            height: 480,
             borderRadius: 16,
             backgroundImage: `url(${selectedSlide!.url})`,
             backgroundPosition: "center",
@@ -122,7 +122,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           gap={16}
           style={{
             marginTop: 16,
-            width: 800,
+            width: 640,
             overflowX: "scroll",
             flexWrap: "nowrap",
             scrollbarWidth: "none" /* Firefox */,

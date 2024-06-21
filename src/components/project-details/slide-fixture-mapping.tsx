@@ -120,7 +120,16 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
   }
 
   return (
-    <Flex style={{ marginTop: 32 }} vertical>
+    <Flex
+      style={{
+        marginTop: 16,
+        padding: 16,
+        borderRadius: 16,
+        border: "1px solid",
+        borderColor: COLORS.borderColor,
+      }}
+      vertical
+    >
       <ImgMapFixture
         modalClosed={() => {
           setIsMapFixtureOpen(false);
@@ -134,20 +143,54 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
         }
         onBoundingBoxComplete={handleBoundingBoxComplete}
       />
-      <Typography.Title level={5} style={{ marginTop: 0 }}>
+      <Typography.Title level={4} style={{ marginTop: 0 }}>
         Fixtures
       </Typography.Title>
+      <Typography.Text
+        style={{
+          marginTop: -8,
+          fontSize: 12,
+          marginBottom: 32,
+          color: COLORS.textColorLight,
+        }}
+      >
+        Map to fixture in this image.
+      </Typography.Text>
       {slideFixtures && slideFixtures.length ? (
         <List
-          bordered
-          style={{ width: 400 }}
+          style={{ width: 250 }}
           dataSource={slideFixtures}
-          renderItem={(fixture: Fixture) => (
-            <Flex style={{ padding: 16 }} align="center">
-              <Typography.Text>
-                {fixture!.fixtureType!.fixtureType}
-              </Typography.Text>
-              <Flex style={{ marginLeft: "auto" }}>
+          renderItem={(fixture: Fixture, index: number) => (
+            <Flex
+              vertical
+              style={{
+                borderBottomColor: COLORS.borderColor,
+                borderBottom: "1px solid",
+                paddingBottom: 8,
+              }}
+            >
+              <Flex>
+                <Typography.Text
+                  style={{
+                    color: "white",
+                    textAlign: "center",
+                    fontSize: 14,
+                    marginBottom: 8,
+                    backgroundColor: COLORS.textColorDark,
+                    height: 20,
+                    width: 20,
+                    borderRadius: "50%",
+                    lineHeight: "140%",
+                    marginRight: 8,
+                  }}
+                >
+                  {index + 1}
+                </Typography.Text>
+                <Typography.Text style={{ fontSize: 16, marginBottom: 8 }}>
+                  {fixture!.fixtureType!.fixtureType}
+                </Typography.Text>
+              </Flex>
+              <Flex>
                 <Button
                   type="link"
                   disabled={fixturesDataPending}
@@ -217,7 +260,8 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
       )}
 
       <Button
-        type="link"
+        type="primary"
+        size="small"
         onClick={() => {
           setEditingFixture(null);
           setFixtureModalVisible(true);
@@ -225,9 +269,10 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
         style={{
           cursor: "pointer",
           marginBottom: 16,
-          textAlign: "left",
-          color: COLORS.primaryColor,
+          textAlign: "center",
           padding: 0,
+          marginTop: 32,
+          width: 100,
         }}
       >
         Add Fixture

@@ -10,6 +10,8 @@ import {
   Flex,
   Tag,
   Alert,
+  Typography,
+  Empty,
 } from "antd";
 import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import { useSaveProject } from "../../hooks/use-projects";
@@ -41,6 +43,7 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [isFormChanged, setIsFormChanged] = useState(false);
+  const [layoutUploadSkipped, setLayoutUploadSkipped] = useState(false);
 
   const { data: homeMetaData, isPending: homeMetaDataPending } = getHomeMeta();
   const [layoutOption, setLayoutOption] = useState("layout");
@@ -158,6 +161,31 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
         return <></>;
     }
   };
+
+  if (!projectData?.homeDetails && (layoutUploadSkipped || !layoutImage)) {
+    return (
+      <Empty
+        image="../../floorplan.png"
+        imageStyle={{ height: 120, marginTop: 32 }}
+        description={
+          <Typography.Text>
+            Upload project floorplan to add details automatically
+          </Typography.Text>
+        }
+      >
+        <Upload
+          action={`${baseApiUrl}upload/single`}
+          name="image"
+          listType="picture"
+          onChange={handleUploadChange}
+          showUploadList={false}
+        >
+          {renderImgStatus()}
+          <Button type="primary">Upload</Button>
+        </Upload>
+      </Empty>
+    );
+  }
 
   return (
     <Form

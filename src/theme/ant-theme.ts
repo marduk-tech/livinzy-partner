@@ -8,4 +8,17 @@ export const antTheme: ThemeConfig = {
     colorTextBase: COLORS.textColorDark,
     controlHeight: 50,
   },
+  components: {
+    Input: {
+      fontSize: 18,
+      paddingBlock: 12,
+      paddingInline: 14,
+      borderRadius: 16,
+      colorBorder: COLORS.borderColorDark,
+    },
+    Select: {
+      borderRadius: 16,
+      colorBorder: "transparent",
+    },
+  },
 };

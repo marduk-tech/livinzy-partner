@@ -13,6 +13,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
     "@auth0/auth0-react": "^2.2.4",
+    "@cometchat/chat-uikit-react": "^4.3.11",
     "@tanstack/react-query": "^5.44.0",
     "@tanstack/react-query-devtools": "^5.45.1",
     "antd": "^5.12.1",

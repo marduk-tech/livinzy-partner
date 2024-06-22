@@ -124,6 +124,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
       style={{
         marginTop: 16,
         padding: 16,
+        minWidth: 250,
         borderRadius: 16,
         border: "1px solid",
         borderColor: COLORS.borderColor,
@@ -154,7 +155,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
           color: COLORS.textColorLight,
         }}
       >
-        Map to fixture in this image.
+        Highlight fixtures in this design.
       </Typography.Text>
       {slideFixtures && slideFixtures.length ? (
         <List
@@ -164,20 +165,22 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
             <Flex
               vertical
               style={{
-                paddingBottom: 8,
-                marginBottom: 8,
+                paddingBottom: 16,
+                marginBottom: 16,
+                borderBottom: "1px dashed",
+                borderBottomColor: COLORS.borderColor,
               }}
             >
-              <Flex>
+              <Flex justify="flex-start">
                 <Typography.Text
                   style={{
                     color: "white",
                     textAlign: "center",
                     fontSize: 14,
-                    marginBottom: 8,
                     backgroundColor: COLORS.textColorDark,
                     height: 20,
                     width: 20,
+                    marginTop: 4,
                     borderRadius: "50%",
                     lineHeight: "140%",
                     marginRight: 8,
@@ -185,69 +188,72 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
                 >
                   {index + 1}
                 </Typography.Text>
-                <Typography.Text style={{ fontSize: 16, marginBottom: 8 }}>
-                  {fixture!.fixtureType!.fixtureType}
-                </Typography.Text>
-              </Flex>
-              <Flex style={{ marginTop: -9 }}>
-                <Button
-                  type="link"
-                  disabled={fixturesDataPending}
-                  style={{
-                    cursor: "pointer",
-                    padding: 0,
-                    marginRight: 16,
-                    height: 32,
-                    color: COLORS.primaryColor,
-                  }}
-                  icon={<BorderOuterOutlined />}
-                  onClick={() => {
-                    setEditingFixture(fixture);
-                    setMapFixtureImg(slide.url);
-                    setIsMapFixtureOpen(true);
-                  }}
-                >
-                  Map
-                </Button>
-                <Button
-                  type="link"
-                  disabled={fixturesDataPending}
-                  style={{
-                    cursor: "pointer",
-                    padding: 0,
-                    marginRight: 16,
-                    height: 32,
-                    color: COLORS.primaryColor,
-                  }}
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    setEditingFixture(fixture);
-                    setFixtureModalVisible(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Popconfirm
-                  title="Are you sure to delete this ?"
-                  disabled={fixturesDataPending}
-                  onConfirm={() => {
-                    onDeleteFixture(fixture);
-                  }}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button
-                    style={{
-                      padding: 0,
-                      height: 32,
-                      color: COLORS.primaryColor,
-                    }}
-                    type="link"
-                    icon={<DeleteOutlined />}
-                  >
-                    Delete
-                  </Button>
-                </Popconfirm>
+
+                <Flex vertical>
+                  <Typography.Text style={{ fontSize: 16, marginBottom: 8 }}>
+                    {fixture!.fixtureType!.fixtureType}
+                  </Typography.Text>
+                  <Flex>
+                    <Button
+                      type="link"
+                      disabled={fixturesDataPending}
+                      style={{
+                        cursor: "pointer",
+                        padding: 0,
+                        marginRight: 16,
+                        height: 32,
+                        color: COLORS.primaryColor,
+                      }}
+                      icon={<BorderOuterOutlined />}
+                      onClick={() => {
+                        setEditingFixture(fixture);
+                        setMapFixtureImg(slide.url);
+                        setIsMapFixtureOpen(true);
+                      }}
+                    >
+                      Map
+                    </Button>
+                    <Button
+                      type="link"
+                      disabled={fixturesDataPending}
+                      style={{
+                        cursor: "pointer",
+                        padding: 0,
+                        marginRight: 16,
+                        height: 32,
+                        color: COLORS.primaryColor,
+                      }}
+                      icon={<EditOutlined />}
+                      onClick={() => {
+                        setEditingFixture(fixture);
+                        setFixtureModalVisible(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Popconfirm
+                      title="Are you sure to delete this ?"
+                      disabled={fixturesDataPending}
+                      onConfirm={() => {
+                        onDeleteFixture(fixture);
+                      }}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button
+                        style={{
+                          padding: 0,
+                          height: 32,
+                          color: COLORS.primaryColor,
+                        }}
+                        type="link"
+                        icon={<DeleteOutlined />}
+                      >
+                        Delete
+                      </Button>
+                    </Popconfirm>
+                  </Flex>
+                </Flex>
               </Flex>
             </Flex>
           )}

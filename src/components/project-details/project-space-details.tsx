@@ -155,7 +155,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
           <List
             loading={isLoading}
-            style={{ width: 500, height: 600, overflow: "scroll" }}
+            style={{ width: 500, height: 550, overflow: "scroll" }}
             dataSource={spaces}
             itemLayout="horizontal"
             renderItem={(space: Space) => (

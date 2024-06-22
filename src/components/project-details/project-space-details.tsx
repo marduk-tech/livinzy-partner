@@ -11,6 +11,7 @@ import {
   Select,
   Typography,
   Empty,
+  Card,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -155,50 +156,40 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
           <List
             loading={isLoading}
-            style={{ width: 500, height: 550, overflow: "scroll" }}
             dataSource={spaces}
-            itemLayout="horizontal"
+            grid={{ gutter: 16, column: 4 }}
             renderItem={(space: Space) => (
-              <Flex
-                align="center"
-                gap={16}
-                style={{
-                  borderBottom: "1px solid",
-                  borderColor: COLORS.borderColor,
-                }}
-              >
-                <Flex vertical style={{ padding: 16 }}>
-                  <Typography.Title level={4} style={{ margin: 0, width: 300 }}>
-                    {space.name}
-                  </Typography.Title>
-                  <Typography.Text
-                    style={{
-                      margin: 0,
-                      width: 300,
-                      color: COLORS.textColorLight,
-                    }}
+              <Card>
+                <Typography.Title level={4} style={{ margin: 0 }}>
+                  {space.name}
+                </Typography.Title>
+                <Typography.Text
+                  style={{
+                    color: COLORS.textColorLight,
+                  }}
+                >
+                  {space.spaceType.spaceType}
+                  {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
+                </Typography.Text>
+                <Flex gap={16}>
+                  <Button
+                    type="link"
+                    style={{ padding: 0 }}
+                    icon={<EditOutlined />}
+                    onClick={() => showModal(space)}
                   >
-                    {space.spaceType.spaceType}
-                    {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
-                  </Typography.Text>
+                    Edit
+                  </Button>
+                  <Button
+                    type="link"
+                    style={{ padding: 0 }}
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDelete(space._id!)}
+                  >
+                    Delete
+                  </Button>
                 </Flex>
-                <Button
-                  type="link"
-                  style={{ padding: 0 }}
-                  icon={<EditOutlined />}
-                  onClick={() => showModal(space)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  type="link"
-                  style={{ padding: 0 }}
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(space._id!)}
-                >
-                  Delete
-                </Button>
-              </Flex>
+              </Card>
             )}
           />
         </Flex>

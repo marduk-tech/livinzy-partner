@@ -158,7 +158,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectData }) => {
         />
       </Flex>
 
-      <Flex style={{ padding: 24 }}>{renderContent()}</Flex>
+      <Flex style={{ padding: 24, minHeight: 600 }}>{renderContent()}</Flex>
     </Flex>
   );
 };

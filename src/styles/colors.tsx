@@ -6,7 +6,7 @@ export const COLORS = {
   orangeIdentifier: "#d68438",
   bgColor: "#fafbfb",
   borderColor: "#eee",
-  borderColorDark: "#aaa",
+  borderColorDark: "#ddd",
   textColorDark: "#2D3F4E",
-  textColorLight: "#888",
+  textColorLight: "#AAA",
 };

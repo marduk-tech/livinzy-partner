@@ -13,8 +13,9 @@ export const antTheme: ThemeConfig = {
       fontSize: 18,
       paddingBlock: 12,
       paddingInline: 14,
-      borderRadius: 16,
+      borderRadius: 12,
       colorBorder: COLORS.borderColorDark,
+      colorTextLabel: COLORS.textColorLight,
     },
     Select: {
       borderRadius: 16,

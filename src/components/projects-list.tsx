@@ -112,7 +112,7 @@ const ProjectsList: React.FC = () => {
             title={
               <Flex vertical>
                 <Typography.Title level={4} style={{ padding: 0, margin: 0 }}>
-                  {project.homeDetails.communityName}
+                  {project.name || project.homeDetails.communityName}
                 </Typography.Title>
                 <Flex>
                   <Typography.Text>

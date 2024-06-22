@@ -233,9 +233,9 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
         </Button>
       </Upload>
       <Form.Item
-        name={["homeDetails", "communityName"]}
-        label="Community Name"
-        rules={[{ required: true, message: "Please enter the community name" }]}
+        name={["name"]}
+        label="Give a name to the project"
+        rules={[{ required: true, message: "Enter any unique name" }]}
       >
         <Input style={{ width: INPUT_WIDTH }} />
       </Form.Item>

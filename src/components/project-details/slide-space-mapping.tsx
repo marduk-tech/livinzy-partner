@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Select, Typography } from "antd";
+import { Flex, Select, Spin } from "antd";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
 import { COLORS } from "../../styles/colors";
+import "../../styles/override.scss";
 
 interface SlideSpaceMappingProps {
   projectId: string;
   slide: Slide;
   onSpacesUpdated: any;
+  isProcessing: boolean;
 }
 
 // Filter `option.label` match the user type `input`
@@ -20,6 +22,7 @@ const filterOption = (
 const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   projectId,
   slide,
+  isProcessing,
   onSpacesUpdated,
 }) => {
   const [selectedSpaces, setSelectedSpaces] = useState<string[]>(
@@ -50,44 +53,38 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
     <Flex
       vertical
       style={{
-        padding: 16,
-        borderRadius: 16,
-        border: "1px solid",
+        minWidth: 250,
         borderColor: COLORS.borderColor,
       }}
     >
-      <Typography.Title level={4} style={{ marginTop: 0 }}>
+      {/* <Typography.Title level={4} style={{ marginTop: 0 }}>
         Spaces
-      </Typography.Title>
-      <Typography.Text
-        style={{
-          marginTop: -8,
-          fontSize: 12,
-          marginBottom: 16,
-          color: COLORS.textColorLight,
-        }}
-      >
-        Map to spaces in this image.
-      </Typography.Text>
-      <Select
-        showSearch
-        mode="multiple"
-        allowClear
-        value={selectedSpaces}
-        placeholder="Select spaces"
-        onChange={handleSpacesChange}
-        style={{
-          width: 250,
-          fontSize: 14,
-        }}
-        filterOption={filterOption}
-        options={projectSpaces!.map((space: Space) => {
-          return {
-            value: space._id!,
-            label: `${space.name}`,
-          };
-        })}
-      ></Select>
+      </Typography.Title> */}
+      {isProcessing ? (
+        <Spin size="small">Finding spaces in design..</Spin>
+      ) : (
+        <Select
+          showSearch
+          mode="multiple"
+          allowClear
+          className="custom-select"
+          loading={isProcessing}
+          value={selectedSpaces}
+          placeholder="Select spaces in this picture"
+          onChange={handleSpacesChange}
+          style={{
+            width: 282,
+            fontSize: 14,
+          }}
+          filterOption={filterOption}
+          options={projectSpaces!.map((space: Space) => {
+            return {
+              value: space._id!,
+              label: `${space.name}`,
+            };
+          })}
+        ></Select>
+      )}
     </Flex>
   );
 };

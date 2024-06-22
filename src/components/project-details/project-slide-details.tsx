@@ -11,6 +11,7 @@ import { Slide } from "../../interfaces/Slide";
 import SlideSpaceMapping from "./slide-space-mapping";
 import SlideFixtureMapping from "./slide-fixture-mapping";
 import { COLORS } from "../../styles/colors";
+import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -19,9 +20,13 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const [slides, setSlides] = useState<Slide[]>([]);
   const bulkSaveSlidesMutation = useBulkSaveSlides();
   const updateSlideMutation = useSaveSlide();
+  const processSpacesInSlidesMutation = useProcessSpacesInSlides();
 
-  const { data: slidesData, isPending: slidesDataPending } =
-    useFetchSlidesByProject(projectData!._id!);
+  const {
+    data: slidesData,
+    isPending: slidesDataPending,
+    refetch: refetchSlidesData,
+  } = useFetchSlidesByProject(projectData!._id!);
 
   useEffect(() => {
     if (!slidesData || !slidesData.length) {
@@ -83,6 +88,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           setSelectedSlide(response[0]);
         }
         message.success("Slides saved successfully!");
+        processSpacesInSlidesMutation.mutate(projectData!._id!, {
+          onSuccess: async () => {
+            refetchSlidesData();
+          },
+          onError: () => {},
+        });
         // await queryClient.invalidateQueries({queryKey: [queryKeys.getSpaces]});
       },
       onError: () => {
@@ -210,6 +221,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
       <Flex vertical>
         <SlideSpaceMapping
           key="slide-spaces"
+          isProcessing={processSpacesInSlidesMutation.isPending}
           onSpacesUpdated={spacesUpdated}
           projectId={projectData!._id!}
           slide={selectedSlide!}

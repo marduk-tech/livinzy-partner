@@ -9,7 +9,6 @@ import {
   Select,
   Flex,
   Tag,
-  Alert,
   Typography,
   Empty,
 } from "antd";
@@ -46,7 +45,6 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
   const [layoutUploadSkipped, setLayoutUploadSkipped] = useState(false);
 
   const { data: homeMetaData, isPending: homeMetaDataPending } = getHomeMeta();
-  const [layoutOption, setLayoutOption] = useState("layout");
   const [layoutImage, setLayoutImage] = useState<string>();
 
   const [layoutImageStatus, setLayoutImageStatus] = useState<string>();
@@ -66,7 +64,8 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
 
       // Fetching layout details using AI
       const layoutDetails = await fetchLayoutDetails(
-        info.file.response.data.Location
+        info.file.response.data.Location,
+        true
       );
 
       const homeMetaType = homeMetaData.find(
@@ -109,7 +108,7 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
         ]);
       }
     }
-  }, [projectData, form]);
+  }, [projectData, form, layoutUploadSkipped]);
 
   const handleFinish = (projectUpdatedData: Project) => {
     projectUpdatedData.designerId = cookies[cookieKeys.userId];
@@ -135,26 +134,38 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
     switch (layoutImageStatus) {
       case IMG_AI_STATUS.UPLOADING:
         return (
-          <Tag icon={<SyncOutlined spin />} color="processing">
-            Uploading..
+          <Tag
+            style={{ fontSize: 16, padding: 8 }}
+            icon={<SyncOutlined spin />}
+            color="processing"
+          >
+            Uploading floorplan..
           </Tag>
         );
       case IMG_AI_STATUS.PROCESSING:
         return (
-          <Tag icon={<SyncOutlined spin />} color="processing">
-            Image uploaded, processing..
+          <Tag
+            style={{ fontSize: 16, padding: 8 }}
+            icon={<SyncOutlined spin />}
+            color="processing"
+          >
+            Uploading done, processing..
           </Tag>
         );
       case IMG_AI_STATUS.COMPLETED:
         return (
-          <Tag icon={<CheckCircleOutlined />} color="success">
-            Processing completed
+          <Tag
+            style={{ fontSize: 16, padding: 8 }}
+            icon={<CheckCircleOutlined />}
+            color="success"
+          >
+            Floorplan processed
           </Tag>
         );
       case IMG_AI_STATUS.ERROR:
         return (
           <Tag icon={<CloseCircleOutlined />} color="error">
-            Processing completed
+            Could not process floorplan
           </Tag>
         );
       default:
@@ -162,27 +173,39 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
     }
   };
 
-  if (!projectData?.homeDetails && (layoutUploadSkipped || !layoutImage)) {
+  if (!projectData && !layoutUploadSkipped && !layoutImage) {
     return (
       <Empty
         image="../../floorplan.png"
         imageStyle={{ height: 120, marginTop: 32 }}
         description={
-          <Typography.Text>
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
             Upload project floorplan to add details automatically
           </Typography.Text>
         }
       >
-        <Upload
-          action={`${baseApiUrl}upload/single`}
-          name="image"
-          listType="picture"
-          onChange={handleUploadChange}
-          showUploadList={false}
-        >
-          {renderImgStatus()}
-          <Button type="primary">Upload</Button>
-        </Upload>
+        <Flex vertical>
+          <Upload
+            action={`${baseApiUrl}upload/single`}
+            name="image"
+            listType="picture"
+            onChange={handleUploadChange}
+            showUploadList={false}
+          >
+            {renderImgStatus()}
+            <Button type="primary">Upload</Button>
+          </Upload>
+          <Button
+            type="link"
+            style={{ color: COLORS.primaryColor }}
+            onClick={() => {
+              setLayoutUploadSkipped(true);
+            }}
+          >
+            {" "}
+            or add details manually
+          </Button>
+        </Flex>
       </Empty>
     );
   }
@@ -194,6 +217,21 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
       onFinish={handleFinish}
       onValuesChange={handleFormChange}
     >
+      <Upload
+        action={`${baseApiUrl}upload/single`}
+        name="image"
+        listType="picture"
+        onChange={handleUploadChange}
+        showUploadList={false}
+      >
+        {renderImgStatus()}
+        <Button
+          type="link"
+          style={{ color: COLORS.primaryColor, padding: 0, marginBottom: 16 }}
+        >
+          + Upload Floorplan
+        </Button>
+      </Upload>
       <Form.Item
         name={["homeDetails", "communityName"]}
         label="Community Name"
@@ -203,26 +241,6 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
       </Form.Item>
 
       <Flex vertical>
-        <Alert
-          message="You can upload the house layout to autopopulate values"
-          type="info"
-          showIcon
-        />
-        <Upload
-          action={`${baseApiUrl}upload/single`}
-          name="image"
-          listType="picture"
-          onChange={handleUploadChange}
-          showUploadList={false}
-        >
-          {renderImgStatus()}
-          <Button
-            type="link"
-            style={{ color: COLORS.primaryColor, padding: 0, marginBottom: 16 }}
-          >
-            + Upload
-          </Button>
-        </Upload>
         <>
           <Form.Item
             name={["homeDetails", "homeType"]}
@@ -255,7 +273,7 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
           </Form.Item>
         </>
       </Flex>
-      <Form.Item style={{ marginTop: 48 }}>
+      <Form.Item>
         <Button
           type="primary"
           htmlType="submit"

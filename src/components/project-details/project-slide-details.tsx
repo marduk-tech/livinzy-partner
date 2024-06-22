@@ -89,7 +89,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         }
         message.success("Slides saved successfully!");
         processSpacesInSlidesMutation.mutate(projectData!._id!, {
-          onSuccess: async (response) => {
+          onSuccess: async () => {
             refetchSlidesData();
           },
           onError: () => {},

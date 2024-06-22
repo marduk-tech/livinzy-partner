@@ -9,6 +9,7 @@ export interface Space {
   oneLiner: string;
   spaceType: {
     spaceType: string;
+    icon: string;
     _id: string;
   };
   cost: number;

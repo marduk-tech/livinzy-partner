@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   Button,
-  List,
   Modal,
   Flex,
   message,
@@ -12,6 +11,7 @@ import {
   Typography,
   Empty,
   Card,
+  Image,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -154,12 +154,85 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             Add Space
           </Button>
 
-          <List
+          {isLoading ? (
+            <Spin size="small">Loading..</Spin>
+          ) : (
+            <Flex
+              gap={16}
+              style={{
+                flexWrap: "wrap",
+              }}
+            >
+              {spaces.map((space: Space) => {
+                return (
+                  <Card style={{ width: 300, height: 200 }}>
+                    <Image
+                      src={
+                        space.spaceType.icon
+                          ? space.spaceType.icon
+                          : "../../app/gen-room.png"
+                      }
+                      height={40}
+                      style={{ opacity: 0.5, marginBottom: 75 }}
+                    ></Image>
+                    <Typography.Title level={4} style={{ margin: 0 }}>
+                      {space.name}
+                    </Typography.Title>
+                    <Typography.Text
+                      style={{
+                        color: COLORS.textColorLight,
+                      }}
+                    >
+                      {space.spaceType.spaceType}
+                      {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
+                    </Typography.Text>
+                    <Flex gap={16} style={{ marginTop: 8 }}>
+                      <Button
+                        type="link"
+                        style={{
+                          padding: 0,
+                          height: 32,
+                          color: COLORS.primaryColor,
+                        }}
+                        icon={<EditOutlined />}
+                        onClick={() => showModal(space)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        type="link"
+                        style={{
+                          padding: 0,
+                          height: 32,
+                          color: COLORS.primaryColor,
+                        }}
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(space._id!)}
+                      >
+                        Delete
+                      </Button>
+                    </Flex>
+                  </Card>
+                );
+              })}
+            </Flex>
+          )}
+
+          {/* <List
             loading={isLoading}
             dataSource={spaces}
-            grid={{ gutter: 16, column: 4 }}
+            grid={{ gutter: 24, column: 3 }}
             renderItem={(space: Space) => (
               <Card>
+                <Image
+                  src={
+                    space.spaceType.icon
+                      ? space.spaceType.icon
+                      : "../../app/gen-room.png"
+                  }
+                  height={40}
+                  style={{ opacity: 0.5, marginBottom: 75 }}
+                ></Image>
                 <Typography.Title level={4} style={{ margin: 0 }}>
                   {space.name}
                 </Typography.Title>
@@ -171,10 +244,14 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                   {space.spaceType.spaceType}
                   {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
                 </Typography.Text>
-                <Flex gap={16}>
+                <Flex gap={16} style={{ marginTop: 8 }}>
                   <Button
                     type="link"
-                    style={{ padding: 0 }}
+                    style={{
+                      padding: 0,
+                      height: 32,
+                      color: COLORS.primaryColor,
+                    }}
                     icon={<EditOutlined />}
                     onClick={() => showModal(space)}
                   >
@@ -182,7 +259,11 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                   </Button>
                   <Button
                     type="link"
-                    style={{ padding: 0 }}
+                    style={{
+                      padding: 0,
+                      height: 32,
+                      color: COLORS.primaryColor,
+                    }}
                     icon={<DeleteOutlined />}
                     onClick={() => handleDelete(space._id!)}
                   >
@@ -191,7 +272,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                 </Flex>
               </Card>
             )}
-          />
+          /> */}
         </Flex>
       ) : (
         <Empty

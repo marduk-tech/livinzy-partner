@@ -36,9 +36,10 @@ export const useProcessSpacesLayout = () => {
 
 export const useProcessSpacesInSlides = () => {
   return useMutation({
-    mutationFn: async (projectId: string) => {
+    mutationFn: async (slideData: any) => {
       const { data } = await axiosApiInstance.post("/ai/slidespaces", {
-        projectId,
+        projectId: slideData.projectId,
+        slideId: slideData.slideId,
       });
       return data;
     },

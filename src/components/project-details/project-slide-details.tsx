@@ -70,6 +70,19 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
    */
   const handleThumbnailClick = (slide: Slide) => {
     setSelectedSlide(slide);
+    if (!!slide.spaces && !!slide.spaces.length) {
+      return;
+    }
+    processSpacesInSlidesMutation.mutate(
+      { projectId: projectData!._id!, slideId: slide._id },
+      {
+        onSuccess: async (response: any) => {
+          slide!.spaces = response.spaces;
+          setSelectedSlide(slide);
+        },
+        onError: () => {},
+      }
+    );
   };
 
   /** When slide images are uploaded */
@@ -88,12 +101,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           setSelectedSlide(response[0]);
         }
         message.success("Slides saved successfully!");
-        processSpacesInSlidesMutation.mutate(projectData!._id!, {
-          onSuccess: async () => {
-            refetchSlidesData();
-          },
-          onError: () => {},
-        });
+
         // await queryClient.invalidateQueries({queryKey: [queryKeys.getSpaces]});
       },
       onError: () => {

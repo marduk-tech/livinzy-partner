@@ -42,7 +42,7 @@ export const DashboardLayout: React.FC = () => {
     if (!isAuthenticated && !isLoading) {
       navigate("/login");
     }
-  });
+  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
     return;

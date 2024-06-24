@@ -33,7 +33,6 @@ function getItem(
 //     label: "Mother Catego
 
 export const DashboardLayout: React.FC = () => {
-  const { loginWithRedirect } = useAuth0();
   const { logout } = useAuth0();
 
   const navigate = useNavigate();
@@ -41,11 +40,11 @@ export const DashboardLayout: React.FC = () => {
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
-      loginWithRedirect();
+      navigate("/login");
     }
   });
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading) {
     return;
   }
 
@@ -94,73 +93,15 @@ export const DashboardLayout: React.FC = () => {
                 cursor: "pointer",
               }}
             ></Image>
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "1",
-                    label: (
-                      <Button
-                        icon={<UserOutlined />}
-                        style={{
-                          color: COLORS.textColorDark,
-                          padding: 0,
-                          height: 32,
-                          width: 150,
-                          textAlign: "left",
-                        }}
-                        type="link"
-                        onClick={() => {
-                          navigate("/account");
-                        }}
-                      >
-                        Account
-                      </Button>
-                    ),
-                  },
-                  {
-                    key: "2",
-                    label: (
-                      <Button
-                        icon={<WalletOutlined />}
-                        style={{
-                          color: COLORS.textColorDark,
-                          padding: 0,
-                          height: 32,
-                          width: 150,
-                          textAlign: "left",
-                        }}
-                        type="link"
-                        onClick={() => {
-                          navigate("/wallet");
-                        }}
-                      >
-                        Wallet
-                      </Button>
-                    ),
-                  },
-                  {
-                    key: "3",
-                    label: (
-                      <Popconfirm
-                        title="Logout"
-                        description="Are you sure you want to logout ?"
-                        onConfirm={() => {
-                          logout({
-                            logoutParams: { returnTo: window.location.origin },
-                          });
-                        }}
-                        okText="Yes"
-                        cancelText="No"
-                        okButtonProps={{
-                          type: "link",
-                        }}
-                        cancelButtonProps={{
-                          type: "link",
-                        }}
-                      >
+            {isAuthenticated ? (
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "1",
+                      label: (
                         <Button
-                          icon={<LogoutOutlined />}
+                          icon={<UserOutlined />}
                           style={{
                             color: COLORS.textColorDark,
                             padding: 0,
@@ -169,26 +110,88 @@ export const DashboardLayout: React.FC = () => {
                             textAlign: "left",
                           }}
                           type="link"
+                          onClick={() => {
+                            navigate("/account");
+                          }}
                         >
-                          Logout
+                          Account
                         </Button>
-                      </Popconfirm>
-                    ),
-                  },
-                ],
-              }}
-              placement="bottomRight"
-            >
-              <Button
-                shape="circle"
-                size="small"
-                icon={<UserOutlined />}
-                style={{
-                  marginRight: 16,
-                  marginLeft: "auto",
+                      ),
+                    },
+                    {
+                      key: "2",
+                      label: (
+                        <Button
+                          icon={<WalletOutlined />}
+                          style={{
+                            color: COLORS.textColorDark,
+                            padding: 0,
+                            height: 32,
+                            width: 150,
+                            textAlign: "left",
+                          }}
+                          type="link"
+                          onClick={() => {
+                            navigate("/wallet");
+                          }}
+                        >
+                          Wallet
+                        </Button>
+                      ),
+                    },
+                    {
+                      key: "3",
+                      label: (
+                        <Popconfirm
+                          title="Logout"
+                          description="Are you sure you want to logout ?"
+                          onConfirm={() => {
+                            logout({
+                              logoutParams: {
+                                returnTo: window.location.origin,
+                              },
+                            });
+                          }}
+                          okText="Yes"
+                          cancelText="No"
+                          okButtonProps={{
+                            type: "link",
+                          }}
+                          cancelButtonProps={{
+                            type: "link",
+                          }}
+                        >
+                          <Button
+                            icon={<LogoutOutlined />}
+                            style={{
+                              color: COLORS.textColorDark,
+                              padding: 0,
+                              height: 32,
+                              width: 150,
+                              textAlign: "left",
+                            }}
+                            type="link"
+                          >
+                            Logout
+                          </Button>
+                        </Popconfirm>
+                      ),
+                    },
+                  ],
                 }}
-              ></Button>
-            </Dropdown>
+                placement="bottomRight"
+              >
+                <Button
+                  shape="circle"
+                  size="small"
+                  icon={<UserOutlined />}
+                  style={{
+                    marginRight: 16,
+                    marginLeft: "auto",
+                  }}
+                ></Button>
+              </Dropdown>
+            ) : null}
           </Flex>
         </Header>
         <Content style={{ margin: "24px 32px" }}>

@@ -7,6 +7,7 @@ export const antTheme: ThemeConfig = {
     colorSuccess: COLORS.greenIdentifier,
     colorTextBase: COLORS.textColorDark,
     controlHeight: 50,
+    fontFamily: "Archivo",
   },
   components: {
     Input: {

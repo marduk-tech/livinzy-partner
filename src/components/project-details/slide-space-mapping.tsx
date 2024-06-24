@@ -38,7 +38,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   useEffect(() => {
     refetchSpaces();
     setSelectedSpaces(slide.spaces || []);
-  }, [slide]);
+  }, [slide, isProcessing]);
 
   const handleSpacesChange = (value: string[]) => {
     setSelectedSpaces(value);
@@ -61,7 +61,9 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
         Spaces
       </Typography.Title> */}
       {isProcessing ? (
-        <Spin size="small">Finding spaces in design..</Spin>
+        <Spin size="small" style={{ width: 250 }}>
+          Loading spaces..
+        </Spin>
       ) : (
         <Select
           showSearch

@@ -64,7 +64,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
         <Flex style={{ height: 64 }} gap={16} align="center">
           <Spin></Spin>
           <Typography.Text style={{ color: COLORS.textColorLight }}>
-            Mapping to spaces in this image
+            Mapping to spaces/rooms in this design
           </Typography.Text>
         </Flex>
       ) : (

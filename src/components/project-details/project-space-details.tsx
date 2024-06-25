@@ -108,6 +108,12 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     });
   };
 
+  const onChangeSpaceType = (value: string) => {
+    const spaceType = spaceMetaData.find((s: SpaceMeta) => s._id == value);
+    form.setFieldsValue({
+      name: spaceType.spaceType,
+    });
+  };
   /**
    * When form is submitted.
    * @param updatedSpaceData
@@ -357,6 +363,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                     .toLowerCase()
                     .includes(input.toLowerCase())
                 }
+                onChange={onChangeSpaceType}
                 options={spaceMetaData.map((spaceMeta: SpaceMeta) => {
                   return {
                     value: spaceMeta._id,
@@ -368,7 +375,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
           </Form.Item>
           <Form.Item
             name="name"
-            label="Name for the space"
+            label="Unique name for the space"
             rules={[{ required: true, message: "Please input the name" }]}
           >
             <Input />

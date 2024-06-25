@@ -13,12 +13,6 @@ interface SlideSpaceMappingProps {
   isProcessing: boolean;
 }
 
-// Filter `option.label` match the user type `input`
-const filterOption = (
-  input: string,
-  option?: { label: string; value: string }
-) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-
 const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   projectId,
   slide,
@@ -43,6 +37,25 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   const handleSpacesChange = (value: string[]) => {
     setSelectedSpaces(value);
     onSpacesUpdated(value);
+  };
+
+  // Filter `option.label` match the user type `input`
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string }
+  ) => {
+    debugger;
+    const optionOriginalSpace = projectSpaces.find(
+      (ps: Space) => ps._id == option!.value
+    );
+    const containsKeyword =
+      (optionOriginalSpace.spaceType.spaceType ?? "")
+        .toLowerCase()
+        .includes(input.toLowerCase()) ||
+      (optionOriginalSpace.name ?? "")
+        .toLowerCase()
+        .includes(input.toLowerCase());
+    return containsKeyword;
   };
 
   if (projectSpacesPending) {

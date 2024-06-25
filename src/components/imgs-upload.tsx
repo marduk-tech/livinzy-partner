@@ -5,7 +5,7 @@ import type { UploadFile, UploadProps } from "antd/es/upload/interface";
 import { baseApiUrl } from "../libs/constants";
 import { COLORS } from "../styles/colors";
 
-const MAX_IMAGE_SIZE_MB = 3;
+const MAX_IMAGE_SIZE_MB = 5;
 
 interface ImgsUploadProps {
   imgsUploaded: (imgs: string[]) => void;
@@ -18,6 +18,7 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
 }) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadPending, setUploadPending] = useState<boolean>(false);
+  const [totalImagesToUpload, setTotalImagesToUpload] = useState<number>(0);
 
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -43,7 +44,8 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
     }
   }, [uploadPending]);
 
-  const beforeUpload = (file: UploadFile) => {
+  const beforeUpload = (file: UploadFile, fileList: UploadFile[]) => {
+    setTotalImagesToUpload(fileList.length);
     const isLt3M = file.size! / 1024 / 1024 < MAX_IMAGE_SIZE_MB;
     if (!isLt3M) {
       message.error(`${file.name} is larger than ${MAX_IMAGE_SIZE_MB}MB!`);
@@ -55,8 +57,8 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
     <Flex vertical>
       <Flex
         style={{
-          width: !confirmProcessing ? 160 : "auto",
-          height: !confirmProcessing ? 120 : "auto",
+          width: !confirmProcessing ? 107 : "auto",
+          height: !confirmProcessing ? 80 : "auto",
           borderRadius: !confirmProcessing ? 16 : 0,
           border: !confirmProcessing ? "1px dashed" : 0,
           borderColor: COLORS.borderColor,
@@ -81,17 +83,22 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
             style={{ border: 0, background: "none" }}
           >
             <PlusOutlined />
-            <div style={{ marginTop: 8 }}> Upload</div>
+            <div style={{ marginTop: 0 }}> Upload</div>
           </Button>
         </Upload>
       </Flex>
-      {confirmProcessing && fileList && !!fileList.length ? (
+      {confirmProcessing ? (
         <Button
           type="primary"
+          disabled={
+            !fileList ||
+            fileList.length == 0 ||
+            fileList.length < totalImagesToUpload
+          }
           onClick={handleProcessImages}
           style={{ marginTop: 32, width: 200 }}
         >
-          Looks good!
+          Looks good!, Proceed..
         </Button>
       ) : null}
     </Flex>

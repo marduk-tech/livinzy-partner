@@ -278,7 +278,6 @@ const ProjectBasicDetails: React.FC<ProjectDetailsProps> = ({
           type="primary"
           htmlType="submit"
           loading={saveProjectMutation.isPending}
-          disabled={!isFormChanged}
         >
           Save
         </Button>

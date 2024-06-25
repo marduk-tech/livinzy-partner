@@ -165,7 +165,7 @@ const AccountDetails: React.FC = () => {
               name="email"
               label="Your Email"
               initialValue={user.email}
-              rules={[{ required: true, message: "Please enter your name" }]}
+              rules={[{ required: true, message: "Please enter your email" }]}
             >
               <Input
                 disabled
@@ -173,11 +173,7 @@ const AccountDetails: React.FC = () => {
               />
             </Form.Item>
 
-            <Form.Item
-              name="mobile"
-              label="Your mobile"
-              rules={[{ required: true, message: "Please enter your name" }]}
-            >
+            <Form.Item name="mobile" label="Your mobile">
               <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
             </Form.Item>
 

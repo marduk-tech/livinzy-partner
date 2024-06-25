@@ -11,22 +11,19 @@ import { useDevice } from "../libs/device";
 const ProjectsList: React.FC = () => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
 
-  const {
-    data: projects,
-    isLoading,
-    isError,
-    error,
-  } = useFetchProjectsByDesigner(cookies[cookieKeys.userId]);
+  const { data: projects, isLoading } = useFetchProjectsByDesigner(
+    cookies[cookieKeys.userId]
+  );
   const [selectedProject, setSelectedProject] = useState<Project>();
   const [createNewProject, setCreateNewProject] = useState<boolean>(false);
   const { isMobile } = useDevice();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!cookies || !cookies[cookieKeys.userId]) {
+    return;
   }
 
-  if (isError) {
-    return <div>Error: {(error as Error).message}</div>;
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   if (selectedProject) {

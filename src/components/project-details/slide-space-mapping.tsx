@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Select, Spin } from "antd";
+import { Flex, Image, Select, Spin, Typography } from "antd";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
@@ -61,28 +61,42 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
         Spaces
       </Typography.Title> */}
       {isProcessing ? (
-        <Spin size="small" style={{ width: 250 }}>
-          Loading spaces..
-        </Spin>
+        <Flex style={{ height: 64 }} gap={16} align="center">
+          <Spin></Spin>
+          <Typography.Text style={{ color: COLORS.textColorLight }}>
+            Mapping to spaces/rooms in this design
+          </Typography.Text>
+        </Flex>
       ) : (
         <Select
           showSearch
+          size="large"
           mode="multiple"
           allowClear
           className="custom-select"
           loading={isProcessing}
           value={selectedSpaces}
-          placeholder="Select spaces in this picture"
+          placeholder="Select spaces/rooms in this design"
           onChange={handleSpacesChange}
           style={{
-            width: 282,
-            fontSize: 14,
+            width: "100%",
+            marginBottom: 16,
           }}
           filterOption={filterOption}
           options={projectSpaces!.map((space: Space) => {
             return {
-              value: space._id!,
-              label: `${space.name}`,
+              value: space._id,
+              label: (
+                <Flex align="center" gap={16} style={{ marginRight: 16 }}>
+                  <Image
+                    width={32}
+                    src={space.spaceType.icon || "../../app/gen-room.png"}
+                  ></Image>
+                  <Typography.Text style={{ fontSize: 18 }}>
+                    {space.name}
+                  </Typography.Text>
+                </Flex>
+              ),
             };
           })}
         ></Select>

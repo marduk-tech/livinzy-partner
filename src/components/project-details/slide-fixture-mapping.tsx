@@ -122,9 +122,8 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
   return (
     <Flex
       style={{
-        marginTop: 16,
         padding: 16,
-        minWidth: 250,
+        minWidth: 300,
         borderRadius: 16,
         border: "1px solid",
         borderColor: COLORS.borderColor,

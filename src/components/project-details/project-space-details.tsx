@@ -12,6 +12,7 @@ import {
   Empty,
   Card,
   Image,
+  Alert,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -28,6 +29,7 @@ import { SpaceMeta } from "../../interfaces/Meta";
 import { useProcessSpacesLayout } from "../../hooks/use-ai";
 import { COLORS } from "../../styles/colors";
 import TextArea from "antd/es/input/TextArea";
+import { SpacesIcon } from "../../libs/icons";
 
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -148,15 +150,33 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     <>
       {spaces && spaces.length ? (
         <Flex vertical>
-          <Button
-            type="link"
-            size="small"
-            style={{ marginBottom: 16, marginLeft: "auto" }}
-            onClick={() => showModal(undefined)}
-            icon={<PlusOutlined />}
-          >
-            Add Space
-          </Button>
+          <Flex gap={16} style={{ marginBottom: 16 }} align="center">
+            <Alert
+              message={
+                <Flex gap={8} align="center">
+                  <SpacesIcon></SpacesIcon>
+                  <Typography.Text>
+                    You can add all the spaces which you have designed for this
+                    project
+                  </Typography.Text>
+                </Flex>
+              }
+              type="info"
+            />
+            <Button
+              type="link"
+              size="small"
+              style={{
+                marginLeft: "auto",
+                padding: 0,
+                color: COLORS.primaryColor,
+              }}
+              onClick={() => showModal(undefined)}
+              icon={<PlusOutlined />}
+            >
+              Add Space
+            </Button>
+          </Flex>
 
           {isLoading ? (
             <Spin size="small">Loading..</Spin>
@@ -219,6 +239,27 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                   </Card>
                 );
               })}
+              <Flex
+                onClick={() => {
+                  showModal(undefined);
+                }}
+                justify="center"
+                align="center"
+                style={{
+                  cursor: "pointer",
+                  width: 300,
+                  height: 200,
+                  border: "2px dashed",
+                  borderColor: COLORS.borderColor,
+                  borderRadius: 8,
+                }}
+                gap={16}
+              >
+                <SpacesIcon></SpacesIcon>
+                <Typography.Text style={{ color: COLORS.textColorLight }}>
+                  + Add Space
+                </Typography.Text>
+              </Flex>
             </Flex>
           )}
 

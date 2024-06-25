@@ -106,7 +106,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         if (!selectedSlide) {
           setSelectedSlide(response[0]);
         }
-        message.success("Slides saved successfully!");
+        message.success("Designs saved successfully!");
 
         // await queryClient.invalidateQueries({queryKey: [queryKeys.getSpaces]});
       },
@@ -130,72 +130,80 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   }
 
   return (
-    <Flex gap={32}>
-      <Flex vertical>
-        <div
-          style={{
-            width: 640,
-            height: 480,
-            borderRadius: 16,
-            backgroundImage: `url(${selectedSlide!.url})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-          }}
-        ></div>
-        <Flex
-          gap={16}
-          style={{
-            marginTop: 16,
-            width: 640,
-            overflowX: "scroll",
-            flexWrap: "nowrap",
-            scrollbarWidth: "none" /* Firefox */,
-            msOverflowStyle: "none" /* IE and Edge */,
-          }}
-        >
-          {slides.map((slide) => (
-            <Flex
-              style={{
-                width: 160,
-                height: 120,
-              }}
-            >
+    <Flex vertical>
+      <SlideSpaceMapping
+        key="slide-spaces"
+        isProcessing={processSpacesInSlidesMutation.isPending}
+        onSpacesUpdated={spacesUpdated}
+        projectId={projectData!._id!}
+        slide={selectedSlide!}
+      ></SlideSpaceMapping>
+      <Flex gap={32}>
+        <Flex vertical>
+          <div
+            style={{
+              width: 560,
+              height: 420,
+              borderRadius: 16,
+              backgroundImage: `url(${selectedSlide!.url})`,
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+            }}
+          ></div>
+          <Flex
+            gap={16}
+            style={{
+              marginTop: 16,
+              width: 560,
+              overflowX: "scroll",
+              flexWrap: "nowrap",
+              scrollbarWidth: "none" /* Firefox */,
+              msOverflowStyle: "none" /* IE and Edge */,
+            }}
+          >
+            {slides.map((slide) => (
               <Flex
-                onClick={() => handleThumbnailClick(slide)}
                 style={{
-                  cursor: "pointer",
-                  width: 160,
-                  height: 120,
-                  border:
-                    slide._id == selectedSlide?._id
-                      ? "4px solid"
-                      : "0.5px solid",
-                  borderColor:
-                    slide._id == selectedSlide?._id
-                      ? COLORS.primaryColor
-                      : COLORS.borderColor,
-                  borderRadius: 16,
-                  backgroundImage: `url(${slide.url})`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                  position: "relative",
+                  width: 107,
+                  height: 80,
                 }}
               >
                 <Flex
+                  onClick={() => handleThumbnailClick(slide)}
                   style={{
-                    padding: 2,
-                    borderRadius: 4,
-                    border: "1px solid",
-                    borderColor: "#ddd",
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
+                    cursor: "pointer",
+                    width: 107,
+                    height: 80,
+                    border:
+                      slide._id == selectedSlide?._id
+                        ? "4px solid"
+                        : "0.5px solid",
+                    borderColor:
+                      slide._id == selectedSlide?._id
+                        ? COLORS.primaryColor
+                        : COLORS.borderColor,
+                    borderRadius: 16,
+                    backgroundImage: `url(${slide.url})`,
+                    backgroundPosition: "center",
+                    backgroundSize: "cover",
+                    backgroundRepeat: "no-repeat",
+                    position: "relative",
                   }}
                 >
-                  <Tooltip title="Click to delete">
-                    {/* <Button
+                  <Flex
+                    style={{
+                      padding: 2,
+                      borderRadius: 4,
+                      border: "1px solid",
+                      borderColor: "#ddd",
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                    }}
+                  >
+                    <Tooltip title="Click to delete">
+                      {/* <Button
                       type="link"
                       onClick={onClickDelete}
                       icon={<DeleteOutlined></DeleteOutlined>}
@@ -207,9 +215,9 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                         marginRight: 8,
                       }}
                     /> */}
-                  </Tooltip>
-                  <Tooltip title="Click to replace">
-                    {/* <Button
+                    </Tooltip>
+                    <Tooltip title="Click to replace">
+                      {/* <Button
                       type="link"
                       onClick={onClickReplace}
                       icon={<UndoOutlined></UndoOutlined>}
@@ -221,31 +229,25 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                         marginRight: 8,
                       }}
                     /> */}
-                  </Tooltip>
+                    </Tooltip>
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
-          ))}
-          <ImgsUpload
-            imgsUploaded={imgsUploaded}
-            confirmProcessing={false}
-          ></ImgsUpload>
+            ))}
+            <ImgsUpload
+              imgsUploaded={imgsUploaded}
+              confirmProcessing={false}
+            ></ImgsUpload>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex vertical>
-        <SlideSpaceMapping
-          key="slide-spaces"
-          isProcessing={processSpacesInSlidesMutation.isPending}
-          onSpacesUpdated={spacesUpdated}
-          projectId={projectData!._id!}
-          slide={selectedSlide!}
-        ></SlideSpaceMapping>
-        <SlideFixtureMapping
-          key="slide-fixtures"
-          onFixturesUpdated={fixturesUpdated}
-          projectId={projectData!._id!}
-          slide={selectedSlide!}
-        ></SlideFixtureMapping>
+        <Flex vertical>
+          <SlideFixtureMapping
+            key="slide-fixtures"
+            onFixturesUpdated={fixturesUpdated}
+            projectId={projectData!._id!}
+            slide={selectedSlide!}
+          ></SlideFixtureMapping>
+        </Flex>
       </Flex>
     </Flex>
   );

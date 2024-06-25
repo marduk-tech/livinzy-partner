@@ -46,6 +46,8 @@ export const DashboardLayout: React.FC = () => {
   const { data } = useGetDesignerByEmail(user?.email || "");
 
   useEffect(() => {
+    console.log("isLoading---" + isLoading);
+    console.log("isAuth---" + isAuthenticated);
     if (isLoading) {
       return;
     }

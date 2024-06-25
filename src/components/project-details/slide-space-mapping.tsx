@@ -76,7 +76,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
           className="custom-select"
           loading={isProcessing}
           value={selectedSpaces}
-          placeholder="Select spaces in this picture"
+          placeholder="Select spaces/rooms in this design"
           onChange={handleSpacesChange}
           style={{
             width: "100%",

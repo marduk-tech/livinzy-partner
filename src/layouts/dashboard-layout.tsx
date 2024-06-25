@@ -38,6 +38,7 @@ function getItem(
 export const DashboardLayout: React.FC = () => {
   const { logout } = useAuth0();
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
+  const { loginWithRedirect } = useAuth0();
 
   const navigate = useNavigate();
   const { user, isLoading, isAuthenticated } = useAuth0();
@@ -46,11 +47,19 @@ export const DashboardLayout: React.FC = () => {
   const { data } = useGetDesignerByEmail(user?.email || "");
 
   useEffect(() => {
+    console.log("isLoading---" + isLoading);
+    console.log("isAuth---" + isAuthenticated);
     if (isLoading) {
       return;
     }
+
     if (!isAuthenticated) {
-      navigate("/login");
+      if (!cookies || !cookies[cookieKeys.userId]) {
+        navigate("/login");
+      } else {
+        // For some reason, isAuthenticated is coming false even though user is logged in.
+        loginWithRedirect();
+      }
     }
   }, [isAuthenticated, isLoading]);
 

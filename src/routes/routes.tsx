@@ -9,13 +9,8 @@ import AccountPage from "../pages/account";
 import WalletPage from "../pages/wallet";
 import ChatPage from "../pages/chat";
 import LandingPage from "../pages/landing-page";
-import { useGetDesignerByEmail } from "../hooks/use-designers";
-import { useAuth0 } from "@auth0/auth0-react";
 
 export const Router = () => {
-  const { user } = useAuth0();
-  const { data } = useGetDesignerByEmail(user?.email || "");
-
   return (
     <Routes>
       <Route element={<DashboardLayout />}>

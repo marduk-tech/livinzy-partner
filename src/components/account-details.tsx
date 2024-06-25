@@ -23,7 +23,7 @@ const AccountDetails: React.FC = () => {
   const { isMobile } = useDevice();
 
   const [form] = Form.useForm();
-  const { data, isLoading } = useGetDesignerByEmail(user?.email || "");
+  const { data, loading } = useGetDesignerByEmail(user?.email || "");
   const saveDesignerMutation = useSaveDesigner();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -85,7 +85,7 @@ const AccountDetails: React.FC = () => {
     setIsFormChanged(true);
   };
 
-  if (isLoading) {
+  if (loading) {
     return <Spin />;
   }
 

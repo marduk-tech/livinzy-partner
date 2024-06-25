@@ -9,6 +9,9 @@ import {
   WalletOutlined,
 } from "@ant-design/icons";
 import { COLORS } from "../styles/colors";
+import { useCookies } from "react-cookie";
+import { cookieKeys } from "../libs/react-query/constants";
+import { useGetDesignerByEmail } from "../hooks/use-designers";
 
 const { Header, Content } = Layout;
 
@@ -34,9 +37,11 @@ function getItem(
 
 export const DashboardLayout: React.FC = () => {
   const { logout } = useAuth0();
+  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
 
   const navigate = useNavigate();
-  const { isLoading, isAuthenticated } = useAuth0();
+  const { user, isLoading, isAuthenticated } = useAuth0();
+  const { data } = useGetDesignerByEmail(user?.email || "");
 
   useEffect(() => {
     if (isLoading) {
@@ -149,6 +154,7 @@ export const DashboardLayout: React.FC = () => {
                           title="Logout"
                           description="Are you sure you want to logout ?"
                           onConfirm={() => {
+                            removeCookie(cookieKeys.userId, { path: "/" });
                             logout({
                               logoutParams: {
                                 returnTo: window.location.origin,

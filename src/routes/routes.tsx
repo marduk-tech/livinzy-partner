@@ -4,11 +4,12 @@ import { Route, Routes } from "react-router-dom";
 import { DashboardLayout } from "../layouts/dashboard-layout";
 
 // Pages
-import HomePage from "../pages/home";
 import AccountPage from "../pages/account";
-import WalletPage from "../pages/wallet";
 import ChatPage from "../pages/chat";
+import HomePage from "../pages/home";
 import LandingPage from "../pages/landing-page";
+import { ProjectDetailsPage } from "../pages/projects/project-details";
+import WalletPage from "../pages/wallet";
 
 export const Router = () => {
   return (
@@ -19,6 +20,10 @@ export const Router = () => {
         <Route path="/account" element={<AccountPage />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/login" element={<LandingPage />} />
+        <Route
+          path="/projects/details/:projectId"
+          element={<ProjectDetailsPage />}
+        />
       </Route>
 
       <Route path="/*" element={<div>404</div>} />

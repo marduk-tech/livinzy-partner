@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { useFetchProjectsByDesigner } from "../hooks/use-projects";
-import { Project } from "../interfaces/Project";
 import { Alert, Card, Flex, Typography, message } from "antd";
 import Meta from "antd/es/card/Meta";
-import { cookieKeys } from "../libs/react-query/constants";
+import React, { useState } from "react";
 import { useCookies } from "react-cookie";
-import ProjectDetails from "./project-details/project-details";
+import { useNavigate } from "react-router-dom";
+import { useFetchProjectsByDesigner } from "../hooks/use-projects";
+import { Project } from "../interfaces/Project";
 import { useDevice } from "../libs/device";
+import { cookieKeys } from "../libs/react-query/constants";
+import ProjectDetails from "./project-details/project-details";
 
 const ProjectsList: React.FC = () => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
@@ -17,6 +18,8 @@ const ProjectsList: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project>();
   const [createNewProject, setCreateNewProject] = useState<boolean>(false);
   const { isMobile } = useDevice();
+
+  const navigate = useNavigate();
 
   if (!cookies || !cookies[cookieKeys.userId]) {
     return;
@@ -84,7 +87,7 @@ const ProjectsList: React.FC = () => {
               message.warning("You can only add or edit designs using desktop");
               return;
             }
-            setSelectedProject(project);
+            navigate(`/projects/details/${project._id}`);
           }}
           style={{ width: isMobile ? "100%" : 240, borderRadius: 16 }}
           cover={

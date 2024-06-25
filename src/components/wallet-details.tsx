@@ -17,9 +17,7 @@ interface Transaction {
 
 const WalletDetails: React.FC = () => {
   const { user } = useAuth0();
-  const { data: designerData, isLoading } = useGetDesignerByEmail(
-    user?.email || ""
-  );
+  const { data: designerData } = useGetDesignerByEmail(user?.email || "");
   const walletBalance: number = 5000; // Static wallet balance
 
   const transactionData: Transaction[] = [

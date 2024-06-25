@@ -20,20 +20,20 @@ export const useGetDesigner = (id: string) => {
 export const useGetDesignerByEmail = (email: string) => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [data, setData] = useState<Designer | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       try {
         const response = await axiosApiInstance.get(
           `/designers/email/${email}`
         );
         setCookie(cookieKeys.userId, response.data._id, { path: "/" });
         setData(response.data);
-        setLoading(false);
+        setIsLoading(false);
       } catch (err) {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -41,7 +41,7 @@ export const useGetDesignerByEmail = (email: string) => {
       fetchData();
     }
   }, [email]);
-  return { data, loading };
+  return { data, isLoading };
 };
 
 // Custom hook to save designer data

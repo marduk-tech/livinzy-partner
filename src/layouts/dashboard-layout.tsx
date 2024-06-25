@@ -41,6 +41,8 @@ export const DashboardLayout: React.FC = () => {
 
   const navigate = useNavigate();
   const { user, isLoading, isAuthenticated } = useAuth0();
+
+  // Just setting the user id for the user once they login.
   const { data } = useGetDesignerByEmail(user?.email || "");
 
   useEffect(() => {

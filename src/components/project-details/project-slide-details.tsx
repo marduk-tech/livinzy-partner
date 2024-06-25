@@ -36,6 +36,25 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     setSelectedSlide(slidesData[0]);
   }, [slidesData]);
 
+  useEffect(() => {
+    if (!selectedSlide) {
+      return;
+    }
+    if (!!selectedSlide.spaces && !!selectedSlide.spaces.length) {
+      return;
+    }
+    processSpacesInSlidesMutation.mutate(
+      { projectId: projectData!._id!, slideId: selectedSlide._id },
+      {
+        onSuccess: async (response: any) => {
+          selectedSlide!.spaces = response.spaces;
+          setSelectedSlide(selectedSlide);
+        },
+        onError: () => {},
+      }
+    );
+  }, [selectedSlide]);
+
   const fixturesUpdated = (fixtures: string[]) => {
     selectedSlide!.fixtures = fixtures;
     updateSlideMutation.mutate(selectedSlide!, {
@@ -70,19 +89,6 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
    */
   const handleThumbnailClick = (slide: Slide) => {
     setSelectedSlide(slide);
-    if (!!slide.spaces && !!slide.spaces.length) {
-      return;
-    }
-    processSpacesInSlidesMutation.mutate(
-      { projectId: projectData!._id!, slideId: slide._id },
-      {
-        onSuccess: async (response: any) => {
-          slide!.spaces = response.spaces;
-          setSelectedSlide(slide);
-        },
-        onError: () => {},
-      }
-    );
   };
 
   /** When slide images are uploaded */

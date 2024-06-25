@@ -145,7 +145,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
       {spaces && spaces.length ? (
         <Flex vertical>
           <Button
-            type="default"
+            type="link"
             size="small"
             style={{ marginBottom: 16, marginLeft: "auto" }}
             onClick={() => showModal(undefined)}

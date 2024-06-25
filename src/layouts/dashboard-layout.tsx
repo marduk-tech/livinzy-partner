@@ -39,10 +39,13 @@ export const DashboardLayout: React.FC = () => {
   const { isLoading, isAuthenticated } = useAuth0();
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (isLoading) {
+      return;
+    }
+    if (!isAuthenticated) {
       navigate("/login");
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return;

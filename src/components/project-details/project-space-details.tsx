@@ -140,12 +140,16 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     );
   }
 
+  if (isLoading) {
+    return <Spin>Loading...</Spin>;
+  }
+
   return (
     <>
       {spaces && spaces.length ? (
         <Flex vertical>
           <Button
-            type="default"
+            type="link"
             size="small"
             style={{ marginBottom: 16, marginLeft: "auto" }}
             onClick={() => showModal(undefined)}

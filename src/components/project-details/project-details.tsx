@@ -6,6 +6,7 @@ import ProjectSpaceDetails from "./project-space-details";
 import ProjectSlideDetails from "./project-slide-details";
 import { COLORS } from "../../styles/colors";
 import { DesignsIcon, DetailsIcon, SpacesIcon } from "../../libs/icons";
+
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const [current, setCurrent] = useState(0);
   const [steps, setSteps] = useState<StepProps[]>([]);

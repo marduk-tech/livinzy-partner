@@ -140,6 +140,10 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     );
   }
 
+  if (isLoading) {
+    return <Spin>Loading...</Spin>;
+  }
+
   return (
     <>
       {spaces && spaces.length ? (

@@ -170,7 +170,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                       rules={[
                         {
                           required: disable ? false : true,
-                          message: "Please enter the type",
+                          message: "Please select fixture",
                         },
                       ]}
                     >

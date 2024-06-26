@@ -1,6 +1,6 @@
 import { Alert, Card, Flex, Typography, message } from "antd";
 import Meta from "antd/es/card/Meta";
-import React, { useState } from "react";
+import React from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useFetchProjectsByDesigner } from "../hooks/use-projects";
@@ -14,8 +14,6 @@ const ProjectsList: React.FC = () => {
   const { data: projects, isLoading } = useFetchProjectsByDesigner(
     cookies[cookieKeys.userId]
   );
-  const [selectedProject, setSelectedProject] = useState<Project>();
-  const [createNewProject, setCreateNewProject] = useState<boolean>(false);
   const { isMobile } = useDevice();
 
   const navigate = useNavigate();

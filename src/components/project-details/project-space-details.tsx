@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import {
   Form,
-  Input,
   Button,
-  Modal,
   Flex,
   message,
   Spin,
-  Select,
   Typography,
   Empty,
   Image,
@@ -26,6 +23,7 @@ import { getSpaceMeta } from "../../hooks/use-meta";
 import { SpaceMeta } from "../../interfaces/Meta";
 import { COLORS } from "../../styles/colors";
 import { convertInchToFeet } from "../../libs/lvnzy-helper";
+import SpaceDetails from "../space-details";
 
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -40,7 +38,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
   const deleteSpaceMutation = useDeleteSpace();
   const saveSpaceMutation = useSaveSpace();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [spaceDialogOpen, setSpaceDialogOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [currentSpace, setCurrentSpace] = useState<Space>();
   const [form] = Form.useForm();
@@ -48,22 +46,9 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   const [processingSpaces, setProcessingSpaces] = useState<boolean>(false);
 
   const showModal = (space: Space | undefined) => {
-    setIsEdit(!!space);
     setCurrentSpace(space);
-    form.resetFields();
-    if (space) {
-      form.setFieldsValue({
-        ...space,
-        spaceType: space.spaceType._id,
-      });
-    }
-    setIsModalVisible(true);
+    setSpaceDialogOpen(true);
   };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
   const handleDelete = (id: string) => {
     deleteSpaceMutation.mutate(id, {
       onSuccess: async () => {
@@ -104,7 +89,6 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
         message.error("Failed to save project.");
       },
     });
-    setIsModalVisible(false);
   };
 
   if (processingSpaces) {
@@ -239,67 +223,14 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
           </Button>
         </Empty>
       )}
-      <Modal
-        title={isEdit ? "Edit Space" : "Add Space"}
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Form form={form} onFinish={handleFinish} layout="vertical">
-          <Form.Item
-            name="spaceType"
-            label="Type"
-            rules={[{ required: true, message: "Please input the type!" }]}
-          >
-            {spaceMetaDataPending ? (
-              <Spin />
-            ) : (
-              <Select
-                showSearch
-                placeholder="Please select a space"
-                filterOption={(input, option) =>
-                  (`${option?.label}` || "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                onChange={onChangeSpaceType}
-                options={spaceMetaData.map((spaceMeta: SpaceMeta) => {
-                  return {
-                    value: spaceMeta._id,
-                    label: spaceMeta.spaceType,
-                  };
-                })}
-              ></Select>
-            )}
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Unique name for the space"
-            rules={[{ required: true, message: "Please input the name" }]}
-          >
-            <Input />
-          </Form.Item>
-          {/* <Form.Item name="cost" label="Cost">
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item name="oneLiner" label="One liner about this space">
-            <TextArea rows={4} />
-          </Form.Item> */}
-          <Flex gap={8}>
-            <Form.Item name={["size", "l"]} label="Length (Optional)">
-              <Input type="number" width={25} />
-            </Form.Item>
-            <Form.Item name={["size", "w"]} label="Width (Optional)">
-              <Input type="number" width={25} />
-            </Form.Item>
-          </Flex>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              {isEdit ? "Update" : "Add"}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <SpaceDetails
+        spaceDialogClosed={() => {
+          setSpaceDialogOpen(false);
+        }}
+        spaceData={currentSpace!}
+        projectId={projectData!._id!}
+        showSpaceDialog={spaceDialogOpen}
+      ></SpaceDetails>
     </>
   );
 };

@@ -52,37 +52,42 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
 
   const renderProjectNameForm = () => {
     return (
-      <Flex vertical style={{ padding: 32 }}>
-        <Image width={200} src="../../new-project-icon.jpeg"></Image>
-        <Typography.Title level={2}>
-          {" "}
-          What do you want to name this project ?
-        </Typography.Title>
-        <Flex gap={16}>
+      <Flex align="center" gap={100}>
+        <Flex vertical style={{ padding: 32 }}>
+          <Typography.Title level={2}>
+            {" "}
+            What do you want to name this project ?
+          </Typography.Title>
           <Input
             onChange={onChangeProjectNmae}
             style={{ width: 600, height: 75, fontSize: 24 }}
           />
           <Button
             onClick={handleNameSubmit}
-            style={{ height: 75, width: 125, fontSize: 24 }}
+            style={{ height: 75, width: 125, fontSize: 24, marginTop: 16 }}
           >
             Next
           </Button>
-        </Flex>
+        </Flex>{" "}
+        <Image
+          width={550}
+          preview={false}
+          src="../../new-project-icon.jpeg"
+          style={{ margin: "auto" }}
+        ></Image>
       </Flex>
     );
   };
 
   return (
     <Flex
+      align="center"
       style={{
         backgroundColor: "white",
         borderRadius: 8,
         padding: 16,
         minHeight: 540,
       }}
-      align="left"
     >
       {currentProject && currentProject?._id ? (
         <ProjectBasicDetails

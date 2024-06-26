@@ -5,4 +5,11 @@ function convertInchToFeet(size: number) {
   return Math.round(size * 0.08333333333);
 }
 
-export { convertInchToFeet };
+function convertFeetToInch(size: number | string) {
+  if (!size) {
+    return 0;
+  }
+  return Math.round((typeof size == "string" ? parseFloat(size) : size) * 12);
+}
+
+export { convertInchToFeet, convertFeetToInch };

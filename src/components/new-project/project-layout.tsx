@@ -197,36 +197,52 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
 
   if (!layoutUploadSkipped) {
     return (
-      <Flex vertical style={{ padding: 48 }}>
-        <Image src="../../floorplan.png" preview={false} width={100}></Image>
-        <Typography.Title level={2}>
-          Do you have the project floorplan ?
-        </Typography.Title>
-        <Flex vertical align="flex-start">
-          <Upload
-            action={`${baseApiUrl}upload/single`}
-            name="image"
-            listType="picture"
-            onChange={handleUploadChange}
-            showUploadList={false}
-          >
-            <Button type="primary" style={{ marginRight: 16 }}>
-              Upload
-            </Button>
-            {renderImgStatus()}
-          </Upload>
-          {layoutImageStatus !== IMG_AI_STATUS.COMPLETED ? (
-            <Button
-              type="link"
-              style={{ color: COLORS.primaryColor, padding: 0, marginTop: 16 }}
-              onClick={() => {
-                setLayoutUploadSkipped(true);
-              }}
+      <Flex align="center" gap={200}>
+        <Flex vertical style={{ padding: 48 }}>
+          <Typography.Title level={2}>
+            Do you have the project floorplan ?
+          </Typography.Title>
+          <Flex vertical>
+            <Upload
+              action={`${baseApiUrl}upload/single`}
+              name="image"
+              listType="picture"
+              onChange={handleUploadChange}
+              showUploadList={false}
             >
-              I would like to add details manually
-            </Button>
-          ) : null}
+              <Button type="primary" style={{ marginRight: 16 }}>
+                Upload
+              </Button>
+              {renderImgStatus()}
+            </Upload>
+            {layoutImageStatus !== IMG_AI_STATUS.COMPLETED ? (
+              <Button
+                type="link"
+                disabled={
+                  layoutImageStatus === IMG_AI_STATUS.PROCESSING ||
+                  layoutImageStatus === IMG_AI_STATUS.UPLOADING
+                }
+                style={{
+                  color: COLORS.primaryColor,
+                  padding: 0,
+                  marginTop: 16,
+                  fontSize: 16,
+                  width: 200,
+                }}
+                onClick={() => {
+                  setLayoutUploadSkipped(true);
+                }}
+              >
+                I would like to add details manually
+              </Button>
+            ) : null}
+          </Flex>
         </Flex>
+        <Image
+          width={400}
+          preview={false}
+          src={layoutImage || "../../floorplan-icon.jpeg"}
+        ></Image>
       </Flex>
     );
   }
@@ -285,7 +301,12 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
           onClick={() => {
             setLayoutUploadSkipped(false);
           }}
-          style={{ color: COLORS.primaryColor, padding: 0, marginBottom: 16 }}
+          style={{
+            color: COLORS.primaryColor,
+            padding: 0,
+            marginBottom: 16,
+            fontSize: 16,
+          }}
         >
           I would like to upload floorplan instead
         </Button>

@@ -129,15 +129,35 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
 
   if (!slidesDataPending && (!slides || !slides.length)) {
     return (
-      <ImgsUpload
-        confirmProcessing={true}
-        imgsUploaded={imgsUploaded}
-      ></ImgsUpload>
+      <Flex
+        align="center"
+        style={{
+          backgroundColor: "white",
+          borderRadius: 8,
+          padding: 16,
+          minHeight: 540,
+          width: "100%",
+        }}
+      >
+        <ImgsUpload
+          confirmProcessing={true}
+          imgsUploaded={imgsUploaded}
+        ></ImgsUpload>
+      </Flex>
     );
   }
 
   return (
-    <Flex vertical style={{ width: "100%" }}>
+    <Flex
+      vertical
+      style={{
+        width: "100%",
+        maxWidth: 1200,
+        backgroundColor: "white",
+        padding: 16,
+        borderRadius: 12,
+      }}
+    >
       <Modal
         open={isSpacesSettingsOpen}
         footer={null}
@@ -305,7 +325,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             backgroundRepeat: "no-repeat",
           }}
         ></div>
-        <Flex vertical gap={16} style={{ width: 300 }}>
+        <Flex vertical gap={16} style={{ width: 350 }}>
           <SlideSpaceMapping
             key="slide-spaces"
             isProcessing={processSpacesInSlidesMutation.isPending}

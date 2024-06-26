@@ -80,16 +80,18 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
   return (
     <Flex vertical style={{ padding: confirmProcessing ? 32 : 0 }}>
       {confirmProcessing ? (
-        <Flex vertical>
+        <Flex justify="center" gap={100}>
+          <Flex vertical align="center">
+            <Typography.Title level={2} style={{ margin: 0, marginBottom: 16 }}>
+              Its time to upload your designs!
+            </Typography.Title>
+            {renderUploadBtn()}
+          </Flex>
           <Image
-            style={{ width: 200 }}
+            style={{ width: 500 }}
             preview={false}
-            src="../../designs-swatch-icon.jpeg"
+            src="../../upload-plcholder.png"
           ></Image>
-          <Typography.Title level={2} style={{ margin: 0, marginBottom: 16 }}>
-            Its time to upload your designs!
-          </Typography.Title>
-          {renderUploadBtn()}
         </Flex>
       ) : (
         <Flex

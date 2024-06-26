@@ -66,7 +66,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
     <Flex
       vertical
       style={{
-        minWidth: 250,
+        width: "100%",
         borderColor: COLORS.borderColor,
       }}
     >
@@ -77,33 +77,33 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
         <Flex style={{ height: 64 }} gap={16} align="center">
           <Spin></Spin>
           <Typography.Text style={{ color: COLORS.textColorLight }}>
-            Mapping to spaces/rooms in this design
+            Loading Spaces..
           </Typography.Text>
         </Flex>
       ) : (
         <Select
           showSearch
           size="large"
-          mode="multiple"
           allowClear
-          className="custom-select"
           loading={isProcessing}
           value={selectedSpaces}
           placeholder="Select spaces/rooms in this design"
           onChange={handleSpacesChange}
           style={{
             width: "100%",
-            marginBottom: 16,
+            height: 75,
           }}
           filterOption={filterOption}
           options={projectSpaces!.map((space: Space) => {
             return {
               value: space._id,
               label: (
-                <Flex align="center" gap={16} style={{ marginRight: 16 }}>
+                <Flex align="center" gap={16}>
                   <Image
                     width={32}
                     src={space.spaceType.icon || "../../app/gen-room.png"}
+                    style={{ marginRight: 16 }}
+                    preview={false}
                   ></Image>
                   <Typography.Text style={{ fontSize: 18 }}>
                     {space.name}

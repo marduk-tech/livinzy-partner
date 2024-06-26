@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Form,
   Input,
@@ -10,9 +10,7 @@ import {
   Select,
   Typography,
   Empty,
-  Card,
   Image,
-  Alert,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -26,10 +24,8 @@ import { queryClient } from "../../libs/react-query/query-client";
 import { queryKeys } from "../../libs/react-query/constants";
 import { getSpaceMeta } from "../../hooks/use-meta";
 import { SpaceMeta } from "../../interfaces/Meta";
-import { useProcessSpacesLayout } from "../../hooks/use-ai";
 import { COLORS } from "../../styles/colors";
-import TextArea from "antd/es/input/TextArea";
-import { SpacesIcon } from "../../libs/icons";
+import { convertInchToFeet } from "../../libs/lvnzy-helper";
 
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -44,38 +40,12 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
   const deleteSpaceMutation = useDeleteSpace();
   const saveSpaceMutation = useSaveSpace();
-  const processSpacesLayoutMutation = useProcessSpacesLayout();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [currentSpace, setCurrentSpace] = useState<Space>();
   const [form] = Form.useForm();
 
   const [processingSpaces, setProcessingSpaces] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (isLoading || (spaces && !!spaces.length)) {
-      return;
-    }
-    async function fetchSpacesInfo() {
-      setProcessingSpaces(true);
-      // const spacesLayoutDetails = await processSpacesLayout(
-      //   projectData!._id!
-      // );
-      processSpacesLayoutMutation.mutate(projectData!._id!, {
-        onSuccess: async () => {
-          setProcessingSpaces(false);
-          refetchSpaces();
-        },
-        onError: () => {
-          setProcessingSpaces(false);
-          refetchSpaces();
-        },
-      });
-    }
-    if (projectData && projectData.homeDetails.layout2D) {
-      fetchSpacesInfo();
-    }
-  }, [projectData, spaces]);
 
   const showModal = (space: Space | undefined) => {
     setIsEdit(!!space);
@@ -155,20 +125,8 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   return (
     <>
       {spaces && spaces.length ? (
-        <Flex vertical>
+        <Flex vertical style={{ height: 500, overflowY: "scroll" }}>
           <Flex gap={16} style={{ marginBottom: 16 }} align="center">
-            <Alert
-              message={
-                <Flex gap={8} align="center">
-                  <SpacesIcon></SpacesIcon>
-                  <Typography.Text>
-                    You can add all the spaces which you have designed for this
-                    project
-                  </Typography.Text>
-                </Flex>
-              }
-              type="info"
-            />
             <Button
               type="link"
               size="small"
@@ -188,6 +146,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             <Spin size="small">Loading..</Spin>
           ) : (
             <Flex
+              vertical
               gap={16}
               style={{
                 flexWrap: "wrap",
@@ -195,28 +154,45 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
             >
               {spaces.map((space: Space) => {
                 return (
-                  <Card style={{ width: 300, height: 200 }}>
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: 75,
+                      border: "1px solid",
+                      borderColor: COLORS.borderColor,
+                      borderRadius: 8,
+                      padding: 16,
+                    }}
+                    align="center"
+                    gap={16}
+                  >
                     <Image
                       src={
                         space.spaceType.icon
                           ? space.spaceType.icon
                           : "../../app/gen-room.png"
                       }
-                      height={40}
-                      style={{ opacity: 0.5, marginBottom: 75 }}
+                      width={38}
+                      style={{ opacity: 0.5 }}
                     ></Image>
-                    <Typography.Title level={4} style={{ margin: 0 }}>
-                      {space.name}
-                    </Typography.Title>
-                    <Typography.Text
-                      style={{
-                        color: COLORS.textColorLight,
-                      }}
-                    >
-                      {space.spaceType.spaceType}
-                      {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
-                    </Typography.Text>
-                    <Flex gap={16} style={{ marginTop: 8 }}>
+                    <Flex vertical>
+                      <Typography.Title level={5} style={{ margin: 0 }}>
+                        {space.name}
+                      </Typography.Title>
+                      <Typography.Text
+                        style={{
+                          color: COLORS.textColorLight,
+                        }}
+                      >
+                        {space.spaceType.spaceType}
+                        {space.size
+                          ? `, ${convertInchToFeet(
+                              space.size.l
+                            )}x${convertInchToFeet(space.size.w)} ft`
+                          : ""}
+                      </Typography.Text>
+                    </Flex>
+                    <Flex gap={16} style={{ marginTop: 8, marginLeft: "auto" }}>
                       <Button
                         type="link"
                         style={{
@@ -242,88 +218,11 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
                         Delete
                       </Button>
                     </Flex>
-                  </Card>
+                  </Flex>
                 );
               })}
-              <Flex
-                onClick={() => {
-                  showModal(undefined);
-                }}
-                justify="center"
-                align="center"
-                style={{
-                  cursor: "pointer",
-                  width: 300,
-                  height: 200,
-                  border: "2px dashed",
-                  borderColor: COLORS.borderColor,
-                  borderRadius: 8,
-                }}
-                gap={16}
-              >
-                <SpacesIcon></SpacesIcon>
-                <Typography.Text style={{ color: COLORS.textColorLight }}>
-                  + Add Space
-                </Typography.Text>
-              </Flex>
             </Flex>
           )}
-
-          {/* <List
-            loading={isLoading}
-            dataSource={spaces}
-            grid={{ gutter: 24, column: 3 }}
-            renderItem={(space: Space) => (
-              <Card>
-                <Image
-                  src={
-                    space.spaceType.icon
-                      ? space.spaceType.icon
-                      : "../../app/gen-room.png"
-                  }
-                  height={40}
-                  style={{ opacity: 0.5, marginBottom: 75 }}
-                ></Image>
-                <Typography.Title level={4} style={{ margin: 0 }}>
-                  {space.name}
-                </Typography.Title>
-                <Typography.Text
-                  style={{
-                    color: COLORS.textColorLight,
-                  }}
-                >
-                  {space.spaceType.spaceType}
-                  {space.size ? `, ${space.size.l}x${space.size.w} in` : ""}
-                </Typography.Text>
-                <Flex gap={16} style={{ marginTop: 8 }}>
-                  <Button
-                    type="link"
-                    style={{
-                      padding: 0,
-                      height: 32,
-                      color: COLORS.primaryColor,
-                    }}
-                    icon={<EditOutlined />}
-                    onClick={() => showModal(space)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    type="link"
-                    style={{
-                      padding: 0,
-                      height: 32,
-                      color: COLORS.primaryColor,
-                    }}
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleDelete(space._id!)}
-                  >
-                    Delete
-                  </Button>
-                </Flex>
-              </Card>
-            )}
-          /> */}
         </Flex>
       ) : (
         <Empty
@@ -380,17 +279,17 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
           >
             <Input />
           </Form.Item>
-          <Form.Item name="cost" label="Cost">
+          {/* <Form.Item name="cost" label="Cost">
             <Input type="number" />
           </Form.Item>
           <Form.Item name="oneLiner" label="One liner about this space">
             <TextArea rows={4} />
-          </Form.Item>
+          </Form.Item> */}
           <Flex gap={8}>
-            <Form.Item name={["size", "l"]} label="Length">
+            <Form.Item name={["size", "l"]} label="Length (Optional)">
               <Input type="number" width={25} />
             </Form.Item>
-            <Form.Item name={["size", "w"]} label="Width">
+            <Form.Item name={["size", "w"]} label="Width (Optional)">
               <Input type="number" width={25} />
             </Form.Item>
           </Flex>

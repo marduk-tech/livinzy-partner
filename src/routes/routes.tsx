@@ -7,8 +7,8 @@ import { DashboardLayout } from "../layouts/dashboard-layout";
 import AccountPage from "../pages/account";
 import ChatPage from "../pages/chat";
 import HomePage from "../pages/home";
-import LandingPage from "../pages/landing-page";
-import { ProjectDetailsPage } from "../pages/projects/project-details";
+import Landing from "../pages/landing";
+import { ProjectDetails } from "../pages/project-details";
 import WalletPage from "../pages/wallet";
 
 export const Router = () => {
@@ -19,10 +19,10 @@ export const Router = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/wallet" element={<WalletPage />} />
-        <Route path="/login" element={<LandingPage />} />
+        <Route path="/login" element={<Landing />} />
         <Route
           path="/projects/details/:projectId"
-          element={<ProjectDetailsPage />}
+          element={<ProjectDetails />}
         />
       </Route>
 

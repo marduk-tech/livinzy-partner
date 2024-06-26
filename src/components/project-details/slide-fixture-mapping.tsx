@@ -122,13 +122,9 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
   return (
     <Flex
       style={{
-        padding: 16,
         minWidth: "100%",
         height: 449,
         overflowY: "scroll",
-        borderRadius: 16,
-        border: "1px solid",
-        borderColor: COLORS.borderColor,
       }}
       vertical
     >
@@ -145,7 +141,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
         }
         onBoundingBoxComplete={handleBoundingBoxComplete}
       />
-      <Flex align="center" style={{ marginBottom: 16 }}>
+      <Flex align="center" style={{ marginTop: 8 }}>
         <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 0 }}>
           Fixtures
         </Typography.Title>
@@ -171,16 +167,18 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
 
       {slideFixtures && slideFixtures.length ? (
         <List
-          style={{ width: 250 }}
+          style={{ width: 350 }}
           dataSource={slideFixtures}
           renderItem={(fixture: Fixture, index: number) => (
             <Flex
               vertical
               style={{
-                paddingBottom: 16,
-                marginBottom: 16,
-                borderBottom: "1px dashed",
-                borderBottomColor: COLORS.borderColor,
+                padding: 16,
+                marginBottom: 8,
+                borderRadius: 8,
+                backgroundColor: "white",
+                border: "1px solid",
+                borderColor: COLORS.borderColor,
               }}
             >
               <Flex justify="flex-start">

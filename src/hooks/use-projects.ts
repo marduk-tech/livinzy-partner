@@ -32,7 +32,7 @@ export const useFetchProjectsByDesigner = (designerId: string) => {
 // Custom hook to save designer data
 export const useSaveProject = () => {
   return useMutation({
-    mutationFn: async (projectData: Project) => {
+    mutationFn: async (projectData: Partial<Project>) => {
       let response;
       if (projectData._id) {
         response = await axiosApiInstance.put(

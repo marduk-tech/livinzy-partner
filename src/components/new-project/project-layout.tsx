@@ -53,6 +53,7 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
    * When the form values are changed
    */
   const onFormValuesChange = (changedValues: any, allValues: any) => {
+    console.log(changedValues);
     const hasErrors = form
       .getFieldsError()
       .some(({ errors }) => errors.length > 0);

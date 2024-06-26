@@ -9,11 +9,7 @@ const { Option } = Select;
 
 const INPUT_WIDTH = 400;
 
-const ProjectSettings: React.FC<ProjectDetailsProps> = ({
-  projectData,
-  basicDetailsUpdated,
-  skipFloorplan,
-}) => {
+const ProjectSettings: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const [form] = Form.useForm();
   const saveProjectMutation = useSaveProject();
 
@@ -24,6 +20,7 @@ const ProjectSettings: React.FC<ProjectDetailsProps> = ({
    * When the form values are changed
    */
   const onFormValuesChange = (changedValues: any, allValues: any) => {
+    console.log(changedValues);
     const hasErrors = form
       .getFieldsError()
       .some(({ errors }) => errors.length > 0);
@@ -54,7 +51,7 @@ const ProjectSettings: React.FC<ProjectDetailsProps> = ({
       projectUpdatedData._id = projectData._id;
     }
     saveProjectMutation.mutate(projectUpdatedData, {
-      onSuccess: (updatedProject: Project) => {
+      onSuccess: () => {
         message.success("Project saved successfully");
       },
       onError: () => {},

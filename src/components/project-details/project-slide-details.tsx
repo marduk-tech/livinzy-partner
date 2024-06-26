@@ -152,10 +152,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
       vertical
       style={{
         width: "100%",
-        maxWidth: 1200,
-        backgroundColor: "white",
-        padding: 16,
-        borderRadius: 12,
+        maxWidth: 1300,
       }}
     >
       <Modal

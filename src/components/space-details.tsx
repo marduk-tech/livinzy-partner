@@ -33,6 +33,7 @@ const SpaceDetails: React.FC<{
   const [form] = Form.useForm();
 
   useEffect(() => {
+    console.log(projectId);
     if (!spaceData) {
       return;
     }

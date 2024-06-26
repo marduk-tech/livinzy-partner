@@ -1,17 +1,18 @@
-import type { MenuProps } from "antd";
-import { Button, Dropdown, Flex, Image, Layout, Popconfirm } from "antd";
-import React, { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
 import {
   LogoutOutlined,
   UserOutlined,
   WalletOutlined,
 } from "@ant-design/icons";
-import { COLORS } from "../styles/colors";
+import { useAuth0 } from "@auth0/auth0-react";
+import type { MenuProps } from "antd";
+import { Button, Dropdown, Flex, Image, Layout, Popconfirm } from "antd";
+import React, { useEffect } from "react";
 import { useCookies } from "react-cookie";
-import { cookieKeys } from "../libs/react-query/constants";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Loader } from "../components/loader";
 import { useGetDesignerByEmail } from "../hooks/use-designers";
+import { cookieKeys } from "../libs/react-query/constants";
+import { COLORS } from "../styles/colors";
 
 const { Header, Content } = Layout;
 
@@ -64,7 +65,7 @@ export const DashboardLayout: React.FC = () => {
   }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
-    return;
+    return <Loader />;
   }
 
   return (
@@ -103,7 +104,7 @@ export const DashboardLayout: React.FC = () => {
             <Image
               preview={false}
               onClick={() => {
-                window.location.href = "/";
+                navigate("/");
               }}
               src="../../logo-studio.png"
               style={{

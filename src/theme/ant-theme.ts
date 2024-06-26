@@ -11,7 +11,7 @@ export const antTheme: ThemeConfig = {
   },
   components: {
     Input: {
-      fontSize: 18,
+      fontSize: 20,
       paddingBlock: 12,
       paddingInline: 14,
       borderRadius: 12,

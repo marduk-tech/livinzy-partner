@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { useFetchProjectsByDesigner } from "../hooks/use-projects";
-import { Project } from "../interfaces/Project";
 import { Alert, Card, Flex, Typography, message } from "antd";
 import Meta from "antd/es/card/Meta";
-import { cookieKeys } from "../libs/react-query/constants";
+import React from "react";
 import { useCookies } from "react-cookie";
-import ProjectDetails from "./project-details/project-details";
+import { useNavigate } from "react-router-dom";
+import { useFetchProjectsByDesigner } from "../hooks/use-projects";
+import { Project } from "../interfaces/Project";
 import { useDevice } from "../libs/device";
+import { cookieKeys } from "../libs/react-query/constants";
 
 const ProjectsList: React.FC = () => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
@@ -14,9 +14,9 @@ const ProjectsList: React.FC = () => {
   const { data: projects, isLoading } = useFetchProjectsByDesigner(
     cookies[cookieKeys.userId]
   );
-  const [selectedProject, setSelectedProject] = useState<Project>();
-  const [createNewProject, setCreateNewProject] = useState<boolean>(false);
   const { isMobile } = useDevice();
+
+  const navigate = useNavigate();
 
   if (!cookies || !cookies[cookieKeys.userId]) {
     return;
@@ -25,15 +25,6 @@ const ProjectsList: React.FC = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  if (selectedProject) {
-    return <ProjectDetails projectData={selectedProject}></ProjectDetails>;
-  }
-
-  if (createNewProject) {
-    return <ProjectDetails projectData={selectedProject}></ProjectDetails>;
-  }
-
   return (
     <Flex style={{ width: "100%", flexWrap: "wrap" }} gap={32}>
       {!isMobile ? (
@@ -56,7 +47,7 @@ const ProjectsList: React.FC = () => {
             />
           }
           onClick={() => {
-            setCreateNewProject(true);
+            navigate(`/projects/details/new`);
           }}
         >
           <Meta
@@ -84,7 +75,7 @@ const ProjectsList: React.FC = () => {
               message.warning("You can only add or edit designs using desktop");
               return;
             }
-            setSelectedProject(project);
+            navigate(`/projects/details/${project._id}`);
           }}
           style={{ width: isMobile ? "100%" : 240, borderRadius: 16 }}
           cover={
@@ -109,18 +100,20 @@ const ProjectsList: React.FC = () => {
             title={
               <Flex vertical>
                 <Typography.Title level={4} style={{ padding: 0, margin: 0 }}>
-                  {project.name || project.homeDetails.communityName}
+                  {project.name}
                 </Typography.Title>
-                <Flex>
-                  <Typography.Text>
-                    {project.homeDetails.homeType.homeType}
-                  </Typography.Text>
-                  {project.homeDetails.size ? (
+                {project.homeDetails ? (
+                  <Flex>
                     <Typography.Text>
-                      , {project.homeDetails.size} sqft
+                      {project.homeDetails.homeType.homeType}
                     </Typography.Text>
-                  ) : null}
-                </Flex>
+                    {project.homeDetails.size ? (
+                      <Typography.Text>
+                        , {project.homeDetails.size} sqft
+                      </Typography.Text>
+                    ) : null}
+                  </Flex>
+                ) : null}
               </Flex>
             }
           />

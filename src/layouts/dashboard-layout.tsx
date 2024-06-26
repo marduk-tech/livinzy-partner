@@ -104,7 +104,7 @@ export const DashboardLayout: React.FC = () => {
             <Image
               preview={false}
               onClick={() => {
-                window.location.href = "/";
+                navigate("/");
               }}
               src="../../logo-studio.png"
               style={{

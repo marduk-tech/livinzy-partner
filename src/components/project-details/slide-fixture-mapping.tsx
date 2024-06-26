@@ -123,7 +123,9 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
     <Flex
       style={{
         padding: 16,
-        minWidth: 300,
+        minWidth: "100%",
+        height: 449,
+        overflowY: "scroll",
         borderRadius: 16,
         border: "1px solid",
         borderColor: COLORS.borderColor,
@@ -143,19 +145,30 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
         }
         onBoundingBoxComplete={handleBoundingBoxComplete}
       />
-      <Typography.Title level={4} style={{ marginTop: 0 }}>
-        Fixtures
-      </Typography.Title>
-      <Typography.Text
-        style={{
-          marginTop: -8,
-          fontSize: 12,
-          marginBottom: 32,
-          color: COLORS.textColorLight,
-        }}
-      >
-        Highlight fixtures in this design.
-      </Typography.Text>
+      <Flex align="center" style={{ marginBottom: 16 }}>
+        <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 0 }}>
+          Fixtures
+        </Typography.Title>
+        <Button
+          type="link"
+          size="small"
+          onClick={() => {
+            setEditingFixture(null);
+            setFixtureModalVisible(true);
+          }}
+          style={{
+            color: COLORS.primaryColor,
+            cursor: "pointer",
+            textAlign: "center",
+            width: 100,
+            padding: 0,
+            marginLeft: "auto",
+          }}
+        >
+          Add Fixture
+        </Button>
+      </Flex>
+
       {slideFixtures && slideFixtures.length ? (
         <List
           style={{ width: 250 }}
@@ -262,25 +275,6 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
           No fixtures mapped
         </Tag>
       )}
-
-      <Button
-        type="primary"
-        size="small"
-        onClick={() => {
-          setEditingFixture(null);
-          setFixtureModalVisible(true);
-        }}
-        style={{
-          cursor: "pointer",
-          marginBottom: 16,
-          textAlign: "center",
-          padding: 0,
-          marginTop: 32,
-          width: 100,
-        }}
-      >
-        Add Fixture
-      </Button>
 
       <FixtureDetails
         isOpen={fixtureModalVisible}

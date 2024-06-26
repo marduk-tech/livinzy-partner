@@ -3,7 +3,7 @@ import React from "react";
 import { useDevice } from "../libs/device";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const LandingPage: React.FC = () => {
+const Landing: React.FC = () => {
   const { isMobile } = useDevice();
   const { loginWithRedirect } = useAuth0();
 
@@ -74,4 +74,4 @@ const LandingPage: React.FC = () => {
   );
 };
 
-export default LandingPage;
+export default Landing;

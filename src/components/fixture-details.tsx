@@ -1,8 +1,4 @@
-import {
-  CloseCircleOutlined,
-  CloseCircleTwoTone,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Divider,
@@ -45,6 +41,8 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
+
+  const [selectExisting, setSelectExisting] = useState<boolean>(false);
 
   const {
     data: fixtureMetaData,
@@ -126,209 +124,209 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
       open={isOpen}
       onCancel={onCancel}
     >
+      {/* <Button
+        type="link"
+        style={{ padding: 0, fontSize: 16, marginLeft: "auto" }}
+        onClick={() => {
+          setSelectExisting(!selectExisting);
+        }}
+      >
+        {selectExisting
+          ? "I want to add a new fixture"
+          : "I want to select an existing added fixture"}
+      </Button> */}
       <Form
         form={form}
         layout="vertical"
         initialValues={fixture}
         onFinish={handleFinish}
       >
-        <Form.Item noStyle shouldUpdate>
-          {({ getFieldsValue }) => {
-            const values = getFieldsValue();
+        {!selectExisting ? (
+          <Form.Item noStyle shouldUpdate>
+            {({ getFieldsValue }) => {
+              const values = getFieldsValue();
 
-            const disable =
-              values.fixtureType || values.cost || values.description;
+              const showResetBtn =
+                values.fixtureType || values.cost || values.description;
 
-            if (fixturesDataPending) {
-              return <Spin />;
-            }
-
-            if (projectFixtures.length > 0) {
-              const uniqueOptions = Array.from(
-                new Set(
-                  projectFixtures.map(
-                    (fixture: Fixture) => fixture.fixtureType?._id
-                  )
-                )
-              ).map((id) => {
-                const fixture = projectFixtures.find(
-                  (f: Fixture) => f.fixtureType?._id === id
-                );
-                return {
-                  value: id,
-                  label: fixture?.fixtureType?.fixtureType,
-                };
-              });
+              const disable = values.existingFixtureId;
 
               return (
                 <>
-                  <Flex align="center" gap={5} justify="center">
-                    <Form.Item
-                      style={{ flex: 1 }}
-                      name="existingFixtureId"
-                      label="Select Existing"
-                      rules={[
-                        {
-                          required: disable ? false : true,
-                          message: "Please select fixture",
-                        },
-                      ]}
-                    >
-                      {fixturesDataPending ? (
-                        <Spin />
-                      ) : (
-                        <Select
-                          disabled={disable}
-                          showSearch
-                          placeholder="Please select a fixture"
-                          filterOption={(input, option) =>
-                            (`${option?.label}` || "")
-                              .toLowerCase()
-                              .includes(input.toLowerCase())
-                          }
-                          options={uniqueOptions}
-                        ></Select>
-                      )}
-                    </Form.Item>
-
-                    {values.existingFixtureId && (
-                      <Button
-                        onClick={() => form.resetFields()}
-                        icon={<CloseCircleOutlined />}
-                        size="small"
-                        type="text"
-                        style={{
-                          marginTop: 5,
-                        }}
-                      ></Button>
-                    )}
-                  </Flex>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      margin: "8px 0",
-                    }}
+                  <Form.Item
+                    name="fixtureType"
+                    label="Type"
+                    rules={[
+                      {
+                        required: disable ? false : true,
+                        message: "Please enter the type",
+                      },
+                    ]}
                   >
-                    <div style={{ marginRight: "8px", flexShrink: 0 }}>
-                      <p>Or Add New</p>
-                    </div>
-                    <div style={{ flexGrow: 1 }}>
-                      <Divider />
-                    </div>
-                  </div>
-                </>
-              );
-            }
-          }}
-        </Form.Item>
-
-        <Form.Item noStyle shouldUpdate>
-          {({ getFieldsValue }) => {
-            const values = getFieldsValue();
-
-            const showResetBtn =
-              values.fixtureType || values.cost || values.description;
-
-            const disable = values.existingFixtureId;
-
-            return (
-              <>
-                <Form.Item
-                  name="fixtureType"
-                  label="Type"
-                  rules={[
-                    {
-                      required: disable ? false : true,
-                      message: "Please enter the type",
-                    },
-                  ]}
-                >
-                  {fixtureMetaDataPending ? (
-                    <Spin />
-                  ) : (
-                    <Select
-                      disabled={disable}
-                      showSearch
-                      dropdownRender={(menu) => (
-                        <>
-                          {menu}
-                          <Divider style={{ margin: "8px 0" }} />
-                          <Space style={{ padding: "0 8px 4px" }}>
-                            <Flex vertical>
-                              <Typography.Text
-                                style={{
-                                  marginTop: 8,
-                                  marginBottom: 8,
-                                  color: COLORS.textColorLight,
-                                }}
-                              >
-                                Couldn't find it in the list ? Add custom
-                                fixture
-                              </Typography.Text>
-                              <Flex>
-                                <Input
-                                  placeholder="Enter the name of fixture"
-                                  ref={inputRef}
-                                  style={{ width: 200 }}
-                                  onKeyDown={(e) => e.stopPropagation()}
-                                />
-                                <Button
-                                  type="link"
-                                  icon={<PlusOutlined />}
-                                  onClick={onClickAddFixture}
+                    {fixtureMetaDataPending ? (
+                      <Spin />
+                    ) : (
+                      <Select
+                        disabled={disable}
+                        showSearch
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Divider style={{ margin: "8px 0" }} />
+                            <Space style={{ padding: "0 8px 4px" }}>
+                              <Flex vertical>
+                                <Typography.Text
+                                  style={{
+                                    marginTop: 8,
+                                    marginBottom: 8,
+                                    color: COLORS.textColorLight,
+                                  }}
                                 >
-                                  Add
-                                </Button>
+                                  Couldn't find it in the list ? Add custom
+                                  fixture
+                                </Typography.Text>
+                                <Flex>
+                                  <Input
+                                    placeholder="Enter the name of fixture"
+                                    ref={inputRef}
+                                    style={{ width: 200 }}
+                                    onKeyDown={(e) => e.stopPropagation()}
+                                  />
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    onClick={onClickAddFixture}
+                                  >
+                                    Add
+                                  </Button>
+                                </Flex>
                               </Flex>
-                            </Flex>
-                          </Space>
-                        </>
-                      )}
-                      placeholder="Please select a fixture type"
-                      filterOption={(input, option) =>
-                        (`${option?.label}` || "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      options={fixtureMetaData.map(
-                        (fixtureMeta: FixtureMeta) => {
-                          return {
-                            value: fixtureMeta._id,
-                            label: fixtureMeta.fixtureType,
-                          };
+                            </Space>
+                          </>
+                        )}
+                        placeholder="Please select a fixture type"
+                        filterOption={(input, option) =>
+                          (`${option?.label}` || "")
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
                         }
-                      )}
-                    ></Select>
-                  )}
-                </Form.Item>
-                {/* <Form.Item
+                        options={fixtureMetaData.map(
+                          (fixtureMeta: FixtureMeta) => {
+                            return {
+                              value: fixtureMeta._id,
+                              label: fixtureMeta.fixtureType,
+                            };
+                          }
+                        )}
+                      ></Select>
+                    )}
+                  </Form.Item>
+                  {/* <Form.Item
           name="designName"
           label="Design Name"
           rules={[{ required: true, message: "Please enter the design name" }]}
         >
           <Input />
         </Form.Item> */}
-                <Form.Item name="cost" label="Cost (approx)">
-                  <Input type="number" disabled={disable} />
-                </Form.Item>
-                <Form.Item
-                  name="description"
-                  label="One liner about this fixture"
-                >
-                  <TextArea rows={4} disabled={disable} />
-                </Form.Item>
+                  <Form.Item name="cost" label="Cost (approx)">
+                    <Input type="number" disabled={disable} />
+                  </Form.Item>
+                  <Form.Item
+                    name="description"
+                    label="One liner about this fixture"
+                  >
+                    <TextArea rows={2} disabled={disable} />
+                  </Form.Item>
+                </>
+              );
+            }}
+          </Form.Item>
+        ) : (
+          <Form.Item noStyle shouldUpdate>
+            {({ getFieldsValue }) => {
+              const values = getFieldsValue();
 
-                {showResetBtn && (
-                  <Button size="small" onClick={() => form.resetFields()}>
-                    Reset form
-                  </Button>
-                )}
-              </>
-            );
-          }}
-        </Form.Item>
+              const disable =
+                values.fixtureType || values.cost || values.description;
+
+              if (fixturesDataPending) {
+                return <Spin />;
+              }
+
+              if (projectFixtures.length > 0) {
+                const uniqueOptions = Array.from(
+                  new Set(
+                    projectFixtures.map(
+                      (fixture: Fixture) => fixture.fixtureType?._id
+                    )
+                  )
+                ).map((id) => {
+                  const fixture = projectFixtures.find(
+                    (f: Fixture) => f.fixtureType?._id === id
+                  );
+                  return {
+                    value: id,
+                    label: fixture?.fixtureType?.fixtureType,
+                  };
+                });
+
+                return (
+                  <>
+                    <Flex align="center" gap={5} justify="center">
+                      <Form.Item
+                        style={{ flex: 1 }}
+                        name="existingFixtureId"
+                        label="Select Existing"
+                        rules={[
+                          {
+                            required: disable ? false : true,
+                            message: "Please select fixture",
+                          },
+                        ]}
+                      >
+                        {fixturesDataPending ? (
+                          <Spin />
+                        ) : (
+                          <Select
+                            disabled={disable}
+                            showSearch
+                            placeholder="Please select a fixture"
+                            filterOption={(input, option) =>
+                              (`${option?.label}` || "")
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                            }
+                            options={uniqueOptions}
+                          ></Select>
+                        )}
+                      </Form.Item>
+
+                      {values.existingFixtureId && (
+                        <Button
+                          onClick={() => form.resetFields()}
+                          icon={<CloseCircleOutlined />}
+                          size="small"
+                          type="text"
+                          style={{
+                            marginTop: 5,
+                          }}
+                        ></Button>
+                      )}
+                    </Flex>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        margin: "8px 0",
+                      }}
+                    ></div>
+                  </>
+                );
+              }
+            }}
+          </Form.Item>
+        )}
 
         <Form.Item style={{ marginTop: 20 }}>
           <Button type="primary" htmlType="submit">

@@ -10,7 +10,6 @@ import {
   Flex,
   Tag,
   Typography,
-  Image,
 } from "antd";
 import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import { useSaveProject } from "../../hooks/use-projects";
@@ -197,9 +196,9 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
 
   if (!layoutUploadSkipped) {
     return (
-      <Flex align="center" gap={200}>
-        <Flex vertical style={{ padding: 48 }}>
-          <Typography.Title level={2}>
+      <Flex align="center" style={{ width: "100%" }}>
+        <Flex vertical style={{ padding: 48, width: "40%" }}>
+          <Typography.Title level={3}>
             Do you have the project floorplan ?
           </Typography.Title>
           <Flex vertical>
@@ -238,11 +237,20 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
             ) : null}
           </Flex>
         </Flex>
-        <Image
-          width={400}
-          preview={false}
-          src={layoutImage || "../../floorplan-icon.jpeg"}
-        ></Image>
+        <Flex
+          style={{
+            width: "60%",
+            height: "80vh",
+            backgroundImage: `url(${
+              layoutImage || "../../floorplan-icon.jpeg"
+            })`,
+            backgroundPosition: "center",
+            backgroundSize: "70%",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {" "}
+        </Flex>
       </Flex>
     );
   }

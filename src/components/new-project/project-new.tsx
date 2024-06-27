@@ -1,4 +1,4 @@
-import { Button, Flex, Image, Input, Typography, message } from "antd";
+import { Button, Flex, Input, Typography, message } from "antd";
 import React, { ChangeEvent, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
@@ -52,9 +52,9 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
 
   const renderProjectNameForm = () => {
     return (
-      <Flex align="center" gap={100}>
-        <Flex vertical style={{ padding: 32, width: 600 }}>
-          <Typography.Title level={2}>
+      <Flex align="center" style={{ width: "100%", height: "100%" }}>
+        <Flex vertical style={{ width: "40%", padding: "2.5%" }}>
+          <Typography.Title level={3}>
             {" "}
             What do you want to name this project ?
           </Typography.Title>
@@ -69,12 +69,18 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
             Next
           </Button>
         </Flex>{" "}
-        <Image
-          width={400}
-          preview={false}
-          src="../../new-project-icon.jpeg"
-          style={{ margin: "auto" }}
-        ></Image>
+        <Flex
+          style={{
+            width: "60%",
+            height: "80vh",
+            backgroundImage: "url(../../landing-bg.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {" "}
+        </Flex>
       </Flex>
     );
   };
@@ -85,8 +91,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
       style={{
         backgroundColor: "white",
         borderRadius: 8,
-        padding: 16,
-        minHeight: 540,
+        height: "80vh",
       }}
     >
       {currentProject && currentProject?._id ? (

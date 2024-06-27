@@ -78,20 +78,37 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
   };
 
   return (
-    <Flex vertical style={{ padding: confirmProcessing ? 32 : 0 }}>
+    <Flex
+      vertical
+      style={{ padding: confirmProcessing ? 32 : 0, width: "100%" }}
+    >
       {confirmProcessing ? (
-        <Flex justify="center" gap={100}>
-          <Flex vertical align="center">
-            <Typography.Title level={2} style={{ margin: 0, marginBottom: 16 }}>
-              Its time to upload your designs!
-            </Typography.Title>
+        <Flex style={{ width: "100%" }}>
+          <Flex vertical style={{ width: "40%" }}>
+            <Flex align="center" style={{ marginBottom: 16 }}>
+              <Typography.Title level={3} style={{ margin: 0 }}>
+                Time to upload designs!
+              </Typography.Title>
+              {fileList && fileList.length > 0 ? (
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={handleProcessImages}
+                  style={{ width: 125, marginLeft: "auto" }}
+                >
+                  All set!
+                </Button>
+              ) : null}
+            </Flex>
             {renderUploadBtn()}
           </Flex>
-          <Image
-            style={{ width: 500 }}
-            preview={false}
-            src="../../upload-plcholder.png"
-          ></Image>
+          <Flex style={{ width: "60%" }} justify="center">
+            <Image
+              style={{ width: 500, margin: "auto" }}
+              preview={false}
+              src="../../upload-plcholder.png"
+            ></Image>
+          </Flex>
         </Flex>
       ) : (
         <Flex
@@ -108,19 +125,6 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
           {renderUploadBtn()}
         </Flex>
       )}
-
-      {confirmProcessing &&
-      fileList &&
-      fileList.length > 0 &&
-      fileList.length == totalImagesToUpload ? (
-        <Button
-          type="primary"
-          onClick={handleProcessImages}
-          style={{ marginTop: 32, width: 200 }}
-        >
-          All set!
-        </Button>
-      ) : null}
     </Flex>
   );
 };

@@ -63,6 +63,7 @@ const SpaceDetails: React.FC<{
    * @param updatedSpaceData
    */
   const handleFinish = (updatedSpaceData: Space) => {
+    updatedSpaceData.projectId = projectId;
     if (updatedSpaceData.size) {
       updatedSpaceData.size.l = updatedSpaceData.size.l
         ? convertFeetToInch(updatedSpaceData.size.l)

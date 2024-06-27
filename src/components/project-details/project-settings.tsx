@@ -1,9 +1,12 @@
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import { Button, Flex, Form, Input, message, Modal, Select, Spin } from "antd";
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Spin, Select, Flex, message } from "antd";
-import { useSaveProject } from "../../hooks/use-projects";
-import { Project, ProjectDetailsProps } from "../../interfaces/Project";
+import { useNavigate } from "react-router-dom";
 import { getHomeMeta } from "../../hooks/use-meta";
+import { useDeleteProject, useSaveProject } from "../../hooks/use-projects";
 import { HomeMeta } from "../../interfaces/Meta";
+import { Project, ProjectDetailsProps } from "../../interfaces/Project";
+const { confirm } = Modal;
 
 const { Option } = Select;
 
@@ -61,6 +64,39 @@ const ProjectSettings: React.FC<ProjectDetailsProps> = ({ projectData }) => {
     saveProject(projectUpdatedData);
   };
 
+  const deleteProjectMutation = useDeleteProject();
+  const navigate = useNavigate();
+
+  const showDeleteConfirm = () => {
+    confirm({
+      title: `Delete This Project`,
+      icon: <ExclamationCircleFilled />,
+      content: `Are you sure you want to delete this project?"`,
+      okText: `Delete ${projectData?.name && projectData.name}`,
+      okType: "danger",
+      cancelButtonProps: {
+        type: "default",
+        shape: "default",
+      },
+      onOk: async () => {
+        await deleteProjectMutation
+          .mutateAsync({
+            projectId: projectData?._id as string,
+          })
+          .catch((err) => {
+            message.error("Something went wrong please try again later");
+          })
+          .then((data: Project) => {
+            if (data.archived) {
+              message.success("Project deleted successfully");
+
+              navigate("/");
+            }
+          });
+      },
+    });
+  };
+
   return (
     <Flex style={{ marginTop: 32 }}>
       <Form
@@ -69,42 +105,49 @@ const ProjectSettings: React.FC<ProjectDetailsProps> = ({ projectData }) => {
         onFinish={handleFinish}
         onValuesChange={onFormValuesChange}
       >
-        <Flex vertical>
-          <Form.Item
-            name={["name"]}
-            label="Project Name"
-            rules={[{ required: true, message: "Enter any unique name" }]}
-          >
-            <Input style={{ width: INPUT_WIDTH }} />
-          </Form.Item>
+        <Form.Item
+          name={["name"]}
+          label="Project Name"
+          rules={[{ required: true, message: "Enter any unique name" }]}
+        >
+          <Input style={{ width: INPUT_WIDTH }} />
+        </Form.Item>
 
-          <Form.Item
-            name={["homeDetails", "homeType"]}
-            label="Select Home Type"
-            rules={[
-              { required: true, message: "Please enter the apartment type" },
-            ]}
-          >
-            {homeMetaDataPending ? (
-              <Spin />
-            ) : (
-              <Select showSearch placeholder="Please select an item">
-                {homeMetaData.map((homeMeta: HomeMeta) => (
-                  <Option key={homeMeta._id} value={homeMeta._id}>
-                    {homeMeta.homeType}
-                  </Option>
-                ))}
-              </Select>
-            )}
-          </Form.Item>
-          <Form.Item
-            name={["homeDetails", "size"]}
-            label="Size (sq ft)"
-            rules={[{ required: true, message: "Please enter the size" }]}
-          >
-            <Input type="number" style={{ width: INPUT_WIDTH }} />
-          </Form.Item>
-        </Flex>
+        <Form.Item
+          name={["homeDetails", "homeType"]}
+          label="Select Home Type"
+          rules={[
+            { required: true, message: "Please enter the apartment type" },
+          ]}
+        >
+          {homeMetaDataPending ? (
+            <Spin />
+          ) : (
+            <Select showSearch placeholder="Please select an item">
+              {homeMetaData.map((homeMeta: HomeMeta) => (
+                <Option key={homeMeta._id} value={homeMeta._id}>
+                  {homeMeta.homeType}
+                </Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+        <Form.Item
+          name={["homeDetails", "size"]}
+          label="Size (sq ft)"
+          rules={[{ required: true, message: "Please enter the size" }]}
+        >
+          <Input type="number" style={{ width: INPUT_WIDTH }} />
+        </Form.Item>
+
+        <Button
+          danger
+          onClick={showDeleteConfirm}
+          loading={deleteProjectMutation.isPending}
+        >
+          Delete This Project
+        </Button>
+
         <Form.Item>
           <Button
             type="primary"

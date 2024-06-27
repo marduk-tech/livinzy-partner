@@ -11,11 +11,12 @@ interface HomeDetails {
 }
 
 export interface Project {
-  _id?: string;
+  _id: string;
   name: string;
   homeDetails?: HomeDetails;
   previewImageUrl?: string;
   designerId: string;
+  archived: boolean;
 }
 
 interface ProjectDetailsProps {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex, Modal, Tooltip, Typography, message } from "antd";
+import { Button, Flex, Modal, Typography, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -148,194 +148,203 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   }
 
   return (
-    <Flex
-      vertical
-      style={{
-        width: "100%",
-        maxWidth: 1300,
-      }}
-    >
-      <Modal
-        open={isSpacesSettingsOpen}
-        footer={null}
-        title={
-          <Typography.Title level={4} style={{ margin: 0 }}>
-            Add or Edit Spaces
-          </Typography.Title>
-        }
-        width={600}
-        onCancel={() => {
-          setIsSpacesSettingsOpen(false);
+    <Flex style={{ width: "100%" }} justify="center">
+      <Flex
+        vertical
+        style={{
+          width: "100%",
+          maxWidth: 1300,
         }}
       >
-        <ProjectSpaceDetails projectData={projectData}></ProjectSpaceDetails>{" "}
-      </Modal>
-      <Modal
-        open={isSettingsOpen}
-        footer={null}
-        title={
-          <Typography.Title level={4} style={{ margin: 0 }}>
-            Update Details
+        <Modal
+          open={isSpacesSettingsOpen}
+          footer={null}
+          title={
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              Add or Edit Spaces
+            </Typography.Title>
+          }
+          width={600}
+          onCancel={() => {
+            setIsSpacesSettingsOpen(false);
+          }}
+        >
+          <ProjectSpaceDetails projectData={projectData}></ProjectSpaceDetails>{" "}
+        </Modal>
+        <Modal
+          open={isSettingsOpen}
+          footer={null}
+          title={
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              Update Details
+            </Typography.Title>
+          }
+          width={600}
+          onCancel={() => {
+            setIsSettingsOpen(false);
+          }}
+        >
+          <ProjectSettings
+            projectData={projectData!}
+            onProjectSaved={() => {
+              setIsSettingsOpen(false);
+            }}
+          ></ProjectSettings>
+        </Modal>
+        <Flex align="center" gap={8}>
+          <DesignsIcon></DesignsIcon>
+          <Typography.Title
+            level={3}
+            style={{
+              margin: 0,
+              marginBottom: 0,
+            }}
+          >
+            {projectData!.name}
           </Typography.Title>
-        }
-        width={600}
-        onCancel={() => {
-          setIsSettingsOpen(false);
-        }}
-      >
-        <ProjectSettings projectData={projectData}></ProjectSettings>
-      </Modal>
-      <Flex align="center" gap={8}>
-        <DesignsIcon></DesignsIcon>
-        <Typography.Title
-          level={3}
-          style={{
-            margin: 0,
-            marginBottom: 0,
-          }}
-        >
-          {projectData!.name}
-        </Typography.Title>
-        <Flex style={{ marginLeft: "auto" }}>
-          <Button
-            style={{ color: COLORS.primaryColor }}
-            type="link"
-            onClick={() => {
-              setIsSpacesSettingsOpen(true);
-            }}
-            icon={<RadiusSettingOutlined />}
-          >
-            Spaces
-          </Button>
-          <Button
-            style={{ color: COLORS.primaryColor }}
-            type="link"
-            onClick={() => {
-              setIsSettingsOpen(true);
-            }}
-            icon={<SettingOutlined />}
-          >
-            Settings
-          </Button>
-        </Flex>
-      </Flex>
-      <Flex justify="center" style={{ marginTop: 24 }}>
-        <Flex
-          vertical
-          style={{
-            width: 100,
-            height: 540,
-            overflowY: "scroll",
-            flexWrap: "nowrap",
-            scrollbarWidth: "none" /* Firefox */,
-            msOverflowStyle: "none" /* IE and Edge */,
-          }}
-          gap={16}
-        >
-          {slides.map((slide) => (
-            <Flex
-              style={{
-                width: "100%",
-                height: 80,
+          <Flex style={{ marginLeft: "auto" }}>
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsSpacesSettingsOpen(true);
               }}
+              icon={<RadiusSettingOutlined />}
             >
+              Spaces
+            </Button>
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsSettingsOpen(true);
+              }}
+              icon={<SettingOutlined />}
+            >
+              Settings
+            </Button>
+          </Flex>
+        </Flex>
+        <Flex justify="center" style={{ marginTop: 24 }}>
+          <Flex
+            vertical
+            style={{
+              width: 100,
+              height: 540,
+              overflowY: "scroll",
+              flexWrap: "nowrap",
+              scrollbarWidth: "none" /* Firefox */,
+              msOverflowStyle: "none" /* IE and Edge */,
+            }}
+            gap={16}
+          >
+            {slides.map((slide) => (
               <Flex
-                onClick={() => handleThumbnailClick(slide)}
                 style={{
-                  cursor: "pointer",
                   width: "100%",
                   height: 80,
-                  border:
-                    slide._id == selectedSlide?._id
-                      ? "4px solid"
-                      : "0.5px solid",
-                  borderColor:
-                    slide._id == selectedSlide?._id
-                      ? COLORS.primaryColor
-                      : COLORS.borderColor,
-                  borderRadius: 16,
-                  backgroundImage: `url(${slide.url})`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                  position: "relative",
                 }}
               >
-                <Flex
+                <div
+                  onClick={() => handleThumbnailClick(slide)}
                   style={{
-                    padding: 2,
-                    borderRadius: 4,
-                    border: "1px solid",
-                    borderColor: "#ddd",
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
+                    cursor: "pointer",
+                    width: "100%",
+                    height: 80,
+                    border:
+                      slide._id == selectedSlide?._id
+                        ? "4px solid"
+                        : "0.5px solid",
+                    borderColor:
+                      slide._id == selectedSlide?._id
+                        ? COLORS.primaryColor
+                        : COLORS.borderColor,
+                    borderRadius: 16,
+                    backgroundImage: `url(${slide.url})`,
+                    backgroundPosition: "center",
+                    backgroundSize: "cover",
+                    backgroundRepeat: "no-repeat",
+                    position: "relative",
                   }}
-                >
-                  <Tooltip title="Click to delete">
-                    {/* <Button
-                      type="link"
-                      onClick={onClickDelete}
-                      icon={<DeleteOutlined></DeleteOutlined>}
-                      style={{
-                        color: "white",
-                        width: 24,
-                        height: 24,
-                        padding: 0,
-                        marginRight: 8,
-                      }}
-                    /> */}
-                  </Tooltip>
-                  <Tooltip title="Click to replace">
-                    {/* <Button
-                      type="link"
-                      onClick={onClickReplace}
-                      icon={<UndoOutlined></UndoOutlined>}
-                      style={{
-                        color: "white",
-                        width: 24,
-                        height: 24,
-                        padding: 0,
-                        marginRight: 8,
-                      }}
-                    /> */}
-                  </Tooltip>
-                </Flex>
+                ></div>
               </Flex>
-            </Flex>
-          ))}
-          <ImgsUpload
-            imgsUploaded={imgsUploaded}
-            confirmProcessing={false}
-          ></ImgsUpload>
-        </Flex>
-        <div
-          style={{
-            width: "calc(100% - 440px)",
-            height: 540,
-            marginLeft: 20,
-            marginRight: 20,
-            borderRadius: 16,
-            backgroundImage: `url(${selectedSlide!.url})`,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-          }}
-        ></div>
-        <Flex vertical gap={16} style={{ width: 350 }}>
-          <SlideSpaceMapping
-            key="slide-spaces"
-            isProcessing={processSpacesInSlidesMutation.isPending}
-            onSpacesUpdated={spacesUpdated}
-            projectId={projectData!._id!}
-            slide={selectedSlide!}
-          ></SlideSpaceMapping>
-          <SlideFixtureMapping
-            key="slide-fixtures"
-            onFixturesUpdated={fixturesUpdated}
-            projectId={projectData!._id!}
-            slide={selectedSlide!}
-          ></SlideFixtureMapping>
+            ))}
+            <ImgsUpload
+              imgsUploaded={imgsUploaded}
+              confirmProcessing={false}
+            ></ImgsUpload>
+          </Flex>
+          <Flex
+            style={{
+              width: "calc(100% - 440px)",
+              height: 540,
+              marginLeft: 20,
+              marginRight: 20,
+              borderRadius: 16,
+              backgroundImage: `url(${selectedSlide!.url})`,
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              position: "relative",
+            }}
+          >
+            {" "}
+            {/* <Flex
+            style={{
+              padding: 2,
+              borderRadius: 4,
+              border: "1px solid",
+              borderColor: "#ddd",
+              position: "absolute",
+              top: 8,
+              right: 8,
+            }}
+          >
+            <Tooltip title="Click to delete">
+              <Button
+                type="link"
+                onClick={onClickDelete}
+                icon={<DeleteOutlined></DeleteOutlined>}
+                style={{
+                  color: "white",
+                  width: 24,
+                  height: 24,
+                  padding: 0,
+                  marginRight: 8,
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="Click to replace">
+              <Button
+                type="link"
+                onClick={onClickReplace}
+                icon={<UndoOutlined></UndoOutlined>}
+                style={{
+                  color: "white",
+                  width: 24,
+                  height: 24,
+                  padding: 0,
+                  marginRight: 8,
+                }}
+              />
+            </Tooltip>
+          </Flex> */}
+          </Flex>
+          <Flex vertical gap={16} style={{ width: 350 }}>
+            <SlideSpaceMapping
+              key="slide-spaces"
+              isProcessing={processSpacesInSlidesMutation.isPending}
+              onSpacesUpdated={spacesUpdated}
+              projectId={projectData!._id!}
+              slide={selectedSlide!}
+            ></SlideSpaceMapping>
+            <SlideFixtureMapping
+              key="slide-fixtures"
+              onFixturesUpdated={fixturesUpdated}
+              projectId={projectData!._id!}
+              slide={selectedSlide!}
+            ></SlideFixtureMapping>
+          </Flex>
         </Flex>
       </Flex>
     </Flex>

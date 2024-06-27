@@ -1,11 +1,11 @@
+import { Button, Flex, Input, Typography, message } from "antd";
 import React, { ChangeEvent, useState } from "react";
-import { Button, Flex, Image, Input, Typography, message } from "antd";
-import { Project, ProjectDetailsProps } from "../../interfaces/Project";
-import ProjectBasicDetails from "./project-layout";
-import { useSaveProject } from "../../hooks/use-projects";
 import { useCookies } from "react-cookie";
-import { cookieKeys } from "../../libs/react-query/constants";
 import { useNavigate } from "react-router-dom";
+import { useSaveProject } from "../../hooks/use-projects";
+import { Project, ProjectDetailsProps } from "../../interfaces/Project";
+import { cookieKeys } from "../../libs/react-query/constants";
+import ProjectBasicDetails from "./project-layout";
 
 const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const [currentProject, setCurrentProject] = useState<Project | undefined>(
@@ -18,7 +18,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
 
   const saveProjectMutation = useSaveProject();
   const handleNameSubmit = () => {
-    const projectData: Project = {
+    const projectData: Partial<Project> = {
       name: projectName!,
       designerId: cookies[cookieKeys.userId],
     };
@@ -52,29 +52,36 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
 
   const renderProjectNameForm = () => {
     return (
-      <Flex align="center" gap={100}>
-        <Flex vertical style={{ padding: 32 }}>
-          <Typography.Title level={2}>
+      <Flex align="center" style={{ width: "100%", height: "100%" }}>
+        <Flex vertical style={{ width: "40%", padding: "2.5%" }}>
+          <Typography.Title level={3}>
             {" "}
             What do you want to name this project ?
           </Typography.Title>
           <Input
             onChange={onChangeProjectNmae}
-            style={{ width: 600, height: 75, fontSize: 24 }}
+            style={{ width: 400, height: 75, fontSize: 24 }}
           />
           <Button
             onClick={handleNameSubmit}
+            loading={saveProjectMutation.isPending}
             style={{ height: 75, width: 125, fontSize: 24, marginTop: 16 }}
           >
             Next
           </Button>
         </Flex>{" "}
-        <Image
-          width={550}
-          preview={false}
-          src="../../new-project-icon.jpeg"
-          style={{ margin: "auto" }}
-        ></Image>
+        <Flex
+          style={{
+            width: "60%",
+            height: "80vh",
+            backgroundImage: "url(../../landing-bg.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {" "}
+        </Flex>
       </Flex>
     );
   };
@@ -85,8 +92,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
       style={{
         backgroundColor: "white",
         borderRadius: 8,
-        padding: 16,
-        minHeight: 540,
+        height: "80vh",
       }}
     >
       {currentProject && currentProject?._id ? (

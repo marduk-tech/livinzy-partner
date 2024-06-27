@@ -3,7 +3,6 @@ import { Loader } from "../components/loader";
 import { useFetchProject } from "../hooks/use-projects";
 import ProjectSlideDetails from "../components/project-details/project-slide-details";
 import ProjectNew from "../components/new-project/project-new";
-import { Flex } from "antd";
 
 export function ProjectDetails() {
   const { projectId } = useParams();
@@ -25,9 +24,7 @@ export function ProjectDetails() {
     projectData.homeDetails.homeType
   ) {
     return (
-      <Flex align="center" justify="center">
-        <ProjectSlideDetails projectData={projectData}></ProjectSlideDetails>
-      </Flex>
+      <ProjectSlideDetails projectData={projectData}></ProjectSlideDetails>
     );
   }
 

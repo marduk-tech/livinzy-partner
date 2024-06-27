@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex, Modal, Tooltip, Typography, message } from "antd";
+import { Button, Flex, Modal, Typography, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -13,12 +13,7 @@ import SlideFixtureMapping from "./slide-fixture-mapping";
 import { COLORS } from "../../styles/colors";
 import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 import { DesignsIcon } from "../../libs/icons";
-import {
-  DeleteOutlined,
-  RadiusSettingOutlined,
-  SettingOutlined,
-  UndoOutlined,
-} from "@ant-design/icons";
+import { RadiusSettingOutlined, SettingOutlined } from "@ant-design/icons";
 import ProjectSpaceDetails from "./project-space-details";
 import ProjectSettings from "./project-settings";
 
@@ -188,7 +183,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           setIsSettingsOpen(false);
         }}
       >
-        <ProjectSettings projectData={projectData}></ProjectSettings>
+        <ProjectSettings
+          projectData={projectData!}
+          onProjectSaved={() => {
+            setIsSettingsOpen(false);
+          }}
+        ></ProjectSettings>
       </Modal>
       <Flex align="center" gap={8}>
         <DesignsIcon></DesignsIcon>
@@ -288,7 +288,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           }}
         >
           {" "}
-          <Flex
+          {/* <Flex
             style={{
               padding: 2,
               borderRadius: 4,
@@ -327,7 +327,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                 }}
               />
             </Tooltip>
-          </Flex>
+          </Flex> */}
         </Flex>
         <Flex vertical gap={16} style={{ width: 350 }}>
           <SlideSpaceMapping

@@ -5,14 +5,19 @@ import { useNavigate } from "react-router-dom";
 import { getHomeMeta } from "../../hooks/use-meta";
 import { useDeleteProject, useSaveProject } from "../../hooks/use-projects";
 import { HomeMeta } from "../../interfaces/Meta";
-import { Project, ProjectDetailsProps } from "../../interfaces/Project";
+import { Project } from "../../interfaces/Project";
+import { queryClient } from "../../libs/react-query/query-client";
+import { queryKeys } from "../../libs/react-query/constants";
 const { confirm } = Modal;
 
 const { Option } = Select;
 
 const INPUT_WIDTH = 400;
 
-const ProjectSettings: React.FC<ProjectDetailsProps> = ({ projectData }) => {
+const ProjectSettings: React.FC<{
+  projectData: Project;
+  onProjectSaved: any;
+}> = ({ projectData, onProjectSaved }) => {
   const [form] = Form.useForm();
   const saveProjectMutation = useSaveProject();
 
@@ -56,6 +61,10 @@ const ProjectSettings: React.FC<ProjectDetailsProps> = ({ projectData }) => {
     saveProjectMutation.mutate(projectUpdatedData, {
       onSuccess: () => {
         message.success("Project saved successfully");
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.getProject, projectData?._id],
+        });
+        onProjectSaved();
       },
       onError: () => {},
     });
@@ -142,10 +151,12 @@ const ProjectSettings: React.FC<ProjectDetailsProps> = ({ projectData }) => {
 
         <Button
           danger
+          type="link"
           onClick={showDeleteConfirm}
+          style={{ padding: 0 }}
           loading={deleteProjectMutation.isPending}
         >
-          Delete This Project
+          I want to delete this project
         </Button>
 
         <Form.Item>

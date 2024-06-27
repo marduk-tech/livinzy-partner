@@ -13,7 +13,12 @@ import SlideFixtureMapping from "./slide-fixture-mapping";
 import { COLORS } from "../../styles/colors";
 import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 import { DesignsIcon } from "../../libs/icons";
-import { RadiusSettingOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  RadiusSettingOutlined,
+  SettingOutlined,
+  UndoOutlined,
+} from "@ant-design/icons";
 import ProjectSpaceDetails from "./project-space-details";
 import ProjectSettings from "./project-settings";
 
@@ -239,7 +244,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                 height: 80,
               }}
             >
-              <Flex
+              <div
                 onClick={() => handleThumbnailClick(slide)}
                 style={{
                   cursor: "pointer",
@@ -260,48 +265,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
                   backgroundRepeat: "no-repeat",
                   position: "relative",
                 }}
-              >
-                <Flex
-                  style={{
-                    padding: 2,
-                    borderRadius: 4,
-                    border: "1px solid",
-                    borderColor: "#ddd",
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                  }}
-                >
-                  <Tooltip title="Click to delete">
-                    {/* <Button
-                      type="link"
-                      onClick={onClickDelete}
-                      icon={<DeleteOutlined></DeleteOutlined>}
-                      style={{
-                        color: "white",
-                        width: 24,
-                        height: 24,
-                        padding: 0,
-                        marginRight: 8,
-                      }}
-                    /> */}
-                  </Tooltip>
-                  <Tooltip title="Click to replace">
-                    {/* <Button
-                      type="link"
-                      onClick={onClickReplace}
-                      icon={<UndoOutlined></UndoOutlined>}
-                      style={{
-                        color: "white",
-                        width: 24,
-                        height: 24,
-                        padding: 0,
-                        marginRight: 8,
-                      }}
-                    /> */}
-                  </Tooltip>
-                </Flex>
-              </Flex>
+              ></div>
             </Flex>
           ))}
           <ImgsUpload
@@ -309,7 +273,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             confirmProcessing={false}
           ></ImgsUpload>
         </Flex>
-        <div
+        <Flex
           style={{
             width: "calc(100% - 440px)",
             height: 540,
@@ -320,8 +284,51 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             backgroundPosition: "center",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
+            position: "relative",
           }}
-        ></div>
+        >
+          {" "}
+          <Flex
+            style={{
+              padding: 2,
+              borderRadius: 4,
+              border: "1px solid",
+              borderColor: "#ddd",
+              position: "absolute",
+              top: 8,
+              right: 8,
+            }}
+          >
+            <Tooltip title="Click to delete">
+              <Button
+                type="link"
+                onClick={onClickDelete}
+                icon={<DeleteOutlined></DeleteOutlined>}
+                style={{
+                  color: "white",
+                  width: 24,
+                  height: 24,
+                  padding: 0,
+                  marginRight: 8,
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="Click to replace">
+              <Button
+                type="link"
+                onClick={onClickReplace}
+                icon={<UndoOutlined></UndoOutlined>}
+                style={{
+                  color: "white",
+                  width: 24,
+                  height: 24,
+                  padding: 0,
+                  marginRight: 8,
+                }}
+              />
+            </Tooltip>
+          </Flex>
+        </Flex>
         <Flex vertical gap={16} style={{ width: 350 }}>
           <SlideSpaceMapping
             key="slide-spaces"

@@ -53,14 +53,14 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const renderProjectNameForm = () => {
     return (
       <Flex align="center" gap={100}>
-        <Flex vertical style={{ padding: 32 }}>
+        <Flex vertical style={{ padding: 32, width: 600 }}>
           <Typography.Title level={2}>
             {" "}
             What do you want to name this project ?
           </Typography.Title>
           <Input
             onChange={onChangeProjectNmae}
-            style={{ width: 600, height: 75, fontSize: 24 }}
+            style={{ width: 400, height: 75, fontSize: 24 }}
           />
           <Button
             onClick={handleNameSubmit}
@@ -70,7 +70,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
           </Button>
         </Flex>{" "}
         <Image
-          width={550}
+          width={400}
           preview={false}
           src="../../new-project-icon.jpeg"
           style={{ margin: "auto" }}

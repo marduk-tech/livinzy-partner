@@ -17,7 +17,7 @@ import { SpaceMeta } from "../interfaces/Meta";
 import { queryClient } from "../libs/react-query/query-client";
 import { queryKeys } from "../libs/react-query/constants";
 import TextArea from "antd/es/input/TextArea";
-import { convertFeetToInch } from "../libs/lvnzy-helper";
+import { convertFeetToInch, convertInchToFeet } from "../libs/lvnzy-helper";
 
 const SpaceDetails: React.FC<{
   spaceData: Space;
@@ -36,6 +36,10 @@ const SpaceDetails: React.FC<{
     console.log(projectId);
     if (!spaceData) {
       return;
+    }
+    if (spaceData.size) {
+      spaceData.size.l = convertInchToFeet(spaceData.size.l);
+      spaceData.size.w = convertInchToFeet(spaceData.size.w);
     }
     form.setFieldsValue({
       ...spaceData,

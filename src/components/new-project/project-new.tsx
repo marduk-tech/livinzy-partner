@@ -64,6 +64,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
           />
           <Button
             onClick={handleNameSubmit}
+            loading={saveProjectMutation.isPending}
             style={{ height: 75, width: 125, fontSize: 24, marginTop: 16 }}
           >
             Next

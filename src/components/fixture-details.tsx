@@ -70,6 +70,15 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   };
 
+  const onChangeFixtureType = (value: string) => {
+    const fixtureType = fixtureMetaData.find(
+      (f: FixtureMeta) => f._id == value
+    );
+    form.setFieldsValue({
+      designName: fixtureType.fixtureType,
+    });
+  };
+
   const onClickAddFixture = () => {
     if (
       inputRef.current &&
@@ -167,6 +176,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                       <Spin />
                     ) : (
                       <Select
+                        onChange={onChangeFixtureType}
                         disabled={disable}
                         showSearch
                         dropdownRender={(menu) => (
@@ -189,7 +199,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                   <Input
                                     placeholder="Enter the name of fixture"
                                     ref={inputRef}
-                                    style={{ width: 200 }}
+                                    style={{ width: 300 }}
                                     onKeyDown={(e) => e.stopPropagation()}
                                   />
                                   <Button
@@ -221,13 +231,18 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                       ></Select>
                     )}
                   </Form.Item>
-                  {/* <Form.Item
-          name="designName"
-          label="Design Name"
-          rules={[{ required: true, message: "Please enter the design name" }]}
-        >
-          <Input />
-        </Form.Item> */}
+                  <Form.Item
+                    name="designName"
+                    label="Custom name for the fixture"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter a custom name",
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
                   <Form.Item name="cost" label="Cost (approx)">
                     <Input type="number" disabled={disable} />
                   </Form.Item>

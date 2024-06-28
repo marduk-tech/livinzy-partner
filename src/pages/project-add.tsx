@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { Loader } from "../components/loader";
 import { useFetchProject } from "../hooks/use-projects";
-import ProjectSlideDetails from "../components/project-details/project-slide-details";
+import ProjectNew from "../components/new-project/project-new";
 
-export function ProjectDetails() {
+export function ProjectAdd() {
   const { projectId } = useParams();
 
   const {
@@ -16,5 +16,5 @@ export function ProjectDetails() {
     return <Loader />;
   }
 
-  return <ProjectSlideDetails projectData={projectData}></ProjectSlideDetails>;
+  return <ProjectNew projectData={projectData!}></ProjectNew>;
 }

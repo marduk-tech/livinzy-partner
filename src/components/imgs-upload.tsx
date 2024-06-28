@@ -66,7 +66,7 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
         accept="image/*"
       >
         <Button
-          disabled={fileList.length >= 15}
+          disabled={uploadPending}
           loading={uploadPending}
           type="link"
           style={{ border: 0, color: COLORS.primaryColor, fontSize: 18 }}
@@ -93,6 +93,7 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
                 <Button
                   type="primary"
                   size="small"
+                  disabled={uploadPending}
                   onClick={handleProcessImages}
                   style={{ width: 125, marginLeft: "auto" }}
                 >
@@ -113,8 +114,8 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
       ) : (
         <Flex
           style={{
-            width: 100,
-            height: 80,
+            width: 115,
+            height: 85,
             borderRadius: !confirmProcessing ? 16 : 0,
             border: !confirmProcessing ? "2px dashed" : 0,
             borderColor: COLORS.borderColor,

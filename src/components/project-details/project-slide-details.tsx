@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex, Modal, Typography, message } from "antd";
+import { Button, Flex, Image, Modal, Tag, Typography, message } from "antd";
 import ImgsUpload from "../imgs-upload";
 import {
   useBulkSaveSlides,
@@ -13,9 +13,15 @@ import SlideFixtureMapping from "./slide-fixture-mapping";
 import { COLORS } from "../../styles/colors";
 import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 import { DesignsIcon } from "../../libs/icons";
-import { RadiusSettingOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  RadiusSettingOutlined,
+  SettingOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import ProjectSpaceDetails from "./project-space-details";
 import ProjectSettings from "./project-settings";
+import { useFetchSpacesByProject } from "../../hooks/use-spaces";
+import { Space } from "../../interfaces/Space";
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -24,10 +30,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const [slides, setSlides] = useState<Slide[]>([]);
   const [isSpacesSettingsOpen, setIsSpacesSettingsOpen] = useState<boolean>();
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>();
+  const { data: allSpaces, isLoading: allSpacesLoading } =
+    useFetchSpacesByProject(projectData!._id!);
 
   const bulkSaveSlidesMutation = useBulkSaveSlides();
   const updateSlideMutation = useSaveSlide();
-  const processSpacesInSlidesMutation = useProcessSpacesInSlides();
+  const processSlidesInSpacesMutation = useProcessSpacesInSlides();
 
   const {
     data: slidesData,
@@ -42,25 +50,6 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     setSlides(slidesData);
     setSelectedSlide(slidesData[0]);
   }, [slidesData]);
-
-  useEffect(() => {
-    if (!selectedSlide) {
-      return;
-    }
-    if (!!selectedSlide.spaces && !!selectedSlide.spaces.length) {
-      return;
-    }
-    processSpacesInSlidesMutation.mutate(
-      { projectId: projectData!._id!, slideId: selectedSlide._id },
-      {
-        onSuccess: async (response: any) => {
-          selectedSlide!.spaces = response.spaces;
-          setSelectedSlide(selectedSlide);
-        },
-        onError: () => {},
-      }
-    );
-  }, [selectedSlide]);
 
   const fixturesUpdated = (fixtures: string[]) => {
     selectedSlide!.fixtures = fixtures;
@@ -113,9 +102,16 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         if (!selectedSlide) {
           setSelectedSlide(response[0]);
         }
+        processSlidesInSpacesMutation.mutate(
+          { projectId: projectData!._id! },
+          {
+            onSuccess: async (response: any) => {
+              refetchSlidesData();
+            },
+            onError: () => {},
+          }
+        );
         message.success("Designs saved successfully!");
-
-        // await queryClient.invalidateQueries({queryKey: [queryKeys.getSpaces]});
       },
       onError: () => {
         message.error("Failed to save project.");
@@ -123,10 +119,85 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     });
   };
 
-  if (slidesDataPending) {
+  const renderSlideThumbnails = () => {
+    let spaceDivider: string,
+      toAddDivider = false;
+    return slides
+      .sort((s1: Slide, s2: Slide) =>
+        (s2.spaces && s2.spaces.length ? s2.spaces[0] : "").localeCompare(
+          s1.spaces && s1.spaces.length ? s1.spaces[0] : ""
+        )
+      )
+      .map((slide) => {
+        const slideSpace = allSpaces.find(
+          (s: Space) =>
+            s._id ==
+            (slide.spaces && slide.spaces.length ? slide.spaces![0] : "")
+        );
+        if (slideSpace) {
+          if (!spaceDivider || spaceDivider !== slideSpace.name) {
+            spaceDivider = slideSpace.name;
+            toAddDivider = true;
+          } else {
+            toAddDivider = false;
+          }
+        } else {
+          toAddDivider = false;
+        }
+
+        return (
+          <Flex
+            style={{
+              width: "100%",
+            }}
+          >
+            <Flex vertical style={{ width: "100%" }}>
+              {toAddDivider && (
+                <Typography.Text
+                  style={{
+                    fontSize: "75%",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  {spaceDivider.toUpperCase()}
+                </Typography.Text>
+              )}
+              <div
+                onClick={() => handleThumbnailClick(slide)}
+                style={{
+                  cursor: "pointer",
+                  width: "100%",
+                  height: 85,
+                  border:
+                    slide._id == selectedSlide?._id
+                      ? "4px solid"
+                      : "0.5px solid",
+                  borderColor:
+                    slide._id == selectedSlide?._id
+                      ? COLORS.primaryColor
+                      : COLORS.borderColor,
+                  borderRadius: 8,
+                  backgroundImage: `url(${slide.url})`,
+                  backgroundPosition: "center",
+                  backgroundSize: "cover",
+                  backgroundRepeat: "no-repeat",
+                  position: "relative",
+                }}
+              ></div>
+            </Flex>
+          </Flex>
+        );
+      });
+  };
+
+  if (slidesDataPending || allSpacesLoading) {
     return <>Loading...</>;
   }
 
+  /**
+   * When there are no slides added.
+   */
   if (!slidesDataPending && (!slides || !slides.length)) {
     return (
       <Flex
@@ -202,6 +273,11 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           >
             {projectData!.name}
           </Typography.Title>
+          {processSlidesInSpacesMutation.isPending && (
+            <Tag icon={<SyncOutlined spin />} color="processing">
+              Processing designs..
+            </Tag>
+          )}
           <Flex style={{ marginLeft: "auto" }}>
             <Button
               style={{ color: COLORS.primaryColor }}
@@ -229,7 +305,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           <Flex
             vertical
             style={{
-              width: 100,
+              width: 125,
               height: 540,
               overflowY: "scroll",
               flexWrap: "nowrap",
@@ -238,57 +314,32 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             }}
             gap={16}
           >
-            {slides.map((slide) => (
-              <Flex
-                style={{
-                  width: "100%",
-                  height: 80,
-                }}
-              >
-                <div
-                  onClick={() => handleThumbnailClick(slide)}
-                  style={{
-                    cursor: "pointer",
-                    width: "100%",
-                    height: 80,
-                    border:
-                      slide._id == selectedSlide?._id
-                        ? "4px solid"
-                        : "0.5px solid",
-                    borderColor:
-                      slide._id == selectedSlide?._id
-                        ? COLORS.primaryColor
-                        : COLORS.borderColor,
-                    borderRadius: 16,
-                    backgroundImage: `url(${slide.url})`,
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                    backgroundRepeat: "no-repeat",
-                    position: "relative",
-                  }}
-                ></div>
-              </Flex>
-            ))}
+            {renderSlideThumbnails()}
             <ImgsUpload
               imgsUploaded={imgsUploaded}
               confirmProcessing={false}
             ></ImgsUpload>
           </Flex>
           <Flex
+            justify="center"
             style={{
               width: "calc(100% - 440px)",
               height: 540,
               marginLeft: 20,
               marginRight: 20,
               borderRadius: 16,
-              backgroundImage: `url(${selectedSlide!.url})`,
+              backgroundColor: COLORS.borderColorDark,
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",
               position: "relative",
             }}
           >
-            {" "}
+            <Image
+              preview={false}
+              src={selectedSlide!.url}
+              height={540}
+            ></Image>
             {/* <Flex
             style={{
               padding: 2,
@@ -333,10 +384,10 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           <Flex vertical gap={16} style={{ width: 350 }}>
             <SlideSpaceMapping
               key="slide-spaces"
-              isProcessing={processSpacesInSlidesMutation.isPending}
               onSpacesUpdated={spacesUpdated}
               projectId={projectData!._id!}
               slide={selectedSlide!}
+              processingDesigns={processSlidesInSpacesMutation.isPending}
             ></SlideSpaceMapping>
             <SlideFixtureMapping
               key="slide-fixtures"

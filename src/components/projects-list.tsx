@@ -50,7 +50,7 @@ const ProjectsList: React.FC = () => {
               />
             }
             onClick={() => {
-              navigate(`/projects/details/new`);
+              navigate(`/projects/new`);
             }}
           >
             <Meta
@@ -82,7 +82,11 @@ const ProjectsList: React.FC = () => {
                   );
                   return;
                 }
-                navigate(`/projects/details/${project._id}`);
+                if (project.homeDetails && project.homeDetails.homeType) {
+                  navigate(`/projects/details/${project._id}`);
+                } else {
+                  navigate(`/projects/new`);
+                }
               }}
               style={{ width: isMobile ? "100%" : 240, borderRadius: 16 }}
               cover={

@@ -10,6 +10,7 @@ import HomePage from "../pages/home";
 import Landing from "../pages/landing";
 import { ProjectDetails } from "../pages/project-details";
 import WalletPage from "../pages/wallet";
+import { ProjectAdd } from "../pages/project-add";
 
 export const Router = () => {
   return (
@@ -24,6 +25,7 @@ export const Router = () => {
           path="/projects/details/:projectId"
           element={<ProjectDetails />}
         />
+        <Route path="/projects/new" element={<ProjectAdd />} />
       </Route>
 
       <Route path="/*" element={<div>404</div>} />

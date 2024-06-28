@@ -34,12 +34,23 @@ export const useProcessSpacesLayout = () => {
   });
 };
 
-export const useProcessSpacesInSlides = () => {
+export const useProcessSlidesInSpaces = () => {
   return useMutation({
     mutationFn: async (slideData: any) => {
       const { data } = await axiosApiInstance.post("/ai/slidespaces", {
         projectId: slideData.projectId,
         slideId: slideData.slideId,
+      });
+      return data;
+    },
+  });
+};
+
+export const useProcessSpacesInSlides = () => {
+  return useMutation({
+    mutationFn: async (slideData: any) => {
+      const { data } = await axiosApiInstance.post("/ai/spacesslides", {
+        projectId: slideData.projectId,
       });
       return data;
     },

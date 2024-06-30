@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Upload, Button, message, Flex, Typography, Image } from "antd";
+import { Button, Flex, Image, message, Typography, Upload } from "antd";
 import type { UploadFile, UploadProps } from "antd/es/upload/interface";
+import React, { useEffect, useState } from "react";
 import { baseApiUrl } from "../libs/constants";
 import { COLORS } from "../styles/colors";
 
@@ -9,11 +9,13 @@ const MAX_IMAGE_SIZE_MB = 5;
 interface ImgsUploadProps {
   imgsUploaded: (imgs: string[]) => void;
   confirmProcessing: boolean;
+  isMultiple?: boolean;
 }
 
 const ImgsUpload: React.FC<ImgsUploadProps> = ({
   imgsUploaded,
   confirmProcessing,
+  isMultiple = true,
 }) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadPending, setUploadPending] = useState<boolean>(false);
@@ -58,7 +60,8 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
         fileList={fileList}
         onChange={handleChange}
         beforeUpload={beforeUpload}
-        multiple
+        multiple={isMultiple}
+        maxCount={!isMultiple ? 1 : undefined}
         name="images"
         action={`${baseApiUrl}upload/multiple`}
         listType={confirmProcessing ? "picture-card" : "picture"}

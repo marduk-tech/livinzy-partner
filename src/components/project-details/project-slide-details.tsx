@@ -1,15 +1,30 @@
 import {
+  DeleteOutlined,
+  ExclamationCircleFilled,
   ExpandOutlined,
   FormatPainterOutlined,
   RadiusSettingOutlined,
   SettingOutlined,
   SyncOutlined,
+  UndoOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Image, Modal, Tag, Typography, message } from "antd";
+import {
+  Button,
+  Flex,
+  Image,
+  Modal,
+  Tag,
+  Tooltip,
+  Typography,
+  Upload,
+  message,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 import {
   useBulkSaveSlides,
+  useDeleteSlide,
   useFetchSlidesByProject,
   useSaveSlide,
 } from "../../hooks/use-slides";
@@ -30,6 +45,7 @@ import ProjectSettings from "./project-settings";
 import ProjectSpaceDetails from "./project-space-details";
 import SlideFixtureMapping from "./slide-fixture-mapping";
 import SlideSpaceMapping from "./slide-space-mapping";
+const { confirm } = Modal;
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -40,6 +56,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const [isSpacesSettingsOpen, setIsSpacesSettingsOpen] = useState<boolean>();
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>();
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>();
+  const [isReplaceSlideOpen, setIsReplaceSlideOpen] = useState<boolean>();
+
+  // State to manage the selected slide for replacement
+  const [replacementSlideUrl, setReplacementSlideUrl] = useState<string | null>(
+    null
+  );
 
   const { data: allSpaces, isLoading: allSpacesLoading } =
     useFetchSpacesByProject(projectData!._id!);
@@ -47,6 +69,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const bulkSaveSlidesMutation = useBulkSaveSlides();
   const updateSlideMutation = useSaveSlide();
   const processSlidesInSpacesMutation = useProcessSpacesInSlides();
+  const deleteSlideMutation = useDeleteSlide();
 
   const {
     data: slidesData,
@@ -58,8 +81,13 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     if (!slidesData || !slidesData.length) {
       return;
     }
-    setSlides(slidesData);
-    setSelectedSlide(slidesData[0]);
+
+    const filterArchivedSlides = slidesData.filter(
+      (slide: Slide) => !slide.archived
+    );
+
+    setSlides(filterArchivedSlides);
+    setSelectedSlide(filterArchivedSlides[0]);
   }, [slidesData]);
 
   const fixturesUpdated = (fixtures: string[]) => {
@@ -84,10 +112,37 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
 
   const onClickDelete = (event: any) => {
     event.stopPropagation();
+    confirm({
+      title: `Delete This Slide`,
+      icon: <ExclamationCircleFilled />,
+      content: `Are you sure you want to delete this slide?"`,
+      okText: `Delete`,
+      okType: "danger",
+      cancelButtonProps: {
+        type: "default",
+        shape: "default",
+      },
+      onOk: async () => {
+        await deleteSlideMutation
+          .mutateAsync(selectedSlide?._id as string)
+          .catch((err) => {
+            message.error("Something went wrong please try again later");
+          })
+          .then((data: Slide) => {
+            if (data.archived) {
+              message.success("Slide deleted successfully");
+            }
+
+            refetchSlidesData();
+          });
+      },
+    });
   };
 
   const onClickReplace = (event: any) => {
     event.stopPropagation();
+    setReplacementSlideUrl(null);
+    setIsReplaceSlideOpen(true);
   };
 
   /**
@@ -134,6 +189,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     let spaceDivider: string,
       toAddDivider = false;
     return slides
+
       .sort((s1: Slide, s2: Slide) =>
         (s2.spaces && s2.spaces.length ? s2.spaces[0] : "").localeCompare(
           s1.spaces && s1.spaces.length ? s1.spaces[0] : ""
@@ -202,6 +258,26 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
       });
   };
 
+  const handleReplaceSlide = async () => {
+    if (selectedSlide) {
+      const updateData = {
+        ...selectedSlide,
+        url: replacementSlideUrl ? replacementSlideUrl : selectedSlide.url,
+      };
+
+      await updateSlideMutation.mutateAsync(updateData, {
+        onSuccess: async () => {
+          message.success("Changes saved");
+        },
+        onError: () => {},
+      });
+
+      refetchSlidesData();
+      setIsReplaceSlideOpen(false);
+      setReplacementSlideUrl(null);
+    }
+  };
+
   if (slidesDataPending || allSpacesLoading) {
     return <>Loading...</>;
   }
@@ -238,6 +314,39 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           maxWidth: 1300,
         }}
       >
+        <Modal
+          open={isReplaceSlideOpen}
+          onOk={handleReplaceSlide}
+          okText="Replace Slide"
+          confirmLoading={updateSlideMutation.isPending}
+          title={
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              Replace Slide
+            </Typography.Title>
+          }
+          width={600}
+          onCancel={() => {
+            setIsReplaceSlideOpen(false);
+          }}
+        >
+          {selectedSlide && (
+            <Image
+              style={{ width: "100%", margin: "auto" }}
+              preview={false}
+              src={
+                replacementSlideUrl ? replacementSlideUrl : selectedSlide.url
+              }
+            ></Image>
+          )}
+          <div style={{ marginTop: 20 }}>
+            <ImgsUpload
+              isMultiple={false}
+              imgsUploaded={(imgs: string[]) => setReplacementSlideUrl(imgs[0])}
+              confirmProcessing={false}
+            ></ImgsUpload>
+          </div>
+        </Modal>
+
         <Modal
           open={isProjectFixturesOpen}
           footer={null}
@@ -401,46 +510,47 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               src={selectedSlide!.url}
               height={540}
             ></Image>
-            {/* <Flex
-            style={{
-              padding: 2,
-              borderRadius: 4,
-              border: "1px solid",
-              borderColor: "#ddd",
-              position: "absolute",
-              top: 8,
-              right: 8,
-            }}
-          >
-            <Tooltip title="Click to delete">
-              <Button
-                type="link"
-                onClick={onClickDelete}
-                icon={<DeleteOutlined></DeleteOutlined>}
-                style={{
-                  color: "white",
-                  width: 24,
-                  height: 24,
-                  padding: 0,
-                  marginRight: 8,
-                }}
-              />
-            </Tooltip>
-            <Tooltip title="Click to replace">
-              <Button
-                type="link"
-                onClick={onClickReplace}
-                icon={<UndoOutlined></UndoOutlined>}
-                style={{
-                  color: "white",
-                  width: 24,
-                  height: 24,
-                  padding: 0,
-                  marginRight: 8,
-                }}
-              />
-            </Tooltip>
-          </Flex> */}
+
+            <Flex
+              style={{
+                padding: 2,
+                borderRadius: 4,
+                border: "1px solid",
+                borderColor: "#ddd",
+                position: "absolute",
+                top: 8,
+                right: 8,
+              }}
+            >
+              <Tooltip title="Click to delete">
+                <Button
+                  type="link"
+                  onClick={onClickDelete}
+                  icon={<DeleteOutlined />}
+                  style={{
+                    color: "white",
+                    width: 24,
+                    height: 24,
+                    padding: 0,
+                    marginRight: 8,
+                  }}
+                />
+              </Tooltip>
+              <Tooltip title="Click to replace">
+                <Button
+                  type="link"
+                  onClick={onClickReplace}
+                  icon={<UndoOutlined />}
+                  style={{
+                    color: "white",
+                    width: 24,
+                    height: 24,
+                    padding: 0,
+                    marginRight: 8,
+                  }}
+                />
+              </Tooltip>
+            </Flex>
           </Flex>
           <Flex vertical gap={16} style={{ width: 350 }}>
             <SlideSpaceMapping

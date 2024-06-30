@@ -1,33 +1,39 @@
-import React, { useEffect, useState } from "react";
+import {
+  FormatPainterOutlined,
+  RadiusSettingOutlined,
+  SettingOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { Button, Flex, Image, Modal, Tag, Typography, message } from "antd";
-import ImgsUpload from "../imgs-upload";
+import React, { useEffect, useState } from "react";
+import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 import {
   useBulkSaveSlides,
   useFetchSlidesByProject,
   useSaveSlide,
 } from "../../hooks/use-slides";
+import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { ProjectDetailsProps } from "../../interfaces/Project";
 import { Slide } from "../../interfaces/Slide";
-import SlideSpaceMapping from "./slide-space-mapping";
-import SlideFixtureMapping from "./slide-fixture-mapping";
-import { COLORS } from "../../styles/colors";
-import { useProcessSpacesInSlides } from "../../hooks/use-ai";
-import { DesignsIcon } from "../../libs/icons";
-import {
-  RadiusSettingOutlined,
-  SettingOutlined,
-  SyncOutlined,
-} from "@ant-design/icons";
-import ProjectSpaceDetails from "./project-space-details";
-import ProjectSettings from "./project-settings";
-import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { Space } from "../../interfaces/Space";
+import { DesignsIcon } from "../../libs/icons";
+import { COLORS } from "../../styles/colors";
+import ImgsUpload from "../imgs-upload";
+import {
+  default as AllFixtures,
+  default as ProjectFixtureDetails,
+} from "./all-fixtures";
+import ProjectSettings from "./project-settings";
+import ProjectSpaceDetails from "./project-space-details";
+import SlideFixtureMapping from "./slide-fixture-mapping";
+import SlideSpaceMapping from "./slide-space-mapping";
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
 }) => {
   const [selectedSlide, setSelectedSlide] = useState<Slide>();
   const [slides, setSlides] = useState<Slide[]>([]);
+  const [isProjectFixturesOpen, setIsProjectFixturesOpen] = useState<boolean>();
   const [isSpacesSettingsOpen, setIsSpacesSettingsOpen] = useState<boolean>();
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>();
   const { data: allSpaces, isLoading: allSpacesLoading } =
@@ -228,6 +234,25 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         }}
       >
         <Modal
+          open={isProjectFixturesOpen}
+          footer={null}
+          title={
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              All Fixtures
+            </Typography.Title>
+          }
+          width={600}
+          onCancel={() => {
+            setIsProjectFixturesOpen(false);
+          }}
+        >
+          <ProjectFixtureDetails
+            projectData={projectData}
+            fixturesUpdated={fixturesUpdated}
+          ></ProjectFixtureDetails>
+        </Modal>
+
+        <Modal
           open={isSpacesSettingsOpen}
           footer={null}
           title={
@@ -242,6 +267,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         >
           <ProjectSpaceDetails projectData={projectData}></ProjectSpaceDetails>{" "}
         </Modal>
+
         <Modal
           open={isSettingsOpen}
           footer={null}
@@ -279,6 +305,16 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             </Tag>
           )}
           <Flex style={{ marginLeft: "auto" }}>
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsProjectFixturesOpen(true);
+              }}
+              icon={<FormatPainterOutlined />}
+            >
+              Fixtures
+            </Button>
             <Button
               style={{ color: COLORS.primaryColor }}
               type="link"

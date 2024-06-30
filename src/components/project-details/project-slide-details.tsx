@@ -1,4 +1,5 @@
 import {
+  ExpandOutlined,
   FormatPainterOutlined,
   RadiusSettingOutlined,
   SettingOutlined,
@@ -23,7 +24,6 @@ import MobileFrame from "../common/mobile-frame";
 import ImgsUpload from "../imgs-upload";
 import {
   default as AllFixtures,
-  ExpandOutlined,
   default as ProjectFixtureDetails,
 } from "./all-fixtures";
 import ProjectSettings from "./project-settings";

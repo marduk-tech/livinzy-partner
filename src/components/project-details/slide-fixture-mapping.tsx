@@ -94,7 +94,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
 
   const onSaveFixture = (fixtureData: FixtureFormData) => {
     fixtureData.projectId = projectId;
-    fixtureData._id = editingFixture?._id;
+    fixtureData._id = fixtureData._id || editingFixture?._id;
     saveFixtureMutation.mutate(fixtureData, {
       onSuccess: (response: any) => {
         slide.fixtures = slide.fixtures || [];

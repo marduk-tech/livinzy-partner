@@ -42,7 +42,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
 
-  const [selectExisting, setSelectExisting] = useState<boolean>(false);
+  const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
 
   const {
     data: fixtureMetaData,
@@ -61,7 +61,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const handleFinish = (values: any) => {
     if (values.existingFixtureId) {
       const fixture = projectFixtures.find(
-        (f: Fixture) => f.fixtureType?._id === values.existingFixtureId
+        (f: Fixture) => f._id === values.existingFixtureId
       );
 
       onSubmit(fixture);
@@ -124,6 +124,9 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 
   return (
     <Modal
+      afterClose={() => {
+        form.resetFields();
+      }}
       title={
         <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
           {fixture ? "Edit Fixture" : "Add Fixture"}
@@ -131,26 +134,32 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
       }
       footer={null}
       open={isOpen}
-      onCancel={onCancel}
+      onCancel={() => {
+        form.resetFields();
+        onCancel();
+      }}
     >
-      {/* <Button
-        type="link"
-        style={{ padding: 0, fontSize: 16, marginLeft: "auto" }}
-        onClick={() => {
-          setSelectExisting(!selectExisting);
-        }}
-      >
-        {selectExisting
-          ? "I want to add a new fixture"
-          : "I want to select an existing added fixture"}
-      </Button> */}
+      {!fixture ? (
+        <Button
+          type="link"
+          style={{ padding: 0, fontSize: 16, marginLeft: "auto" }}
+          onClick={() => {
+            setSelectExisting(!selectExisting);
+          }}
+        >
+          {!selectExisting
+            ? "I want to add a new fixture"
+            : "I want to select an existing added fixture"}
+        </Button>
+      ) : null}
+
       <Form
         form={form}
         layout="vertical"
         initialValues={fixture}
         onFinish={handleFinish}
       >
-        {!selectExisting ? (
+        {selectExisting ? (
           <Form.Item noStyle shouldUpdate>
             {({ getFieldsValue }) => {
               const values = getFieldsValue();
@@ -271,17 +280,16 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
               if (projectFixtures.length > 0) {
                 const uniqueOptions = Array.from(
                   new Set(
-                    projectFixtures.map(
-                      (fixture: Fixture) => fixture.fixtureType?._id
-                    )
+                    projectFixtures.map((fixture: Fixture) => fixture._id)
                   )
                 ).map((id) => {
                   const fixture = projectFixtures.find(
-                    (f: Fixture) => f.fixtureType?._id === id
+                    (f: Fixture) => f._id === id
                   );
                   return {
                     value: id,
-                    label: fixture?.fixtureType?.fixtureType,
+                    label:
+                      fixture.designName || fixture?.fixtureType?.fixtureType,
                   };
                 });
 

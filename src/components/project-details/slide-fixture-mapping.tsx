@@ -94,7 +94,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
 
   const onSaveFixture = (fixtureData: FixtureFormData) => {
     fixtureData.projectId = projectId;
-    fixtureData._id = editingFixture?._id;
+    fixtureData._id = fixtureData._id || editingFixture?._id;
     saveFixtureMutation.mutate(fixtureData, {
       onSuccess: (response: any) => {
         slide.fixtures = slide.fixtures || [];
@@ -203,7 +203,16 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
                 </Typography.Text>
 
                 <Flex vertical>
-                  <Typography.Text style={{ fontSize: 16, marginBottom: 8 }}>
+                  <Typography.Text style={{ fontSize: 16 }}>
+                    {fixture.designName || fixture!.fixtureType!.fixtureType}
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{
+                      color: COLORS.textColorLight,
+                      marginBottom: 8,
+                      fontSize: 12,
+                    }}
+                  >
                     {fixture!.fixtureType!.fixtureType}
                   </Typography.Text>
                   <Flex>

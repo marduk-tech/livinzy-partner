@@ -124,6 +124,9 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 
   return (
     <Modal
+      afterClose={() => {
+        form.resetFields();
+      }}
       title={
         <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
           {fixture ? "Edit Fixture" : "Add Fixture"}

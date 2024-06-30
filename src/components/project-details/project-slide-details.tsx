@@ -14,6 +14,7 @@ import { COLORS } from "../../styles/colors";
 import { useProcessSpacesInSlides } from "../../hooks/use-ai";
 import { DesignsIcon } from "../../libs/icons";
 import {
+  ExpandOutlined,
   RadiusSettingOutlined,
   SettingOutlined,
   SyncOutlined,
@@ -22,6 +23,8 @@ import ProjectSpaceDetails from "./project-space-details";
 import ProjectSettings from "./project-settings";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { Space } from "../../interfaces/Space";
+import MobileFrame from "../common/mobile-frame";
+import { baseAppUrl } from "../../libs/constants";
 
 const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
@@ -30,6 +33,8 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const [slides, setSlides] = useState<Slide[]>([]);
   const [isSpacesSettingsOpen, setIsSpacesSettingsOpen] = useState<boolean>();
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>();
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>();
+
   const { data: allSpaces, isLoading: allSpacesLoading } =
     useFetchSpacesByProject(projectData!._id!);
 
@@ -262,6 +267,16 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             }}
           ></ProjectSettings>
         </Modal>
+        <Modal
+          footer={[]}
+          width={1000}
+          open={isPreviewOpen}
+          onCancel={() => {
+            setIsPreviewOpen(false);
+          }}
+        >
+          <MobileFrame url={`${baseAppUrl}project/${projectData?._id}`} />
+        </Modal>
         <Flex align="center" gap={8}>
           <DesignsIcon></DesignsIcon>
           <Typography.Title
@@ -298,6 +313,16 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               icon={<SettingOutlined />}
             >
               Settings
+            </Button>
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsPreviewOpen(true);
+              }}
+              icon={<ExpandOutlined />}
+            >
+              Preview
             </Button>
           </Flex>
         </Flex>

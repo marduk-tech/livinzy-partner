@@ -92,6 +92,9 @@ const SpaceDetails: React.FC<{
   return (
     <>
       <Modal
+        afterClose={() => {
+          form.resetFields();
+        }}
         title={spaceData && spaceData._id ? "Edit Space" : "Add Space"}
         open={showSpaceDialog}
         onCancel={handleCancel}

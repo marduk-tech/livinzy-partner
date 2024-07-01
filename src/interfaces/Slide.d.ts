@@ -5,6 +5,7 @@ export interface Slide {
   url: string;
   spaces?: string[];
   fixtures?: string[];
+  archived?: boolean;
 }
 
 interface SlideDetailsProps {

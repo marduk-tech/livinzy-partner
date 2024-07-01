@@ -2,7 +2,6 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
   ExpandOutlined,
-  FormatPainterOutlined,
   RadiusSettingOutlined,
   SettingOutlined,
   SyncOutlined,
@@ -425,7 +424,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             </Tag>
           )}
           <Flex style={{ marginLeft: "auto" }}>
-            <Button
+            {/* <Button
               style={{ color: COLORS.primaryColor }}
               type="link"
               onClick={() => {
@@ -434,6 +433,16 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               icon={<FormatPainterOutlined />}
             >
               Fixtures
+            </Button> */}
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsPreviewOpen(true);
+              }}
+              icon={<ExpandOutlined />}
+            >
+              Preview
             </Button>
             <Button
               style={{ color: COLORS.primaryColor }}
@@ -454,16 +463,6 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               icon={<SettingOutlined />}
             >
               Settings
-            </Button>
-            <Button
-              style={{ color: COLORS.primaryColor }}
-              type="link"
-              onClick={() => {
-                setIsPreviewOpen(true);
-              }}
-              icon={<ExpandOutlined />}
-            >
-              Preview
             </Button>
           </Flex>
         </Flex>

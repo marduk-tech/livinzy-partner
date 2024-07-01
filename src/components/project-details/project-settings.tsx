@@ -1,4 +1,4 @@
-import { ExclamationCircleFilled } from "@ant-design/icons";
+import { ExclamationCircleFilled, UngroupOutlined } from "@ant-design/icons";
 import { Button, Flex, Form, Input, message, Modal, Select, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import { HomeMeta } from "../../interfaces/Meta";
 import { Project } from "../../interfaces/Project";
 import { queryClient } from "../../libs/react-query/query-client";
 import { queryKeys } from "../../libs/react-query/constants";
+import TextArea from "antd/es/input/TextArea";
+import { useDescribeProject } from "../../hooks/use-ai";
 const { confirm } = Modal;
 
 const { Option } = Select;
@@ -20,6 +22,7 @@ const ProjectSettings: React.FC<{
 }> = ({ projectData, onProjectSaved }) => {
   const [form] = Form.useForm();
   const saveProjectMutation = useSaveProject();
+  const describeProjectMutation = useDescribeProject();
 
   const { data: homeMetaData, isPending: homeMetaDataPending } = getHomeMeta();
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
@@ -45,7 +48,7 @@ const ProjectSettings: React.FC<{
         form.setFieldsValue({
           ...projectData,
           homeDetails: {
-            homeType: projectData.homeDetails.homeType,
+            homeType: projectData.homeDetails.homeType._id,
             communityName: projectData.homeDetails.communityName,
             size: projectData.homeDetails.size,
           },
@@ -148,6 +151,35 @@ const ProjectSettings: React.FC<{
         >
           <Input type="number" style={{ width: INPUT_WIDTH }} />
         </Form.Item>
+        <Flex vertical justify="flex-start">
+          <Form.Item
+            name={["oneLiner"]}
+            label="Enter project description"
+            style={{ margin: 0 }}
+          >
+            <TextArea rows={4} />
+          </Form.Item>
+          <Button
+            icon={<UngroupOutlined />}
+            type="link"
+            loading={describeProjectMutation.isPending}
+            onClick={() => {
+              describeProjectMutation.mutate(projectData._id, {
+                onSuccess: (response: any) => {
+                  form.setFieldsValue({
+                    oneLiner: response,
+                  });
+                },
+                onError: () => {
+                  message.error("Could not generate description");
+                },
+              });
+            }}
+            style={{ padding: 0, textAlign: "left", marginTop: -8 }}
+          >
+            AI Generate
+          </Button>
+        </Flex>
 
         <Button
           danger
@@ -163,7 +195,6 @@ const ProjectSettings: React.FC<{
           <Button
             type="primary"
             onClick={() => form.submit()}
-            disabled={isSubmitDisabled}
             style={{ marginTop: 24 }}
             loading={saveProjectMutation.isPending}
           >

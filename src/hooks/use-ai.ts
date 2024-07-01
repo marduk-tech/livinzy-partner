@@ -56,3 +56,14 @@ export const useProcessSpacesInSlides = () => {
     },
   });
 };
+
+export const useDescribeProject = () => {
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const { data } = await axiosApiInstance.post("/ai/projectdescribe", {
+        projectId,
+      });
+      return data;
+    },
+  });
+};

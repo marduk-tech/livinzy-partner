@@ -2,6 +2,7 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
   ExpandOutlined,
+  FormatPainterOutlined,
   RadiusSettingOutlined,
   SettingOutlined,
   SyncOutlined,
@@ -34,7 +35,7 @@ import { DesignsIcon } from "../../libs/icons";
 import { COLORS } from "../../styles/colors";
 import MobileFrame from "../common/mobile-frame";
 import ImgsUpload from "../imgs-upload";
-import { default as ProjectFixtureDetails } from "./all-fixtures";
+import ProjectFixtureDetails from "./project-fixture-details";
 import ProjectSettings from "./project-settings";
 import ProjectSpaceDetails from "./project-space-details";
 import SlideFixtureMapping from "./slide-fixture-mapping";
@@ -84,8 +85,8 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     setSelectedSlide(filterArchivedSlides[0]);
   }, [slidesData]);
 
-  const fixturesUpdated = (fixtures: string[]) => {
-    selectedSlide!.fixtures = fixtures;
+  const fixturesUpdated = (slide: Slide) => {
+    selectedSlide!.fixtures = slide.fixtures;
     updateSlideMutation.mutate(selectedSlide!, {
       onSuccess: async () => {
         message.success("Changes saved");
@@ -357,7 +358,6 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         >
           <ProjectFixtureDetails
             projectData={projectData}
-            fixturesUpdated={fixturesUpdated}
           ></ProjectFixtureDetails>
         </Modal>
 
@@ -425,7 +425,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             </Tag>
           )}
           <Flex style={{ marginLeft: "auto" }}>
-            {/* <Button
+            <Button
               style={{ color: COLORS.primaryColor }}
               type="link"
               onClick={() => {
@@ -434,7 +434,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               icon={<FormatPainterOutlined />}
             >
               Fixtures
-            </Button> */}
+            </Button>
             <Button
               style={{ color: COLORS.primaryColor }}
               type="link"

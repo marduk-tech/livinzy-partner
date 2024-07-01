@@ -60,12 +60,13 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 
   const handleFinish = (values: any) => {
     if (values.existingFixtureId) {
-      const fixture = projectFixtures.find(
+      const existingFixture = projectFixtures.find(
         (f: Fixture) => f._id === values.existingFixtureId
       );
 
-      onSubmit(fixture);
+      onSubmit(existingFixture);
     } else {
+      values.slideId = fixture?.slideId;
       onSubmit(values);
     }
   };

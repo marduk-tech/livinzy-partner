@@ -108,9 +108,9 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const onClickDelete = (event: any) => {
     event.stopPropagation();
     confirm({
-      title: `Delete This Slide`,
+      title: `Delete Design`,
       icon: <ExclamationCircleFilled />,
-      content: `Are you sure you want to delete this slide?"`,
+      content: `Are you sure you want to delete this design?`,
       okText: `Delete`,
       okType: "danger",
       cancelButtonProps: {

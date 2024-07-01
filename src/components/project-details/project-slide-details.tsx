@@ -400,6 +400,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         <Modal
           footer={[]}
           width={1000}
+          destroyOnClose={true}
           open={isPreviewOpen}
           onCancel={() => {
             setIsPreviewOpen(false);

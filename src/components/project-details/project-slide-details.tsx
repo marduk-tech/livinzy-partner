@@ -7,7 +7,6 @@ import {
   SettingOutlined,
   SyncOutlined,
   UndoOutlined,
-  UploadOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -17,7 +16,6 @@ import {
   Tag,
   Tooltip,
   Typography,
-  Upload,
   message,
 } from "antd";
 import React, { useEffect, useState } from "react";
@@ -37,10 +35,7 @@ import { DesignsIcon } from "../../libs/icons";
 import { COLORS } from "../../styles/colors";
 import MobileFrame from "../common/mobile-frame";
 import ImgsUpload from "../imgs-upload";
-import {
-  default as AllFixtures,
-  default as ProjectFixtureDetails,
-} from "./all-fixtures";
+import { default as ProjectFixtureDetails } from "./all-fixtures";
 import ProjectSettings from "./project-settings";
 import ProjectSpaceDetails from "./project-space-details";
 import SlideFixtureMapping from "./slide-fixture-mapping";
@@ -317,11 +312,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         <Modal
           open={isReplaceSlideOpen}
           onOk={handleReplaceSlide}
-          okText="Replace Slide"
+          okText="Update"
+          okButtonProps={{ disabled: !replacementSlideUrl }}
           confirmLoading={updateSlideMutation.isPending}
           title={
             <Typography.Title level={4} style={{ margin: 0 }}>
-              Replace Slide
+              Update Design
             </Typography.Title>
           }
           width={600}
@@ -331,7 +327,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         >
           {selectedSlide && (
             <Image
-              style={{ width: "100%", margin: "auto" }}
+              style={{ width: "100%", margin: "auto", maxHeight: 400 }}
               preview={false}
               src={
                 replacementSlideUrl ? replacementSlideUrl : selectedSlide.url

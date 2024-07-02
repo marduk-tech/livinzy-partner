@@ -15,6 +15,7 @@ interface FixtureListProps {
   onEdit: (fixture: Fixture) => void;
   onDelete: (fixture: Fixture) => void;
   isPending: boolean;
+  isModal: boolean;
 }
 
 const FixtureList: React.FC<FixtureListProps> = ({
@@ -23,6 +24,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
   onEdit,
   onDelete,
   isPending,
+  isModal = false,
 }) => {
   if (!fixtures.length) {
     return (
@@ -80,21 +82,24 @@ const FixtureList: React.FC<FixtureListProps> = ({
                 {fixture!.fixtureType!.fixtureType}
               </Typography.Text>
               <Flex>
-                <Button
-                  type="link"
-                  disabled={isPending}
-                  style={{
-                    cursor: "pointer",
-                    padding: 0,
-                    marginRight: 16,
-                    height: 32,
-                    color: COLORS.primaryColor,
-                  }}
-                  icon={<BorderOuterOutlined />}
-                  onClick={() => onMap(fixture)}
-                >
-                  Map
-                </Button>
+                {!isModal && (
+                  <Button
+                    type="link"
+                    disabled={isPending}
+                    style={{
+                      cursor: "pointer",
+                      padding: 0,
+                      marginRight: 16,
+                      height: 32,
+                      color: COLORS.primaryColor,
+                    }}
+                    icon={<BorderOuterOutlined />}
+                    onClick={() => onMap(fixture)}
+                  >
+                    Map
+                  </Button>
+                )}
+
                 <Button
                   type="link"
                   disabled={isPending}
@@ -110,25 +115,28 @@ const FixtureList: React.FC<FixtureListProps> = ({
                 >
                   Edit
                 </Button>
-                <Popconfirm
-                  title="Are you sure to delete this ?"
-                  disabled={isPending}
-                  onConfirm={() => onDelete(fixture)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button
-                    style={{
-                      padding: 0,
-                      height: 32,
-                      color: COLORS.primaryColor,
-                    }}
-                    type="link"
-                    icon={<DeleteOutlined />}
+
+                {!isModal && (
+                  <Popconfirm
+                    title="Are you sure to delete this ?"
+                    disabled={isPending}
+                    onConfirm={() => onDelete(fixture)}
+                    okText="Yes"
+                    cancelText="No"
                   >
-                    Delete
-                  </Button>
-                </Popconfirm>
+                    <Button
+                      style={{
+                        padding: 0,
+                        height: 32,
+                        color: COLORS.primaryColor,
+                      }}
+                      type="link"
+                      icon={<DeleteOutlined />}
+                    >
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                )}
               </Flex>
             </Flex>
           </Flex>

@@ -32,6 +32,8 @@ import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
 import { baseAppUrl } from "../../libs/constants";
 import { DesignsIcon } from "../../libs/icons";
+import { queryKeys } from "../../libs/react-query/constants";
+import { queryClient } from "../../libs/react-query/query-client";
 import { COLORS } from "../../styles/colors";
 import MobileFrame from "../common/mobile-frame";
 import ImgsUpload from "../imgs-upload";
@@ -89,6 +91,9 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     selectedSlide!.fixtures = slide.fixtures;
     updateSlideMutation.mutate(selectedSlide!, {
       onSuccess: async () => {
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.getSlides, projectData?._id],
+        });
         message.success("Changes saved");
       },
       onError: () => {},

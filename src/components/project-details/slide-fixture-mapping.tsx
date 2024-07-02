@@ -14,6 +14,7 @@ import {
 import { useFetchSlidesByProject } from "../../hooks/use-slides";
 import { Fixture, FixtureFormData } from "../../interfaces/Fixture";
 import { Slide } from "../../interfaces/Slide";
+
 import { COLORS } from "../../styles/colors";
 import FixtureList from "../common/fixture-list";
 import ImgMapFixture from "../common/img-map-fixture";
@@ -26,7 +27,30 @@ interface FixtureMappingProps {
   onFixturesUpdated: any;
 }
 
-const FixtureMapping: React.FC<FixtureMappingProps> = ({
+function filterFixtures(
+  projectFixtures: Fixture[],
+  projectSlides: Slide[]
+): Fixture[] {
+  // Filter non-archived slides
+  const nonArchivedSlides = projectSlides.filter((slide) => !slide.archived);
+
+  // Extract all fixture IDs from non-archived slides
+  const fixtureIds = new Set<string>();
+  nonArchivedSlides.forEach((slide) => {
+    slide.fixtures!.forEach((fixtureId) => {
+      fixtureIds.add(fixtureId);
+    });
+  });
+
+  // Filter projectFixtures to include only those present in fixtureIds
+  const filteredProjectFixtures = projectFixtures.filter((fixture) =>
+    fixtureIds.has(fixture._id!)
+  );
+
+  return filteredProjectFixtures;
+}
+
+const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   projectId,
   slide,
   onFixturesUpdated,
@@ -47,7 +71,12 @@ const FixtureMapping: React.FC<FixtureMappingProps> = ({
     useFetchSlidesByProject(projectId);
 
   useEffect(() => {
-    if (!projectFixtures || !projectFixtures.length) {
+    if (
+      !projectFixtures ||
+      !projectFixtures.length ||
+      !projectSlides ||
+      !projectSlides.length
+    ) {
       return;
     }
 
@@ -56,9 +85,9 @@ const FixtureMapping: React.FC<FixtureMappingProps> = ({
         projectFixtures.filter((f: Fixture) => slide.fixtures?.includes(f._id!))
       );
     } else {
-      setSlideFixtures(projectFixtures);
+      setSlideFixtures(filterFixtures(projectFixtures, projectSlides));
     }
-  }, [projectFixtures, slide]);
+  }, [projectFixtures, slide, projectSlides, refetchProjectFixtures]);
 
   const saveFixtureMutation = useSaveFixture();
   const deleteFixtureMutation = useDeleteFixture();
@@ -89,16 +118,14 @@ const FixtureMapping: React.FC<FixtureMappingProps> = ({
 
   const onDeleteFixture = (fixtureData: Fixture) => {
     deleteFixtureMutation.mutate(fixtureData._id!, {
-      onSuccess: () => {
-        const slide = projectSlides.filter(
-          (slide: Slide) => slide._id === fixtureData.slideId
-        )[0];
+      onSuccess: async () => {
+        if (slide) {
+          const index = slide.fixtures!.indexOf(fixtureData._id!);
 
-        const index = slide.fixtures!.indexOf(fixtureData._id!);
-
-        if (index > -1) {
-          slide.fixtures!.splice(index, 1);
-          onFixturesUpdated(slide);
+          if (index > -1) {
+            slide.fixtures!.splice(index, 1);
+            onFixturesUpdated(slide);
+          }
         }
 
         refetchProjectFixtures();
@@ -112,25 +139,23 @@ const FixtureMapping: React.FC<FixtureMappingProps> = ({
   const onSaveFixture = (fixtureData: FixtureFormData) => {
     fixtureData.projectId = projectId;
     fixtureData._id = fixtureData._id || editingFixture?._id;
-    fixtureData.slideId = slide ? slide._id : fixtureData.slideId;
 
     saveFixtureMutation.mutate(fixtureData, {
       onSuccess: (response: any) => {
-        const slide = projectSlides.filter(
-          (slide: Slide) => slide._id === fixtureData.slideId
-        )[0];
+        if (slide) {
+          slide.fixtures = slide.fixtures || [];
+          if (slide.fixtures.includes(response._id)) {
+            refetchProjectFixtures();
+            return;
+          }
+          slide.fixtures.push(response._id);
+          if (!editingFixture) {
+            onFixturesUpdated(slide);
+          } else {
+            message.success("Changed saved");
+          }
+        }
 
-        slide.fixtures = slide.fixtures || [];
-        if (slide.fixtures.includes(response._id)) {
-          refetchProjectFixtures();
-          return;
-        }
-        slide.fixtures.push(response._id);
-        if (!editingFixture) {
-          onFixturesUpdated(slide);
-        } else {
-          message.success("Changed saved");
-        }
         refetchProjectFixtures();
       },
       onError: (err) => {
@@ -197,15 +222,12 @@ const FixtureMapping: React.FC<FixtureMappingProps> = ({
 
       <div style={{ marginTop: slide ? 0 : 10 }}>
         <FixtureList
+          isModal={slide ? false : true}
           fixtures={slideFixtures}
           isPending={fixturesDataPending}
           onMap={(fixture) => {
-            const slide = projectSlides.filter(
-              (slide: Slide) => slide._id === fixture.slideId
-            )[0];
-
             setEditingFixture(fixture);
-            setMapFixtureImg(slide.url);
+            setMapFixtureImg(slide?.url);
             setIsMapFixtureOpen(true);
           }}
           onEdit={(fixture) => {
@@ -229,4 +251,4 @@ const FixtureMapping: React.FC<FixtureMappingProps> = ({
   );
 };
 
-export default FixtureMapping;
+export default SlideFixtureMapping;

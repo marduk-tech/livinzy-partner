@@ -13,7 +13,6 @@ export interface Fixture {
     endPoint: { x: number; y: number };
     imageSize: { width: number; height: number };
   };
-  slideId?: string;
 }
 
 export interface FixtureFormData {
@@ -28,5 +27,4 @@ export interface FixtureFormData {
     endPoint: { x: number; y: number };
     imageSize: { width: number; height: number };
   };
-  slideId?: string;
 }

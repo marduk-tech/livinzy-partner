@@ -1,10 +1,9 @@
 import {
-  BorderOuterOutlined,
   DeleteOutlined,
   EditOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, List, message, Popconfirm, Tag, Typography } from "antd";
+import { Button, Flex, List, Popconfirm, Tag, Typography } from "antd";
 import React from "react";
 import { Fixture } from "../../interfaces/Fixture";
 import { COLORS } from "../../styles/colors";
@@ -82,7 +81,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                 {fixture!.fixtureType!.fixtureType}
               </Typography.Text>
               <Flex>
-                {!isModal && (
+                {/* {!isModal && (
                   <Button
                     type="link"
                     disabled={isPending}
@@ -98,7 +97,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                   >
                     Map
                   </Button>
-                )}
+                )} */}
 
                 <Button
                   type="link"

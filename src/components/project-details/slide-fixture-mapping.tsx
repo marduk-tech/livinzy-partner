@@ -12,7 +12,6 @@ import {
   InfoCircleOutlined,
   EditOutlined,
   DeleteOutlined,
-  BorderOuterOutlined,
 } from "@ant-design/icons";
 import { Fixture, FixtureFormData } from "../../interfaces/Fixture";
 import ImgMapFixture from "../common/img-map-fixture";
@@ -216,7 +215,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
                     {fixture!.fixtureType!.fixtureType}
                   </Typography.Text>
                   <Flex>
-                    <Button
+                    {/* <Button
                       type="link"
                       disabled={fixturesDataPending}
                       style={{
@@ -234,7 +233,7 @@ const SlideFixtureMapping: React.FC<SlideFixtureMappingProps> = ({
                       }}
                     >
                       Map
-                    </Button>
+                    </Button> */}
                     <Button
                       type="link"
                       disabled={fixturesDataPending}

@@ -167,7 +167,12 @@ const SpaceDetails: React.FC<{
           />
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ marginTop: 32 }}>
+            <Button
+              loading={saveSpaceMutation.isPending}
+              type="primary"
+              htmlType="submit"
+              style={{ marginTop: 32 }}
+            >
               {spaceData && spaceData._id ? "Update" : "Add"}
             </Button>
           </Form.Item>

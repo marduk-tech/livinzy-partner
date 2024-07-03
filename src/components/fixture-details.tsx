@@ -9,7 +9,6 @@ import {
   Modal,
   Select,
   Space,
-  Spin,
   Typography,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -144,23 +143,9 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         )
       )
     )
+      .filter((id) => slide && !slide.fixtures?.includes(id as string))
       .map((id) => {
         const fixture = projectFixtures.find((f: Fixture) => f._id === id);
-
-        if (slide) {
-          const isInSlideFixtures = slide.fixtures?.includes(id as string);
-
-          // If fixture is in slide.fixtures, return null
-          if (isInSlideFixtures) {
-            return null;
-          }
-
-          // Return the fixture with value and label
-          return {
-            value: id,
-            label: fixture?.designName || fixture?.fixtureType?.fixtureType,
-          };
-        }
 
         return {
           value: id,

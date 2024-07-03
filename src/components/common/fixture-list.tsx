@@ -27,7 +27,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
 }) => {
   if (!fixtures.length) {
     return (
-      <Tag style={{ padding: 8 }} icon={<InfoCircleOutlined />}>
+      <Tag style={{ padding: 8, width: "100%" }} icon={<InfoCircleOutlined />}>
         No fixtures mapped
       </Tag>
     );

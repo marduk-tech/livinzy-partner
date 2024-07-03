@@ -1,4 +1,4 @@
-import { Button, Flex, Typography, message } from "antd";
+import { Button, Flex, Tooltip, Typography, message } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   useDeleteFixture,
@@ -14,6 +14,7 @@ import FixtureList from "../common/fixture-list";
 import ImgMapFixture from "../common/img-map-fixture";
 import FixtureDetails from "../fixture-details";
 import { Loader } from "../loader";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 interface FixtureMappingProps {
   projectId: string;
@@ -190,9 +191,14 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
 
       {slide && (
         <Flex align="center" style={{ marginTop: 8 }}>
-          <Typography.Title level={4} style={{ marginTop: 0, marginBottom: 0 }}>
-            Fixtures
-          </Typography.Title>
+          <Flex align="center" gap={4} style={{ cursor: "pointer" }}>
+            <Typography.Title level={4} style={{ marginTop: 0, margin: 0 }}>
+              Fixtures
+            </Typography.Title>
+            <Tooltip title="Add fixtures in this design">
+              <InfoCircleOutlined></InfoCircleOutlined>
+            </Tooltip>
+          </Flex>
           <Button
             type="link"
             size="small"

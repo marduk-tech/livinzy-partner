@@ -87,6 +87,9 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     });
   };
 
+  /**
+   * When a new fixture is added by the designer
+   */
   const onClickAddFixture = () => {
     if (
       inputRef.current &&
@@ -110,6 +113,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   };
 
   useEffect(() => {
+    // Auto select the fixture type once fixture meta is added.
     if (autoSelectFixtureMeta) {
       setTimeout(() => {
         form.setFieldsValue({
@@ -156,10 +160,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 
     return (
       <Modal
-        afterClose={() => {
-          form.resetFields();
-          setSelectExisting(true);
-        }}
+        destroyOnClose={true}
         title={
           <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
             {fixture ? "Edit Fixture" : "Add Fixture"}
@@ -190,22 +191,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
           </>
         )}
 
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={fixture}
-          onFinish={handleFinish}
-        >
+        <Form form={form} layout="vertical" onFinish={handleFinish}>
           {selectExisting ? (
             <Form.Item noStyle shouldUpdate>
               {({ getFieldsValue }) => {
-                const values = getFieldsValue();
-
-                const showResetBtn =
-                  values.fixtureType || values.cost || values.description;
-
-                const disable = values.existingFixtureId;
-
                 return (
                   <>
                     <Form.Item
@@ -213,14 +202,13 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                       label="Type"
                       rules={[
                         {
-                          required: disable ? false : true,
+                          required: true,
                           message: "Please enter the type",
                         },
                       ]}
                     >
                       <Select
                         onChange={onChangeFixtureType}
-                        disabled={disable}
                         showSearch
                         dropdownRender={(menu) => (
                           <>
@@ -248,6 +236,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                   <Button
                                     type="link"
                                     icon={<PlusOutlined />}
+                                    loading={saveFixtureMetaMutation.isPending}
                                     onClick={onClickAddFixture}
                                   >
                                     Add
@@ -286,13 +275,13 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                       <Input />
                     </Form.Item>
                     <Form.Item name="cost" label="Cost (approx)">
-                      <Input type="number" disabled={disable} />
+                      <Input type="number" />
                     </Form.Item>
                     <Form.Item
                       name="description"
-                      label="One liner about this fixture"
+                      label="One liner about this fixture in 400 chars or less"
                     >
-                      <TextArea rows={2} disabled={disable} />
+                      <TextArea rows={2} maxLength={400} />
                     </Form.Item>
                   </>
                 );

@@ -156,9 +156,9 @@ const SpaceDetails: React.FC<{
                     </Flex>
                     <Form.Item
                       name="oneLiner"
-                      label="One liner about this space"
+                      label="One liner description (400 characters or less)"
                     >
-                      <TextArea rows={2} />
+                      <TextArea rows={2} maxLength={400} />
                     </Form.Item>
                   </>
                 ),
@@ -167,7 +167,12 @@ const SpaceDetails: React.FC<{
           />
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ marginTop: 32 }}>
+            <Button
+              loading={saveSpaceMutation.isPending}
+              type="primary"
+              htmlType="submit"
+              style={{ marginTop: 32 }}
+            >
               {spaceData && spaceData._id ? "Update" : "Add"}
             </Button>
           </Form.Item>

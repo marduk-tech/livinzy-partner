@@ -18,16 +18,21 @@ import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { useFetchFixturesByProject } from "../hooks/use-fixtures";
 import { getFixtureMeta, useSaveFixtureMeta } from "../hooks/use-meta";
+import { useFetchSlidesByProject } from "../hooks/use-slides";
 import { Fixture } from "../interfaces/Fixture";
 import { FixtureMeta } from "../interfaces/Meta";
+import { Slide } from "../interfaces/Slide";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
+import { Loader } from "./loader";
+import { filterFixtures } from "./project-details/slide-fixture-mapping";
 
 interface FixtureModalProps {
   isOpen: boolean;
   onCancel: () => void;
   onSubmit: (fixture: any) => void;
   fixture?: any;
+  slide?: Slide;
 }
 
 const FixtureDetails: React.FC<FixtureModalProps> = ({
@@ -35,13 +40,13 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   onCancel,
   onSubmit,
   fixture,
+  slide,
 }) => {
   const inputRef = useRef<InputRef>(null);
   const saveFixtureMetaMutation = useSaveFixtureMeta();
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
-
   const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
 
   const {
@@ -55,6 +60,9 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     isPending: fixturesDataPending,
     refetch: refetchProjectFixtures,
   } = useFetchFixturesByProject(projectId as string);
+
+  const { data: projectSlides, isPending: projectSlidesPending } =
+    useFetchSlidesByProject(projectId as string);
 
   const [form] = Form.useForm();
 
@@ -123,68 +131,108 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   }, fixture);
 
-  return (
-    <Modal
-      afterClose={() => {
-        form.resetFields();
-      }}
-      title={
-        <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
-          {fixture ? "Edit Fixture" : "Add Fixture"}
-        </Typography.Title>
-      }
-      footer={null}
-      open={isOpen}
-      onCancel={() => {
-        form.resetFields();
-        onCancel();
-      }}
-    >
-      {!fixture ? (
-        <Button
-          type="link"
-          style={{ padding: 0, fontSize: 16, marginLeft: "auto" }}
-          onClick={() => {
-            setSelectExisting(!selectExisting);
-          }}
-        >
-          {!selectExisting
-            ? "I want to add a new fixture"
-            : "I want to select an existing added fixture"}
-        </Button>
-      ) : null}
+  if (fixturesDataPending || projectSlidesPending || fixtureMetaDataPending) {
+    return <Loader />;
+  }
 
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={fixture}
-        onFinish={handleFinish}
+  if (projectFixtures && projectSlides && fixtureMetaData) {
+    const existingFixturesOptions = Array.from(
+      new Set(
+        // removes fixtures which are not assigned to any slides
+        filterFixtures(projectFixtures, projectSlides).map(
+          (fixture: Fixture) => fixture._id
+        )
+      )
+    )
+      .map((id) => {
+        const fixture = projectFixtures.find((f: Fixture) => f._id === id);
+
+        if (slide) {
+          const isInSlideFixtures = slide.fixtures?.includes(id as string);
+
+          // If fixture is in slide.fixtures, return null
+          if (isInSlideFixtures) {
+            return null;
+          }
+
+          // Return the fixture with value and label
+          return {
+            value: id,
+            label: fixture?.designName || fixture?.fixtureType?.fixtureType,
+          };
+        }
+
+        return {
+          value: id,
+          label: fixture.designName || fixture?.fixtureType?.fixtureType,
+        };
+      })
+      .filter((item) => item !== null);
+
+    return (
+      <Modal
+        afterClose={() => {
+          form.resetFields();
+          setSelectExisting(true);
+        }}
+        title={
+          <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
+            {fixture ? "Edit Fixture" : "Add Fixture"}
+          </Typography.Title>
+        }
+        footer={null}
+        open={isOpen}
+        onCancel={() => {
+          form.resetFields();
+          onCancel();
+        }}
       >
-        {selectExisting ? (
-          <Form.Item noStyle shouldUpdate>
-            {({ getFieldsValue }) => {
-              const values = getFieldsValue();
+        {existingFixturesOptions.length > 0 && (
+          <>
+            {!fixture ? (
+              <Button
+                type="link"
+                style={{ padding: 0, fontSize: 16, marginLeft: "auto" }}
+                onClick={() => {
+                  setSelectExisting(!selectExisting);
+                }}
+              >
+                {!selectExisting
+                  ? "I want to add a new fixture"
+                  : "I want to select an existing added fixture"}
+              </Button>
+            ) : null}
+          </>
+        )}
 
-              const showResetBtn =
-                values.fixtureType || values.cost || values.description;
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={fixture}
+          onFinish={handleFinish}
+        >
+          {selectExisting ? (
+            <Form.Item noStyle shouldUpdate>
+              {({ getFieldsValue }) => {
+                const values = getFieldsValue();
 
-              const disable = values.existingFixtureId;
+                const showResetBtn =
+                  values.fixtureType || values.cost || values.description;
 
-              return (
-                <>
-                  <Form.Item
-                    name="fixtureType"
-                    label="Type"
-                    rules={[
-                      {
-                        required: disable ? false : true,
-                        message: "Please enter the type",
-                      },
-                    ]}
-                  >
-                    {fixtureMetaDataPending ? (
-                      <Spin />
-                    ) : (
+                const disable = values.existingFixtureId;
+
+                return (
+                  <>
+                    <Form.Item
+                      name="fixtureType"
+                      label="Type"
+                      rules={[
+                        {
+                          required: disable ? false : true,
+                          message: "Please enter the type",
+                        },
+                      ]}
+                    >
                       <Select
                         onChange={onChangeFixtureType}
                         disabled={disable}
@@ -239,78 +287,55 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           }
                         )}
                       ></Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item
-                    name="designName"
-                    label="Custom name for the fixture"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter a custom name",
-                      },
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item name="cost" label="Cost (approx)">
-                    <Input type="number" disabled={disable} />
-                  </Form.Item>
-                  <Form.Item
-                    name="description"
-                    label="One liner about this fixture"
-                  >
-                    <TextArea rows={2} disabled={disable} />
-                  </Form.Item>
-                </>
-              );
-            }}
-          </Form.Item>
-        ) : (
-          <Form.Item noStyle shouldUpdate>
-            {({ getFieldsValue }) => {
-              const values = getFieldsValue();
+                    </Form.Item>
+                    <Form.Item
+                      name="designName"
+                      label="Custom name for the fixture"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a custom name",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                    <Form.Item name="cost" label="Cost (approx)">
+                      <Input type="number" disabled={disable} />
+                    </Form.Item>
+                    <Form.Item
+                      name="description"
+                      label="One liner about this fixture"
+                    >
+                      <TextArea rows={2} disabled={disable} />
+                    </Form.Item>
+                  </>
+                );
+              }}
+            </Form.Item>
+          ) : (
+            <Form.Item noStyle shouldUpdate>
+              {({ getFieldsValue }) => {
+                const values = getFieldsValue();
 
-              const disable =
-                values.fixtureType || values.cost || values.description;
+                const disable =
+                  values.fixtureType || values.cost || values.description;
 
-              if (fixturesDataPending) {
-                return <Spin />;
-              }
-
-              if (projectFixtures.length > 0) {
-                const uniqueOptions = Array.from(
-                  new Set(
-                    projectFixtures.map((fixture: Fixture) => fixture._id)
-                  )
-                ).map((id) => {
-                  const fixture = projectFixtures.find(
-                    (f: Fixture) => f._id === id
-                  );
-                  return {
-                    value: id,
-                    label:
-                      fixture.designName || fixture?.fixtureType?.fixtureType,
-                  };
-                });
-
-                return (
-                  <>
-                    <Flex align="center" gap={5} justify="center">
-                      <Form.Item
-                        style={{ flex: 1 }}
-                        name="existingFixtureId"
-                        label="Select Existing"
-                        rules={[
-                          {
-                            required: disable ? false : true,
-                            message: "Please select fixture",
-                          },
-                        ]}
-                      >
-                        {fixturesDataPending ? (
-                          <Spin />
-                        ) : (
+                if (projectFixtures.length > 0 && projectSlides.length > 0) {
+                  return (
+                    <>
+                      <Flex align="center" gap={5} justify="center">
+                        <Form.Item
+                          style={{ flex: 1 }}
+                          name="existingFixtureId"
+                          label="Select Existing"
+                          rules={[
+                            {
+                              required: disable ? false : true,
+                              message: "Please select fixture",
+                            },
+                          ]}
+                        >
                           <Select
                             disabled={disable}
                             showSearch
@@ -320,55 +345,55 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                 .toLowerCase()
                                 .includes(input.toLowerCase())
                             }
-                            options={uniqueOptions}
+                            options={existingFixturesOptions}
                           ></Select>
+                        </Form.Item>
+
+                        {values.existingFixtureId && (
+                          <Button
+                            onClick={() => form.resetFields()}
+                            icon={<CloseCircleOutlined />}
+                            size="small"
+                            type="text"
+                            style={{
+                              marginTop: 5,
+                            }}
+                          ></Button>
                         )}
-                      </Form.Item>
+                      </Flex>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          margin: "8px 0",
+                        }}
+                      ></div>
+                    </>
+                  );
+                }
+              }}
+            </Form.Item>
+          )}
 
-                      {values.existingFixtureId && (
-                        <Button
-                          onClick={() => form.resetFields()}
-                          icon={<CloseCircleOutlined />}
-                          size="small"
-                          type="text"
-                          style={{
-                            marginTop: 5,
-                          }}
-                        ></Button>
-                      )}
-                    </Flex>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        margin: "8px 0",
-                      }}
-                    ></div>
-                  </>
-                );
-              }
-            }}
+          <Form.Item style={{ marginTop: 20 }}>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+            <Button
+              onClick={() => {
+                form.resetFields();
+                onCancel();
+              }}
+              style={{ marginLeft: 8 }}
+            >
+              Cancel
+            </Button>
           </Form.Item>
-        )}
-
-        <Form.Item style={{ marginTop: 20 }}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-          <Button
-            onClick={() => {
-              form.resetFields();
-              onCancel();
-            }}
-            style={{ marginLeft: 8 }}
-          >
-            Cancel
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
+        </Form>
+      </Modal>
+    );
+  }
 };
 
 export default FixtureDetails;

@@ -6,6 +6,10 @@ import ProjectNew from "../components/new-project/project-new";
 export function ProjectAdd() {
   const { projectId } = useParams();
 
+  if (!projectId) {
+    return <ProjectNew></ProjectNew>;
+  }
+
   const {
     data: projectData,
     isLoading,

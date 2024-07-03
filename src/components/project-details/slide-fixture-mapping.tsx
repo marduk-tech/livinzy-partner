@@ -21,7 +21,7 @@ interface FixtureMappingProps {
   onFixturesUpdated: any;
 }
 
-function filterFixtures(
+export function filterFixtures(
   projectFixtures: Fixture[],
   projectSlides: Slide[]
 ): Fixture[] {
@@ -235,6 +235,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
       <FixtureDetails
         isOpen={fixtureModalVisible}
         fixture={editingFixture}
+        slide={slide}
         onSubmit={onSaveFixture}
         onCancel={() => {
           setFixtureModalVisible(false);

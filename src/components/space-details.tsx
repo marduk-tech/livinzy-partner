@@ -95,6 +95,7 @@ const SpaceDetails: React.FC<{
         open={showSpaceDialog}
         onCancel={handleCancel}
         footer={null}
+        width={700}
       >
         <Form form={form} onFinish={handleFinish} layout="vertical">
           <Form.Item
@@ -158,7 +159,11 @@ const SpaceDetails: React.FC<{
                       name="oneLiner"
                       label="One liner description (400 characters or less)"
                     >
-                      <TextArea rows={2} maxLength={400} />
+                      <TextArea
+                        rows={5}
+                        maxLength={400}
+                        style={{ fontSize: "110%" }}
+                      />
                     </Form.Item>
                   </>
                 ),

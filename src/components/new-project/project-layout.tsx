@@ -18,7 +18,7 @@ import { useCookies } from "react-cookie";
 import { cookieKeys } from "../../libs/react-query/constants";
 import { getHomeMeta } from "../../hooks/use-meta";
 import { HomeMeta } from "../../interfaces/Meta";
-import { IMG_AI_STATUS, baseApiUrl } from "../../libs/constants";
+import { LAYOUT_AI_STATUS, baseApiUrl } from "../../libs/constants";
 import { COLORS } from "../../styles/colors";
 import { fetchLayoutDetails, useProcessSpacesLayout } from "../../hooks/use-ai";
 import {
@@ -65,11 +65,11 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
 
   const handleUploadChange = async (info: UploadChangeParam<UploadFile>) => {
     if (info.file.status === "uploading") {
-      setLayoutImageStatus(IMG_AI_STATUS.UPLOADING);
+      setLayoutImageStatus(LAYOUT_AI_STATUS.UPLOADING);
       return;
     }
     if (info.file.status === "done") {
-      setLayoutImageStatus(IMG_AI_STATUS.PROCESSING);
+      setLayoutImageStatus(LAYOUT_AI_STATUS.PROCESSING_SIZE);
       const layoutImg = info.file.response.data.Location;
       setLayoutImage(layoutImg);
 
@@ -88,7 +88,7 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
         };
         saveProject(projectData!);
       } else {
-        setLayoutImageStatus(IMG_AI_STATUS.ERROR);
+        setLayoutImageStatus(LAYOUT_AI_STATUS.ERROR);
       }
     } else if (info.file.status === "error") {
       message.error("Upload failed");
@@ -125,6 +125,7 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
       { ...projectData, ...projectUpdatedData },
       {
         onSuccess: (updatedProject: Project) => {
+          setLayoutImageStatus(LAYOUT_AI_STATUS.PROCESSING_SPACES);
           if (
             updatedProject &&
             updatedProject.homeDetails &&
@@ -132,8 +133,10 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
           ) {
             processSpacesLayoutMutation.mutate(projectData!._id!, {
               onSuccess: async () => {
-                setLayoutImageStatus(IMG_AI_STATUS.COMPLETED);
-                basicDetailsUpdated(updatedProject);
+                setLayoutImageStatus(LAYOUT_AI_STATUS.COMPLETED);
+                setTimeout(() => {
+                  basicDetailsUpdated(updatedProject);
+                }, 1000);
               },
               onError: () => {
                 basicDetailsUpdated(updatedProject);
@@ -153,7 +156,7 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
 
   const renderImgStatus = () => {
     switch (layoutImageStatus) {
-      case IMG_AI_STATUS.UPLOADING:
+      case LAYOUT_AI_STATUS.UPLOADING:
         return (
           <Tag
             style={{ fontSize: 16, padding: 8 }}
@@ -163,27 +166,37 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
             Uploading floorplan..
           </Tag>
         );
-      case IMG_AI_STATUS.PROCESSING:
+      case LAYOUT_AI_STATUS.PROCESSING_SIZE:
         return (
           <Tag
             style={{ fontSize: 16, padding: 8 }}
             icon={<SyncOutlined spin />}
             color="processing"
           >
-            Uploading done, processing..
+            Floorplan uploaded, analysing size & home type..
           </Tag>
         );
-      case IMG_AI_STATUS.COMPLETED:
+      case LAYOUT_AI_STATUS.PROCESSING_SPACES:
+        return (
+          <Tag
+            style={{ fontSize: 16, padding: 8 }}
+            icon={<SyncOutlined spin />}
+            color="processing"
+          >
+            Size updated, finding all spaces..
+          </Tag>
+        );
+      case LAYOUT_AI_STATUS.COMPLETED:
         return (
           <Tag
             style={{ fontSize: 16, padding: 8 }}
             icon={<CheckCircleOutlined />}
             color="success"
           >
-            Floorplan processed
+            Floorplan processed succesfully
           </Tag>
         );
-      case IMG_AI_STATUS.ERROR:
+      case LAYOUT_AI_STATUS.ERROR:
         return (
           <Tag icon={<CloseCircleOutlined />} color="error">
             Could not process floorplan
@@ -209,32 +222,37 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
               onChange={handleUploadChange}
               showUploadList={false}
             >
-              <Button type="primary" style={{ marginRight: 16 }}>
+              <Button
+                disabled={
+                  !!layoutImageStatus &&
+                  layoutImageStatus !== LAYOUT_AI_STATUS.COMPLETED
+                }
+                type="primary"
+                style={{ marginRight: 16 }}
+              >
                 Upload
               </Button>
-              {renderImgStatus()}
             </Upload>
-            {layoutImageStatus !== IMG_AI_STATUS.COMPLETED ? (
-              <Button
-                type="link"
-                disabled={
-                  layoutImageStatus === IMG_AI_STATUS.PROCESSING ||
-                  layoutImageStatus === IMG_AI_STATUS.UPLOADING
-                }
-                style={{
-                  color: COLORS.primaryColor,
-                  padding: 0,
-                  marginTop: 16,
-                  fontSize: 16,
-                  width: 200,
-                }}
-                onClick={() => {
-                  setLayoutUploadSkipped(true);
-                }}
-              >
-                I would like to add details manually
-              </Button>
-            ) : null}
+            <Flex style={{ marginTop: 16 }}>{renderImgStatus()}</Flex>
+            <Button
+              type="link"
+              disabled={
+                !!layoutImageStatus &&
+                layoutImageStatus !== LAYOUT_AI_STATUS.COMPLETED
+              }
+              style={{
+                color: COLORS.primaryColor,
+                padding: 0,
+                marginTop: 16,
+                fontSize: 16,
+                width: 200,
+              }}
+              onClick={() => {
+                setLayoutUploadSkipped(true);
+              }}
+            >
+              I would like to add details manually
+            </Button>
           </Flex>
         </Flex>
         <Flex

@@ -6,11 +6,7 @@ import ProjectSlideDetails from "../components/project-details/project-slide-det
 export function ProjectDetails() {
   const { projectId } = useParams();
 
-  const {
-    data: projectData,
-    isLoading,
-    refetch: refetchProjectData,
-  } = useFetchProject(projectId as string);
+  const { data: projectData, isLoading } = useFetchProject(projectId as string);
 
   if (isLoading) {
     return <Loader />;

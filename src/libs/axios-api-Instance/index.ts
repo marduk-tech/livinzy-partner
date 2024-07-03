@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 import { baseApiUrl } from "../constants";
 
 const config = {
-  baseURL: baseApiUrl
+  baseURL: baseApiUrl,
 };
 
 const api = axios.create(config);
@@ -11,6 +11,7 @@ const api = axios.create(config);
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    // message.error("Oops. Something failed. Please try again.");
     if (error.response && error.response.status == 401) {
       // logout();
     }

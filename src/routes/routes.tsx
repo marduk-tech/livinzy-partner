@@ -25,7 +25,7 @@ export const Router = () => {
           path="/projects/details/:projectId"
           element={<ProjectDetails />}
         />
-        <Route path="/projects/new" element={<ProjectAdd />} />
+        <Route path="/projects/new/:projectId?" element={<ProjectAdd />} />
       </Route>
 
       <Route path="/*" element={<div>404</div>} />

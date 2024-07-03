@@ -1,10 +1,4 @@
-import {
-  BorderOuterOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
-import { Button, Flex, List, Popconfirm, Tag, Typography, message } from "antd";
+import { Button, Flex, Typography, message } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   useDeleteFixture,

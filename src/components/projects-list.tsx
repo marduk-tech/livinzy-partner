@@ -85,7 +85,7 @@ const ProjectsList: React.FC = () => {
                 if (project.homeDetails && project.homeDetails.homeType) {
                   navigate(`/projects/details/${project._id}`);
                 } else {
-                  navigate(`/projects/new`);
+                  navigate(`/projects/new/${project._id}`);
                 }
               }}
               style={{ width: isMobile ? "100%" : 240, borderRadius: 16 }}

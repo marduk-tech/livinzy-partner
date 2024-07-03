@@ -139,11 +139,9 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
       onSuccess: (response: any) => {
         if (slide) {
           slide.fixtures = slide.fixtures || [];
-          if (slide.fixtures.includes(response._id)) {
-            refetchProjectFixtures();
-            return;
+          if (!slide.fixtures.includes(response._id)) {
+            slide.fixtures.push(response._id);
           }
-          slide.fixtures.push(response._id);
           if (!editingFixture) {
             onFixturesUpdated(slide);
           } else {

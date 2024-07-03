@@ -18,13 +18,13 @@ export const useFetchSlidesByProject = (projectId: string) => {
 
 // Custom hook to save designer data
 export const useBulkSaveSlides = () => {
-    return useMutation({
-      mutationFn: async (slidesData: Slide[]) => {
-        let response = await axiosApiInstance.post("/slides/bulk", slidesData);
-        return response.data;
-      },
-    });
-  };
+  return useMutation({
+    mutationFn: async (slidesData: Slide[]) => {
+      let response = await axiosApiInstance.post("/slides/bulk", slidesData);
+      return response.data;
+    },
+  });
+};
 
 // Custom hook to save designer data
 export const useSaveSlide = () => {

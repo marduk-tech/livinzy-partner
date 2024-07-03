@@ -14,7 +14,7 @@ const { confirm } = Modal;
 
 const { Option } = Select;
 
-const INPUT_WIDTH = 400;
+const INPUT_WIDTH = 500;
 
 const ProjectSettings: React.FC<{
   projectData: Project;
@@ -157,7 +157,7 @@ const ProjectSettings: React.FC<{
             label="Enter project description"
             style={{ margin: 0 }}
           >
-            <TextArea rows={4} />
+            <TextArea rows={6} style={{ fontSize: "100%" }} />
           </Form.Item>
           <Button
             icon={<UngroupOutlined />}
@@ -175,13 +175,15 @@ const ProjectSettings: React.FC<{
                 },
               });
             }}
-            style={{ padding: 0, textAlign: "left", marginTop: -8 }}
+            style={{ padding: 0, textAlign: "left", marginTop: 4 }}
           >
-            AI Generate
+            {describeProjectMutation.isPending
+              ? "Generating description from designs.."
+              : "AI Generate"}
           </Button>
         </Flex>
 
-        <Button
+        {/* <Button
           danger
           type="link"
           onClick={showDeleteConfirm}
@@ -189,7 +191,7 @@ const ProjectSettings: React.FC<{
           loading={deleteProjectMutation.isPending}
         >
           I want to delete this project
-        </Button>
+        </Button> */}
 
         <Form.Item>
           <Button

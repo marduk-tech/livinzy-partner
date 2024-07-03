@@ -79,12 +79,18 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
       return;
     }
 
-    const filterArchivedSlides = slidesData.filter(
-      (slide: Slide) => !slide.archived
-    );
+    const filterArchivedSlides = slidesData
+      .filter((slide: Slide) => !slide.archived)
+      .sort((s1: Slide, s2: Slide) =>
+        (s2.spaces && s2.spaces.length ? s2.spaces[0] : "").localeCompare(
+          s1.spaces && s1.spaces.length ? s1.spaces[0] : ""
+        )
+      );
 
     setSlides(filterArchivedSlides);
-    setSelectedSlide(filterArchivedSlides[0]);
+    if (!selectedSlide) {
+      setSelectedSlide(filterArchivedSlides[0]);
+    }
   }, [slidesData]);
 
   const fixturesUpdated = (slide: Slide) => {
@@ -188,74 +194,68 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   const renderSlideThumbnails = () => {
     let spaceDivider: string,
       toAddDivider = false;
-    return slides
-
-      .sort((s1: Slide, s2: Slide) =>
-        (s2.spaces && s2.spaces.length ? s2.spaces[0] : "").localeCompare(
-          s1.spaces && s1.spaces.length ? s1.spaces[0] : ""
-        )
-      )
-      .map((slide) => {
-        const slideSpace = allSpaces.find(
-          (s: Space) =>
-            s._id ==
-            (slide.spaces && slide.spaces.length ? slide.spaces![0] : "")
-        );
-        if (slideSpace) {
-          if (!spaceDivider || spaceDivider !== slideSpace.name) {
-            spaceDivider = slideSpace.name;
-            toAddDivider = true;
-          } else {
-            toAddDivider = false;
-          }
+    return slides.map((slide) => {
+      const slideSpace = allSpaces.find(
+        (s: Space) =>
+          s._id == (slide.spaces && slide.spaces.length ? slide.spaces![0] : "")
+      );
+      if (slideSpace) {
+        if (!spaceDivider || spaceDivider !== slideSpace.name) {
+          spaceDivider = slideSpace.name;
+          toAddDivider = true;
         } else {
           toAddDivider = false;
         }
+      } else {
+        toAddDivider = false;
+      }
 
-        return (
-          <Flex
-            style={{
-              width: "100%",
-            }}
-          >
-            <Flex vertical style={{ width: "100%" }}>
-              {toAddDivider && (
-                <Typography.Text
-                  style={{
-                    fontSize: "75%",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  {spaceDivider.toUpperCase()}
-                </Typography.Text>
-              )}
-              <div
-                onClick={() => handleThumbnailClick(slide)}
+      return (
+        <Flex
+          style={{
+            width: "100%",
+          }}
+        >
+          <Flex vertical style={{ width: "100%" }}>
+            {toAddDivider && (
+              <Tag
                 style={{
-                  cursor: "pointer",
-                  width: "100%",
-                  height: 85,
-                  border:
-                    slide._id == selectedSlide?._id
-                      ? "4px solid"
-                      : "0.5px solid",
-                  borderColor:
-                    slide._id == selectedSlide?._id
-                      ? COLORS.primaryColor
-                      : COLORS.borderColor,
-                  borderRadius: 8,
-                  backgroundImage: `url(${slide.url})`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                  position: "relative",
+                  backgroundColor: COLORS.textColorDark,
+                  borderRadius: 32,
+                  color: COLORS.bgColor,
+                  fontSize: "75%",
+                  margin: "auto",
+                  marginBottom: 8,
+                  textAlign: "center",
                 }}
-              ></div>
-            </Flex>
+              >
+                {spaceDivider.toUpperCase()}
+              </Tag>
+            )}
+            <div
+              onClick={() => handleThumbnailClick(slide)}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                height: 85,
+                border:
+                  slide._id == selectedSlide?._id ? "4px solid" : "0.5px solid",
+                borderColor:
+                  slide._id == selectedSlide?._id
+                    ? COLORS.primaryColor
+                    : COLORS.borderColor,
+                borderRadius: 8,
+                backgroundImage: `url(${slide.url})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                position: "relative",
+              }}
+            ></div>
           </Flex>
-        );
-      });
+        </Flex>
+      );
+    });
   };
 
   const handleReplaceSlide = async () => {
@@ -311,9 +311,15 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         vertical
         style={{
           width: "100%",
-          maxWidth: 1300,
+          maxWidth: 1400,
+          borderRadius: 16,
+          border: "2px solid",
+          borderColor: COLORS.borderColor,
+          padding: 24,
+          backgroundColor: "white",
         }}
       >
+        {/* Replace slide modal */}
         <Modal
           open={isReplaceSlideOpen}
           onOk={handleReplaceSlide}
@@ -348,6 +354,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           </div>
         </Modal>
 
+        {/* All fixtures modal */}
         <Modal
           open={isProjectFixturesOpen}
           footer={null}
@@ -366,6 +373,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           ></ProjectFixtureDetails>
         </Modal>
 
+        {/* All spaces modal */}
         <Modal
           open={isSpacesSettingsOpen}
           footer={null}
@@ -382,12 +390,13 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           <ProjectSpaceDetails projectData={projectData}></ProjectSpaceDetails>{" "}
         </Modal>
 
+        {/* Project settings modal */}
         <Modal
           open={isSettingsOpen}
           footer={null}
           title={
             <Typography.Title level={4} style={{ margin: 0 }}>
-              Update Details
+              Project Settings
             </Typography.Title>
           }
           width={600}
@@ -402,6 +411,8 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             }}
           ></ProjectSettings>
         </Modal>
+
+        {/* Preview  modal */}
         <Modal
           footer={[]}
           width={1000}
@@ -413,6 +424,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
         >
           <MobileFrame url={`${baseAppUrl}project/${projectData?._id}`} />
         </Modal>
+
         <Flex align="center" gap={8}>
           <DesignsIcon></DesignsIcon>
           <Typography.Title
@@ -468,11 +480,11 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               }}
               icon={<SettingOutlined />}
             >
-              Settings
+              Project Settings
             </Button>
           </Flex>
         </Flex>
-        <Flex justify="center" style={{ marginTop: 24 }}>
+        <Flex justify="center" style={{ marginTop: 24 }} gap={24}>
           <Flex
             vertical
             style={{
@@ -510,6 +522,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
               preview={false}
               src={selectedSlide!.url}
               height={540}
+              style={{ borderRadius: 16 }}
             ></Image>
 
             <Flex

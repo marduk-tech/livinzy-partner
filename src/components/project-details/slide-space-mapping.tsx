@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex, Image, Select, Typography } from "antd";
+import { Button, Flex, Image, Select, Tooltip, Typography } from "antd";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { Slide } from "../../interfaces/Slide";
 import { COLORS } from "../../styles/colors";
 import "../../styles/override.scss";
 import { Space } from "../../interfaces/Space";
-import { SettingFilled } from "@ant-design/icons";
+import { InfoCircleOutlined, SettingFilled } from "@ant-design/icons";
 import SpaceDetails from "../space-details";
 import { convertInchToFeet } from "../../libs/lvnzy-helper";
 
@@ -27,6 +27,8 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   );
   const [spaceDialogOpen, setSpaceDialogOpen] = useState(false);
 
+  const [formattedSpaces, setFormattedSpaces] = useState<Space[]>([]);
+
   const {
     data: projectSpaces,
     isPending: projectSpacesPending,
@@ -39,6 +41,25 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
       slide.spaces && slide.spaces.length ? slide.spaces[0] : ""
     );
   }, [slide]);
+
+  useEffect(() => {
+    if (projectSpaces && projectSpaces.length) {
+      setFormattedSpaces(
+        projectSpaces.map((s: Space) => {
+          return {
+            ...s,
+            size:
+              s.size && s.size.l
+                ? {
+                    l: convertInchToFeet(s.size.l),
+                    w: convertInchToFeet(s.size.w),
+                  }
+                : undefined,
+          };
+        })
+      );
+    }
+  }, [projectSpaces]);
 
   const handleSpacesChange = (value: string) => {
     setSelectedSpace(value);
@@ -57,9 +78,14 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
         borderColor: COLORS.borderColor,
       }}
     >
-      {/* <Typography.Title level={4} style={{ marginTop: 0 }}>
-        Spaces
-      </Typography.Title> */}
+      <Flex align="center" gap={4} style={{ cursor: "pointer" }}>
+        <Typography.Title level={4} style={{ marginTop: 0, margin: 0 }}>
+          Space
+        </Typography.Title>
+        <Tooltip title="Select the space in this design">
+          <InfoCircleOutlined></InfoCircleOutlined>
+        </Tooltip>
+      </Flex>
 
       <Flex gap={8} style={{ width: "100%" }}>
         <Select
@@ -72,7 +98,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
             width: "calc(100% - 68px)",
             height: 60,
           }}
-          options={projectSpaces!.map((space: Space) => {
+          options={formattedSpaces!.map((space: Space) => {
             return {
               value: space._id,
               label: (
@@ -95,9 +121,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
                     >
                       ₹{space.cost || "??"}
                       {space.size
-                        ? ` | ${convertInchToFeet(
-                            space.size.l
-                          )}x${convertInchToFeet(space.size.w)} ft`
+                        ? ` | ${space.size.l + 0}x${space.size.w} ft`
                         : ""}
                     </Typography.Text>
                   </Flex>
@@ -118,7 +142,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
             setSpaceDialogOpen(false);
           }}
           spaceData={
-            projectSpaces.find((ps: Space) => selectedSpace == ps._id!)!
+            formattedSpaces.find((ps: Space) => selectedSpace == ps._id!)!
           }
           projectId={projectId}
           showSpaceDialog={spaceDialogOpen}

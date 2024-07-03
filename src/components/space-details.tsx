@@ -17,7 +17,7 @@ import { SpaceMeta } from "../interfaces/Meta";
 import { queryClient } from "../libs/react-query/query-client";
 import { queryKeys } from "../libs/react-query/constants";
 import TextArea from "antd/es/input/TextArea";
-import { convertFeetToInch, convertInchToFeet } from "../libs/lvnzy-helper";
+import { convertFeetToInch } from "../libs/lvnzy-helper";
 
 const SpaceDetails: React.FC<{
   spaceData: Space;
@@ -36,10 +36,6 @@ const SpaceDetails: React.FC<{
     console.log(projectId);
     if (!spaceData) {
       return;
-    }
-    if (spaceData.size) {
-      spaceData.size.l = convertInchToFeet(spaceData.size.l);
-      spaceData.size.w = convertInchToFeet(spaceData.size.w);
     }
     form.setFieldsValue({
       ...spaceData,
@@ -145,10 +141,16 @@ const SpaceDetails: React.FC<{
                 children: (
                   <>
                     <Flex gap={8}>
-                      <Form.Item name={["size", "l"]} label="Length (Optional)">
+                      <Form.Item
+                        name={["size", "l"]}
+                        label="Length in Feet (Optional)"
+                      >
                         <Input type="number" width={25} />
                       </Form.Item>
-                      <Form.Item name={["size", "w"]} label="Width (Optional)">
+                      <Form.Item
+                        name={["size", "w"]}
+                        label="Width in Feet (Optional)"
+                      >
                         <Input type="number" width={25} />
                       </Form.Item>
                     </Flex>

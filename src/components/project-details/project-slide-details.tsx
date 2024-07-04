@@ -27,7 +27,6 @@ import {
   useSaveSlide,
 } from "../../hooks/use-slides";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
-import { ProjectDetailsProps } from "../../interfaces/Project";
 import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
 import { baseAppUrl } from "../../libs/constants";
@@ -42,10 +41,11 @@ import ProjectSettings from "./project-settings";
 import ProjectSpaceDetails from "./project-space-details";
 import SlideFixtureMapping from "./slide-fixture-mapping";
 import SlideSpaceMapping from "./slide-space-mapping";
+import { useFetchProject } from "../../hooks/use-projects";
 const { confirm } = Modal;
 
-const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
-  projectData,
+const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
+  projectId,
 }) => {
   const [selectedSlide, setSelectedSlide] = useState<Slide>();
   const [slides, setSlides] = useState<Slide[]>([]);
@@ -61,7 +61,12 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
   );
 
   const { data: allSpaces, isLoading: allSpacesLoading } =
-    useFetchSpacesByProject(projectData!._id!);
+    useFetchSpacesByProject(projectId!);
+  const {
+    data: projectData,
+    isLoading: projectDataLoading,
+    refetch: refetchProjectData,
+  } = useFetchProject(projectId as string);
 
   const bulkSaveSlidesMutation = useBulkSaveSlides();
   const updateSlideMutation = useSaveSlide();
@@ -72,7 +77,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     data: slidesData,
     isPending: slidesDataPending,
     refetch: refetchSlidesData,
-  } = useFetchSlidesByProject(projectData!._id!);
+  } = useFetchSlidesByProject(projectId!);
 
   useEffect(() => {
     if (!slidesData || !slidesData.length) {
@@ -98,7 +103,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     updateSlideMutation.mutate(selectedSlide!, {
       onSuccess: async () => {
         queryClient.invalidateQueries({
-          queryKey: [queryKeys.getSlides, projectData?._id],
+          queryKey: [queryKeys.getSlides, projectId],
         });
         message.success("Changes saved");
       },
@@ -164,7 +169,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     const slidesData = imgs.map((img: string) => {
       return {
         url: img,
-        projectId: projectData!._id,
+        projectId: projectId,
       };
     });
 
@@ -175,9 +180,10 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
           setSelectedSlide(response[0]);
         }
         processSlidesInSpacesMutation.mutate(
-          { projectId: projectData!._id! },
+          { projectId: projectId! },
           {
             onSuccess: async (response: any) => {
+              refetchProjectData();
               refetchSlidesData();
             },
             onError: () => {},
@@ -278,7 +284,7 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
     }
   };
 
-  if (slidesDataPending || allSpacesLoading) {
+  if (slidesDataPending || allSpacesLoading || projectDataLoading) {
     return <>Loading...</>;
   }
 
@@ -570,14 +576,14 @@ const ProjectSlideDetails: React.FC<ProjectDetailsProps> = ({
             <SlideSpaceMapping
               key="slide-spaces"
               onSpacesUpdated={spacesUpdated}
-              projectId={projectData!._id!}
+              projectId={projectId!}
               slide={selectedSlide!}
               processingDesigns={processSlidesInSpacesMutation.isPending}
             ></SlideSpaceMapping>
             <SlideFixtureMapping
               key="slide-fixtures"
               onFixturesUpdated={fixturesUpdated}
-              projectId={projectData!._id!}
+              projectId={projectId!}
               slide={selectedSlide!}
             ></SlideFixtureMapping>
           </Flex>

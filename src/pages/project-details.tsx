@@ -12,5 +12,5 @@ export function ProjectDetails() {
     return <Loader />;
   }
 
-  return <ProjectSlideDetails projectData={projectData}></ProjectSlideDetails>;
+  return <ProjectSlideDetails projectId={projectId!}></ProjectSlideDetails>;
 }

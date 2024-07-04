@@ -172,6 +172,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
           form.resetFields();
           onCancel();
         }}
+        width={700}
       >
         {existingFixturesOptions.length > 0 && (
           <>
@@ -281,7 +282,11 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                       name="description"
                       label="One liner about this fixture in 400 chars or less"
                     >
-                      <TextArea rows={2} maxLength={400} />
+                      <TextArea
+                        rows={5}
+                        maxLength={400}
+                        style={{ fontSize: "110%" }}
+                      />
                     </Form.Item>
                   </>
                 );

@@ -1,11 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Upload, message, Avatar, Spin, Flex } from "antd";
+import {
+  ContactsOutlined,
+  ShopOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { useAuth0 } from "@auth0/auth0-react";
+import {
+  Avatar,
+  Button,
+  Flex,
+  Form,
+  Input,
+  Spin,
+  Tabs,
+  Typography,
+  Upload,
+  message,
+} from "antd";
 import ImgCrop from "antd-img-crop";
-import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
-import { UserOutlined } from "@ant-design/icons";
+import TabPane from "antd/es/tabs/TabPane";
+import { UploadChangeParam, UploadFile } from "antd/lib/upload/interface";
+import React, { useEffect, useState } from "react";
 import { useGetDesignerByEmail, useSaveDesigner } from "../hooks/use-designers";
 import { Designer } from "../interfaces/Designer";
-import { useAuth0 } from "@auth0/auth0-react";
 import { baseApiUrl } from "../libs/constants";
 import { useDevice } from "../libs/device";
 
@@ -100,98 +116,143 @@ const AccountDetails: React.FC = () => {
         onFinish={handleFinish}
         onValuesChange={handleFormChange}
       >
-        <Flex gap={24} align="center">
-          <Form.Item>
-            <Avatar
-              size={100}
-              style={{ marginRight: 32 }}
-              icon={<UserOutlined />}
-              src={
-                fileList.length > 0 && fileList[0].url
-                  ? fileList[0].url
-                  : undefined
-              }
-            />
-            <ImgCrop rotationSlider>
-              <Upload
-                action={`${baseApiUrl}upload/single`}
-                name="image"
-                listType="picture"
-                fileList={fileList}
-                onChange={handleUploadChange}
-                showUploadList={false}
+        <Tabs
+          defaultActiveKey="1"
+          tabPosition={isMobile ? "top" : "left"}
+          style={{ marginTop: 20 }}
+        >
+          <TabPane tab="Basic Details" key="1" icon={<ContactsOutlined />}>
+            <Typography.Title style={{ margin: 0, marginBottom: 40 }} level={3}>
+              Basic Details
+            </Typography.Title>
+
+            <Flex gap={24} align="center">
+              <Form.Item>
+                <Avatar
+                  size={100}
+                  style={{ marginRight: 32 }}
+                  icon={<UserOutlined />}
+                  src={
+                    fileList.length > 0 && fileList[0].url
+                      ? fileList[0].url
+                      : undefined
+                  }
+                />
+                <ImgCrop rotationSlider>
+                  <Upload
+                    action={`${baseApiUrl}upload/single`}
+                    name="image"
+                    listType="picture"
+                    fileList={fileList}
+                    onChange={handleUploadChange}
+                    showUploadList={false}
+                  >
+                    <Button>Change picture</Button>
+                  </Upload>
+                </ImgCrop>
+              </Form.Item>
+            </Flex>
+
+            <Flex vertical={isMobile} style={{ marginBottom: 32 }}>
+              <Flex vertical style={{ marginRight: isMobile ? 0 : 32 }}>
+                <Form.Item
+                  name="designerName"
+                  label="Your name or company name"
+                  rules={[
+                    { required: true, message: "Please enter your name" },
+                  ]}
+                >
+                  <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
+                </Form.Item>
+
+                <Form.Item
+                  name="email"
+                  label="Your Email"
+                  initialValue={user.email}
+                  rules={[
+                    { required: true, message: "Please enter your email" },
+                  ]}
+                >
+                  <Input
+                    disabled
+                    style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
+                  />
+                </Form.Item>
+              </Flex>
+              <Flex vertical>
+                <Form.Item name="mobile" label="Your mobile">
+                  <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
+                </Form.Item>
+
+                <Form.Item name="address" label="Your address">
+                  <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
+                </Form.Item>
+              </Flex>
+            </Flex>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={saveDesignerMutation.isPending}
+                disabled={!isFormChanged}
               >
-                <Button>Change picture</Button>
-              </Upload>
-            </ImgCrop>
-          </Form.Item>
-        </Flex>
-        <Flex vertical={isMobile} style={{ marginBottom: 32 }}>
-          <Flex vertical style={{ marginRight: isMobile ? 0 : 32 }}>
-            <Form.Item
-              name="designerName"
-              label="Your name or company name"
-              rules={[{ required: true, message: "Please enter your name" }]}
-            >
-              <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
+                Save changes
+              </Button>
             </Form.Item>
-            <Form.Item
-              name="numYearsExperience"
-              label="Your experience in years"
-            >
-              <Input
-                type="number"
-                style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
-              />
-            </Form.Item>
-            <Form.Item name="numProjects" label="Projects you have completed">
-              <Input
-                type="number"
-                style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
-              />
-            </Form.Item>
-            <Form.Item
-              name="bio"
-              label="Describe your experience & how you are unique"
-            >
-              <TextArea
-                rows={4}
-                style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
-              />
-            </Form.Item>
-          </Flex>
-          <Flex vertical>
-            <Form.Item
-              name="email"
-              label="Your Email"
-              initialValue={user.email}
-              rules={[{ required: true, message: "Please enter your email" }]}
-            >
-              <Input
-                disabled
-                style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
-              />
-            </Form.Item>
+          </TabPane>
+          <TabPane tab="About Your Studio" key="2" icon={<ShopOutlined />}>
+            <Typography.Title style={{ margin: 0, marginBottom: 40 }} level={3}>
+              About Your Studio
+            </Typography.Title>
 
-            <Form.Item name="mobile" label="Your mobile">
-              <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
-            </Form.Item>
+            <Flex vertical={isMobile} style={{ marginBottom: 32 }}>
+              <Flex vertical style={{ marginRight: isMobile ? 0 : 32 }}>
+                <Form.Item
+                  name="numYearsExperience"
+                  label="Your experience in years"
+                >
+                  <Input
+                    type="number"
+                    style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
+                  />
+                </Form.Item>
 
-            <Form.Item name="address" label="Your address">
-              <Input style={{ width: isMobile ? "100%" : INPUT_WIDTH }} />
+                <Form.Item
+                  name="bio"
+                  label="Describe your experience & how you are unique"
+                >
+                  <TextArea
+                    rows={4}
+                    style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
+                  />
+                </Form.Item>
+              </Flex>
+              <Flex vertical>
+                <Form.Item
+                  name="numProjects"
+                  label="Projects you have completed"
+                >
+                  <Input
+                    type="number"
+                    style={{ width: isMobile ? "100%" : INPUT_WIDTH }}
+                  />
+                </Form.Item>
+              </Flex>
+            </Flex>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={saveDesignerMutation.isPending}
+                disabled={!isFormChanged}
+              >
+                Save changes
+              </Button>
             </Form.Item>
-          </Flex>
-        </Flex>
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={saveDesignerMutation.isPending}
-            disabled={!isFormChanged}
-          >
-            Save changes
-          </Button>
-        </Form.Item>
+          </TabPane>
+        </Tabs>
       </Form>
     </Flex>
   );

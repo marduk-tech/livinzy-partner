@@ -3,6 +3,8 @@ import {
   ExclamationCircleFilled,
   ExpandOutlined,
   FormatPainterOutlined,
+  InfoCircleFilled,
+  PictureFilled,
   RadiusSettingOutlined,
   SettingOutlined,
   SyncOutlined,
@@ -20,6 +22,7 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useProcessSpacesInSlides } from "../../hooks/use-ai";
+import { useFetchProject, useSaveProject } from "../../hooks/use-projects";
 import {
   useBulkSaveSlides,
   useDeleteSlide,
@@ -27,6 +30,7 @@ import {
   useSaveSlide,
 } from "../../hooks/use-slides";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
+import { Project } from "../../interfaces/Project";
 import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
 import { baseAppUrl } from "../../libs/constants";
@@ -41,7 +45,6 @@ import ProjectSettings from "./project-settings";
 import ProjectSpaceDetails from "./project-space-details";
 import SlideFixtureMapping from "./slide-fixture-mapping";
 import SlideSpaceMapping from "./slide-space-mapping";
-import { useFetchProject } from "../../hooks/use-projects";
 const { confirm } = Modal;
 
 const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
@@ -54,6 +57,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>();
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>();
   const [isReplaceSlideOpen, setIsReplaceSlideOpen] = useState<boolean>();
+  const [isPreviewImage, setIsPreviewImage] = useState<boolean>();
 
   // State to manage the selected slide for replacement
   const [replacementSlideUrl, setReplacementSlideUrl] = useState<string | null>(
@@ -72,6 +76,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   const updateSlideMutation = useSaveSlide();
   const processSlidesInSpacesMutation = useProcessSpacesInSlides();
   const deleteSlideMutation = useDeleteSlide();
+  const updateProjectMutation = useSaveProject();
 
   const {
     data: slidesData,
@@ -98,6 +103,12 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
   }, [slidesData]);
 
+  useEffect(() => {
+    if (projectData?.previewImageUrl) {
+      setIsPreviewImage(projectData.previewImageUrl === selectedSlide?.url);
+    }
+  }, [projectData, selectedSlide]);
+
   const fixturesUpdated = (slide: Slide) => {
     selectedSlide!.fixtures = slide.fixtures;
     updateSlideMutation.mutate(selectedSlide!, {
@@ -123,6 +134,11 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
 
   const onClickDelete = (event: any) => {
     event.stopPropagation();
+
+    if (isPreviewImage) {
+      return message.error("You cannot delete / replace a preview slide");
+    }
+
     confirm({
       title: `Delete Design`,
       icon: <ExclamationCircleFilled />,
@@ -152,6 +168,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
 
   const onClickReplace = (event: any) => {
     event.stopPropagation();
+    if (isPreviewImage) {
+      return message.error("You cannot delete / replace a preview slide");
+    }
     setReplacementSlideUrl(null);
     setIsReplaceSlideOpen(true);
   };
@@ -282,6 +301,38 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
       setIsReplaceSlideOpen(false);
       setReplacementSlideUrl(null);
     }
+  };
+
+  const onClickUpdatePreviewImage = (event: any) => {
+    event.stopPropagation();
+
+    confirm({
+      title: `Update preview image`,
+      icon: <InfoCircleFilled />,
+      content: `Are you sure you want to set this slide as preview image?`,
+      okText: `Update`,
+      okType: "primary",
+      okButtonProps: {
+        style: { backgroundColor: COLORS.primaryColor },
+      },
+      onOk: async () => {
+        const updateData = {
+          ...projectData,
+          previewImageUrl: selectedSlide?.url,
+        };
+
+        await updateProjectMutation
+          .mutateAsync(updateData)
+          .catch((err) => {
+            message.error("Something went wrong please try again later");
+          })
+          .then((data: Project) => {
+            message.success("Preview image set successfully successfully");
+            refetchProjectData();
+            refetchSlidesData();
+          });
+      },
+    });
   };
 
   if (slidesDataPending || allSpacesLoading || projectDataLoading) {
@@ -542,6 +593,26 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
                 right: 8,
               }}
             >
+              <Tooltip title="Click to delete">
+                <Button
+                  type="link"
+                  onClick={onClickUpdatePreviewImage}
+                  icon={
+                    isPreviewImage ? (
+                      <PictureFilled style={{ color: COLORS.primaryColor }} />
+                    ) : (
+                      <PictureFilled />
+                    )
+                  }
+                  style={{
+                    color: "white",
+                    width: 24,
+                    height: 24,
+                    padding: 0,
+                    marginRight: 8,
+                  }}
+                />
+              </Tooltip>
               <Tooltip title="Click to delete">
                 <Button
                   type="link"

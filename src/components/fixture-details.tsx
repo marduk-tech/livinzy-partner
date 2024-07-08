@@ -346,12 +346,12 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                         {variations && variations.length ? (
                           <Form.Item
                             name="materialVariation"
-                            label="Variation"
+                            label="Sub material"
                             rules={[{ required: true }]}
                           >
                             <Select
                               style={{ width: 250 }}
-                              placeholder="Select a variation"
+                              placeholder="Select sub material"
                               disabled={!selectedMaterial}
                               options={variations.map(
                                 (variation: MaterialVariationMeta) => ({
@@ -365,7 +365,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                         {finishes && finishes.length ? (
                           <Form.Item
                             name="materialFinish"
-                            label="Finish"
+                            label="Material finish"
                             rules={[{ required: true }]}
                           >
                             <Select

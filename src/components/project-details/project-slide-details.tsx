@@ -593,7 +593,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
                 right: 8,
               }}
             >
-              <Tooltip title="Click to delete">
+              <Tooltip title="Click to set as project image">
                 <Button
                   type="link"
                   onClick={onClickUpdatePreviewImage}

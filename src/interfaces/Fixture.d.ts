@@ -21,9 +21,9 @@ export interface FixtureFormData {
   cost?: Number;
   designName?: string;
   description?: string;
-  material: string;
-  materialVariation: string;
-  materialFinish: string;
+  material?: string;
+  materialVariation?: string;
+  materialFinish?: string;
   projectId?: string;
   imageBounds?: {
     startPoint: { x: number; y: number };

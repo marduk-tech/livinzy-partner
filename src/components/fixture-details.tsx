@@ -36,7 +36,6 @@ import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
 import { Loader } from "./loader";
 import { filterFixtures } from "./project-details/slide-fixture-mapping";
-import SearchHighlights from "./common/search-highlights";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -106,8 +105,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     );
     form.setFieldsValue({
       designName: fixtureType.fixtureType,
+      material: "",
     });
 
+    setSelectedMaterial("");
     setMaterials(fixtureType.materials);
   };
 
@@ -334,7 +335,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           name="material"
                           style={{ width: 250 }}
                           label="Material"
-                          rules={[{ required: true }]}
                         >
                           <Select
                             placeholder="Select a material"
@@ -352,7 +352,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           <Form.Item
                             name="materialVariation"
                             label="Sub material"
-                            rules={[{ required: true }]}
+                            rules={[{ required: !!selectedMaterial }]}
                           >
                             <Select
                               style={{ width: 250 }}
@@ -371,7 +371,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           <Form.Item
                             name="materialFinish"
                             label="Material finish"
-                            rules={[{ required: true }]}
+                            rules={[{ required: !!selectedMaterial }]}
                           >
                             <Select
                               style={{ width: 250 }}
@@ -398,13 +398,13 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           label: "More options",
                           children: (
                             <>
-                              <SearchHighlights
+                              {/* <SearchHighlights
                                 label="Add a special highlight about this fixture"
                                 fixtureType={fixture.fixtureType.fixtureType}
                                 onChange={(highlights: string[]) => {
                                   console.log(highlights);
                                 }}
-                              ></SearchHighlights>
+                              ></SearchHighlights> */}
                               <Form.Item
                                 name="description"
                                 label="One liner about this fixture in 400 chars or less"

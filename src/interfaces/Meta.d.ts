@@ -16,4 +16,31 @@ export interface FixtureMeta {
   fixtureType: string;
   description?: string;
   addedByDesignerId?: string;
+  materials?: string[];
+}
+
+export interface MaterialMeta {
+  _id?: string;
+  name: string;
+  costScore?: string;
+  benefit?: string;
+  drawback?: string;
+}
+
+export interface MaterialVariationMeta {
+  _id?: string;
+  name: string;
+  materialId: string;
+  costScore?: string;
+  benefit?: string;
+  drawback?: string;
+}
+
+export interface MaterialFinishMeta {
+  _id?: string;
+  name: string;
+  materialId: string;
+  costScore?: string;
+  benefit?: string;
+  drawback?: string;
 }

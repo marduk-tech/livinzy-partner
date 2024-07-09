@@ -8,7 +8,9 @@ export const queryKeys: { [key: string]: string } = {
   getFixtures: "getFixtures",
   getHomeMeta: "getHomeMeta",
   getSpaceMeta: "getSpaceMeta",
-  getLayoutDetails: "getLayoutDetails"
+  getLayoutDetails: "getLayoutDetails",
+  getMaterialVariatonByMaterial: "getMaterialVariatonByMaterial",
+  getMaterialFinishByMaterial: "getMaterialFinishByMaterial",
 };
 
 export const cookieKeys = {

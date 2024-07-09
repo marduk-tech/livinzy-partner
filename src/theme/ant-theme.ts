@@ -19,7 +19,7 @@ export const antTheme: ThemeConfig = {
       colorTextLabel: COLORS.textColorLight,
     },
     Select: {
-      borderRadius: 16,
+      borderRadius: 12,
     },
   },
 };

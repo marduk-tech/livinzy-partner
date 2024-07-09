@@ -35,6 +35,19 @@ export const useSaveFixture = () => {
 };
 
 // Custom hook to save designer data
+export const useSearchFixtureHighlights = () => {
+  return useMutation({
+    mutationFn: async (searchData: any) => {
+      let response = await axiosApiInstance.post(
+        `/fixtures/highlights`,
+        searchData
+      );
+      return response.data;
+    },
+  });
+};
+
+// Custom hook to save designer data
 export const useDeleteFixture = () => {
   return useMutation({
     mutationFn: async (fixtureId: string) => {

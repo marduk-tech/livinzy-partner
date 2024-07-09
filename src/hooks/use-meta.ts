@@ -38,6 +38,36 @@ export const getFixtureMeta = () => {
   });
 };
 
+// Custom hook to fetch projects using useQuery
+export const getFixtureMaterialVariationsMetaByMaterial = (
+  materialId: string
+) => {
+  return useQuery({
+    queryKey: [queryKeys.getMaterialVariatonByMaterial, materialId],
+    queryFn: async () => {
+      const { data } = await axiosApiInstance.get(
+        `/materialvariationmeta/material/${materialId}`
+      );
+      return data;
+    },
+  });
+};
+
+// Custom hook to fetch projects using useQuery
+export const getFixtureMaterialFinishesMetaByMaterial = (
+  materialId: string
+) => {
+  return useQuery({
+    queryKey: [queryKeys.getMaterialFinishByMaterial, materialId],
+    queryFn: async () => {
+      const { data } = await axiosApiInstance.get(
+        `/materialfinishmeta/material/${materialId}`
+      );
+      return data;
+    },
+  });
+};
+
 // Custom hook to save designer data
 export const useSaveFixtureMeta = () => {
   return useMutation({

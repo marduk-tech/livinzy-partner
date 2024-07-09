@@ -36,6 +36,7 @@ import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
 import { Loader } from "./loader";
 import { filterFixtures } from "./project-details/slide-fixture-mapping";
+import SearchHighlights from "./common/search-highlights";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -300,14 +301,18 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                               .toLowerCase()
                               .includes(input.toLowerCase())
                           }
-                          options={fixtureMetaData.map(
-                            (fixtureMeta: FixtureMeta) => {
+                          options={fixtureMetaData
+                            .sort(
+                              (f1: FixtureMeta, f2: FixtureMeta) =>
+                                (f2.materials || []).length -
+                                (f1.materials || []).length
+                            )
+                            .map((fixtureMeta: FixtureMeta) => {
                               return {
                                 value: fixtureMeta._id,
                                 label: fixtureMeta.fixtureType,
                               };
-                            }
-                          )}
+                            })}
                         ></Select>
                       </Form.Item>
                       <Form.Item
@@ -393,13 +398,13 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           label: "More options",
                           children: (
                             <>
-                              {/* <SearchHighlights
+                              <SearchHighlights
                                 label="Add a special highlight about this fixture"
                                 fixtureType={fixture.fixtureType.fixtureType}
                                 onChange={(highlights: string[]) => {
                                   console.log(highlights);
                                 }}
-                              ></SearchHighlights> */}
+                              ></SearchHighlights>
                               <Form.Item
                                 name="description"
                                 label="One liner about this fixture in 400 chars or less"

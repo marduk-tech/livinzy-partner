@@ -29,7 +29,11 @@ const ProjectsList: React.FC = () => {
 
   if (projects) {
     return (
-      <Flex style={{ width: "100%", flexWrap: "wrap" }} gap={32}>
+      <Flex
+        style={{ width: "100%", flexWrap: "wrap" }}
+        justify="center"
+        gap={32}
+      >
         {!isMobile ? (
           <Card
             style={{ width: isMobile ? "100%" : 240 }}

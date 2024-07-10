@@ -5,6 +5,7 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
+  Collapse,
   Divider,
   Flex,
   Form,
@@ -22,10 +23,20 @@ import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { useGenerateOneLiner } from "../hooks/use-ai";
 import { useFetchFixturesByProject } from "../hooks/use-fixtures";
-import { getFixtureMeta, useSaveFixtureMeta } from "../hooks/use-meta";
+import {
+  getFixtureMaterialFinishesMetaByMaterial,
+  getFixtureMaterialVariationsMetaByMaterial,
+  getFixtureMeta,
+  useSaveFixtureMeta,
+} from "../hooks/use-meta";
 import { useFetchSlidesByProject } from "../hooks/use-slides";
 import { Fixture } from "../interfaces/Fixture";
-import { FixtureMeta } from "../interfaces/Meta";
+import {
+  FixtureMeta,
+  MaterialFinishMeta,
+  MaterialMeta,
+  MaterialVariationMeta,
+} from "../interfaces/Meta";
 import { Slide } from "../interfaces/Slide";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
@@ -55,6 +66,11 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
   const generateOneLinerMutation = useGenerateOneLiner();
 
+  const [materials, setMaterials] = useState([]);
+  const [variations, setVariations] = useState([]);
+  const [finishes, setFinishes] = useState([]);
+  const [selectedMaterial, setSelectedMaterial] = useState<string>("");
+
   const {
     data: fixtureMetaData,
     isPending: fixtureMetaDataPending,
@@ -66,6 +82,11 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     isPending: fixturesDataPending,
     refetch: refetchProjectFixtures,
   } = useFetchFixturesByProject(projectId as string);
+
+  const { data: materialVariations } =
+    getFixtureMaterialVariationsMetaByMaterial(selectedMaterial);
+  const { data: materialFinishes } =
+    getFixtureMaterialFinishesMetaByMaterial(selectedMaterial);
 
   const { data: projectSlides, isPending: projectSlidesPending } =
     useFetchSlidesByProject(projectId as string);
@@ -91,13 +112,22 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     );
     form.setFieldsValue({
       designName: fixtureType.fixtureType,
+      material: "",
     });
+
+    setSelectedMaterial("");
+    setMaterials(fixtureType.materials);
+  };
+
+  const handleMaterialChange = async (value: string) => {
+    setSelectedMaterial(value);
+    form.resetFields(["materialVariation", "materialFinish"]);
   };
 
   /**
    * When a new fixture is added by the designer
    */
-  const onClickAddFixture = () => {
+  const onClickAddNewFixture = () => {
     if (
       inputRef.current &&
       inputRef.current.input &&
@@ -141,7 +171,12 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   };
 
   useEffect(() => {
-    // Auto select the fixture type once fixture meta is added.
+    setFinishes(materialFinishes);
+    setVariations(materialVariations);
+  }, [materialFinishes, materialVariations]);
+
+  useEffect(() => {
+    // Auto select the fixture type once a new fixture meta is added.
     if (autoSelectFixtureMeta) {
       setTimeout(() => {
         form.setFieldsValue({
@@ -151,14 +186,24 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   }, [fixtureMetaData]);
 
-  useEffect(() => {
-    if (fixture) {
+  const onModalToggle = (open: boolean) => {
+    if (open && fixture) {
+      const fixtureType = fixtureMetaData.find(
+        (f: FixtureMeta) => f._id == fixture.fixtureType._id
+      );
+      setMaterials(fixtureType.materials);
+      if (fixture.material) {
+        setSelectedMaterial(fixture.material);
+      }
       form.setFieldsValue({
         ...fixture,
         fixtureType: fixture.fixtureType._id,
       });
+    } else {
+      setMaterials([]);
     }
-  }, fixture);
+    console.log(open);
+  };
 
   if (fixturesDataPending || projectSlidesPending || fixtureMetaDataPending) {
     return <Loader />;
@@ -186,6 +231,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 
     return (
       <Modal
+        afterOpenChange={onModalToggle}
         destroyOnClose={true}
         title={
           <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
@@ -198,7 +244,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
           form.resetFields();
           onCancel();
         }}
-        width={700}
+        width={900}
       >
         {existingFixturesOptions.length > 0 && (
           <>
@@ -224,116 +270,202 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
               {({ getFieldValue }) => {
                 return (
                   <>
-                    <Form.Item
-                      name="fixtureType"
-                      label="Type"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter the type",
-                        },
-                      ]}
-                    >
-                      <Select
-                        onChange={onChangeFixtureType}
-                        showSearch
-                        dropdownRender={(menu) => (
-                          <>
-                            {menu}
-                            <Divider style={{ margin: "8px 0" }} />
-                            <Space style={{ padding: "0 8px 4px" }}>
-                              <Flex vertical>
-                                <Typography.Text
-                                  style={{
-                                    marginTop: 8,
-                                    marginBottom: 8,
-                                    color: COLORS.textColorLight,
-                                  }}
-                                >
-                                  Couldn't find it in the list ? Add custom
-                                  fixture
-                                </Typography.Text>
-                                <Flex>
-                                  <Input
-                                    placeholder="Enter the name of fixture"
-                                    ref={inputRef}
-                                    style={{ width: 300 }}
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                  />
-                                  <Button
-                                    type="link"
-                                    icon={<PlusOutlined />}
-                                    loading={saveFixtureMetaMutation.isPending}
-                                    onClick={onClickAddFixture}
+                    <Flex gap={16}>
+                      <Form.Item
+                        name="fixtureType"
+                        label="Type"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter the type",
+                          },
+                        ]}
+                      >
+                        <Select
+                          onChange={onChangeFixtureType}
+                          showSearch
+                          style={{ height: 56, width: 516 }}
+                          dropdownRender={(menu) => (
+                            <>
+                              {menu}
+                              <Divider style={{ margin: "8px 0" }} />
+                              <Space style={{ padding: "0 8px 4px" }}>
+                                <Flex vertical>
+                                  <Typography.Text
+                                    style={{
+                                      marginTop: 8,
+                                      marginBottom: 8,
+                                      color: COLORS.textColorLight,
+                                    }}
                                   >
-                                    Add
-                                  </Button>
+                                    Couldn't find it in the list ? Add custom
+                                    fixture
+                                  </Typography.Text>
+                                  <Flex>
+                                    <Input
+                                      placeholder="Enter the name of fixture"
+                                      ref={inputRef}
+                                      style={{ width: 250 }}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                    />
+                                    <Button
+                                      type="link"
+                                      icon={<PlusOutlined />}
+                                      loading={
+                                        saveFixtureMetaMutation.isPending
+                                      }
+                                      onClick={onClickAddNewFixture}
+                                    >
+                                      Add
+                                    </Button>
+                                  </Flex>
                                 </Flex>
-                              </Flex>
-                            </Space>
-                          </>
-                        )}
-                        placeholder="Please select a fixture type"
-                        filterOption={(input, option) =>
-                          (`${option?.label}` || "")
-                            .toLowerCase()
-                            .includes(input.toLowerCase())
-                        }
-                        options={fixtureMetaData.map(
-                          (fixtureMeta: FixtureMeta) => {
-                            return {
-                              value: fixtureMeta._id,
-                              label: fixtureMeta.fixtureType,
-                            };
+                              </Space>
+                            </>
+                          )}
+                          placeholder="Please select a fixture type"
+                          filterOption={(input, option) =>
+                            (`${option?.label}` || "")
+                              .toLowerCase()
+                              .includes(input.toLowerCase())
                           }
-                        )}
-                      ></Select>
-                    </Form.Item>
-                    <Form.Item
-                      name="designName"
-                      label="Custom name for the fixture"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a custom name",
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
+                          options={fixtureMetaData
+                            .sort(
+                              (f1: FixtureMeta, f2: FixtureMeta) =>
+                                (f2.materials || []).length -
+                                (f1.materials || []).length
+                            )
+                            .map((fixtureMeta: FixtureMeta) => {
+                              return {
+                                value: fixtureMeta._id,
+                                label: fixtureMeta.fixtureType,
+                              };
+                            })}
+                        ></Select>
+                      </Form.Item>
+                      <Form.Item
+                        name="designName"
+                        label="Give it a custom name"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter a custom name",
+                          },
+                        ]}
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Flex>
+                    {materials && materials.length ? (
+                      <Flex gap={16}>
+                        <Form.Item
+                          name="material"
+                          style={{ width: 250 }}
+                          label="Material"
+                        >
+                          <Select
+                            placeholder="Select a material"
+                            onChange={handleMaterialChange}
+                            options={materials.map(
+                              (material: MaterialMeta) => ({
+                                label: material.name,
+                                value: material._id,
+                              })
+                            )}
+                          ></Select>
+                        </Form.Item>
+
+                        {variations && variations.length ? (
+                          <Form.Item
+                            name="materialVariation"
+                            label="Sub material"
+                            rules={[{ required: !!selectedMaterial }]}
+                          >
+                            <Select
+                              style={{ width: 250 }}
+                              placeholder="Select sub material"
+                              disabled={!selectedMaterial}
+                              options={variations.map(
+                                (variation: MaterialVariationMeta) => ({
+                                  label: variation.name,
+                                  value: variation._id,
+                                })
+                              )}
+                            ></Select>
+                          </Form.Item>
+                        ) : null}
+                        {finishes && finishes.length ? (
+                          <Form.Item
+                            name="materialFinish"
+                            label="Material finish"
+                            rules={[{ required: !!selectedMaterial }]}
+                          >
+                            <Select
+                              style={{ width: 250 }}
+                              placeholder="Select a finish"
+                              disabled={!selectedMaterial}
+                              options={finishes.map(
+                                (finish: MaterialFinishMeta) => ({
+                                  label: finish.name,
+                                  value: finish._id,
+                                })
+                              )}
+                            ></Select>
+                          </Form.Item>
+                        ) : null}
+                      </Flex>
+                    ) : null}
                     <Form.Item name="cost" label="Cost (approx)">
                       <Input type="number" />
                     </Form.Item>
-                    <Flex vertical justify="flex-start">
-                      <Form.Item
-                        style={{ marginBottom: 0 }}
-                        name="description"
-                        label="One liner about this fixture in 400 chars or less"
-                      >
-                        <TextArea
-                          rows={5}
-                          maxLength={400}
-                          style={{ fontSize: "110%", margin: 0 }}
-                        />
-                      </Form.Item>
-                      <Button
-                        disabled={!getFieldValue("designName")}
-                        icon={<UngroupOutlined />}
-                        type="link"
-                        style={{
-                          padding: 0,
-                          textAlign: "left",
-                          marginTop: 5,
-                        }}
-                        onClick={() =>
-                          onClickGenerateOneLiner(getFieldValue("designName"))
-                        }
-                      >
-                        {generateOneLinerMutation.isPending
-                          ? "Generating description from designs.."
-                          : "AI Generate"}
-                      </Button>
-                    </Flex>
+                    <Collapse
+                      items={[
+                        {
+                          key: "1",
+                          label: "More options",
+                          children: (
+                            <>
+                              {/* <SearchHighlights
+                                label="Add a special highlight about this fixture"
+                                fixtureType={fixture.fixtureType.fixtureType}
+                                onChange={(highlights: string[]) => {
+                                  console.log(highlights);
+                                }}
+                              ></SearchHighlights> */}
+                              <Form.Item
+                                name="description"
+                                label="One liner about this fixture in 400 chars or less"
+                              >
+                                <TextArea
+                                  rows={5}
+                                  maxLength={400}
+                                  style={{ fontSize: "110%" }}
+                                />
+                              </Form.Item>
+                              <Button
+                                disabled={!getFieldValue("designName")}
+                                icon={<UngroupOutlined />}
+                                type="link"
+                                style={{
+                                  padding: 0,
+                                  textAlign: "left",
+                                  marginTop: 5,
+                                }}
+                                onClick={() =>
+                                  onClickGenerateOneLiner(
+                                    getFieldValue("designName")
+                                  )
+                                }
+                              >
+                                {generateOneLinerMutation.isPending
+                                  ? "Generating description from designs.."
+                                  : "AI Generate"}
+                              </Button>
+                            </>
+                          ),
+                        },
+                      ]}
+                    ></Collapse>
                   </>
                 );
               }}

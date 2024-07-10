@@ -1,32 +1,33 @@
-import React, { useState } from "react";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  Form,
   Button,
+  Empty,
   Flex,
+  Form,
+  Image,
   message,
   Spin,
   Typography,
-  Empty,
-  Image,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { getSpaceMeta } from "../../hooks/use-meta";
 import {
   useDeleteSpace,
   useFetchSpacesByProject,
   useSaveSpace,
 } from "../../hooks/use-spaces";
+import { SpaceMeta } from "../../interfaces/Meta";
 import { ProjectDetailsProps } from "../../interfaces/Project";
 import { Space } from "../../interfaces/Space";
-import { queryClient } from "../../libs/react-query/query-client";
-import { queryKeys } from "../../libs/react-query/constants";
-import { getSpaceMeta } from "../../hooks/use-meta";
-import { SpaceMeta } from "../../interfaces/Meta";
-import { COLORS } from "../../styles/colors";
 import { convertInchToFeet } from "../../libs/lvnzy-helper";
+import { queryKeys } from "../../libs/react-query/constants";
+import { queryClient } from "../../libs/react-query/query-client";
+import { COLORS } from "../../styles/colors";
 import SpaceDetails from "../space-details";
 
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
+  slide,
 }) => {
   const {
     data: spaces,
@@ -227,6 +228,7 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
         spaceDialogClosed={() => {
           setSpaceDialogOpen(false);
         }}
+        slide={slide}
         spaceData={currentSpace!}
         projectId={projectData!._id!}
         showSpaceDialog={spaceDialogOpen}

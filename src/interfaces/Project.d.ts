@@ -1,3 +1,5 @@
+import { Slide } from "./Slide";
+
 interface HomeDetails {
   communityName?: string;
   size: number;
@@ -23,4 +25,5 @@ interface ProjectDetailsProps {
   projectData?: Project;
   basicDetailsUpdated?: any;
   skipFloorplan?: boolean;
+  slide?: Slide;
 }

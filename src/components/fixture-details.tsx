@@ -1,4 +1,8 @@
-import { CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  PlusOutlined,
+  UngroupOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Divider,
@@ -6,6 +10,7 @@ import {
   Form,
   Input,
   InputRef,
+  message,
   Modal,
   Select,
   Space,
@@ -15,6 +20,7 @@ import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
+import { useGenerateOneLiner } from "../hooks/use-ai";
 import { useFetchFixturesByProject } from "../hooks/use-fixtures";
 import { getFixtureMeta, useSaveFixtureMeta } from "../hooks/use-meta";
 import { useFetchSlidesByProject } from "../hooks/use-slides";
@@ -47,6 +53,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
   const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
+  const generateOneLinerMutation = useGenerateOneLiner();
 
   const {
     data: fixtureMetaData,
@@ -112,6 +119,27 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   };
 
+  const onClickGenerateOneLiner = async (designName: string) => {
+    await generateOneLinerMutation.mutateAsync(
+      {
+        designName: designName,
+        projectId: projectId as string,
+        fixtureId: fixture ? fixture._id : null,
+        slideId: fixture ? undefined : slide?._id,
+      },
+      {
+        onSuccess: (response: any) => {
+          form.setFieldsValue({
+            description: response,
+          });
+        },
+        onError: () => {
+          message.error("Could not generate description");
+        },
+      }
+    );
+  };
+
   useEffect(() => {
     // Auto select the fixture type once fixture meta is added.
     if (autoSelectFixtureMeta) {
@@ -129,8 +157,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         ...fixture,
         fixtureType: fixture.fixtureType._id,
       });
-    } else {
-      form.resetFields();
     }
   }, fixture);
 
@@ -195,7 +221,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         <Form form={form} layout="vertical" onFinish={handleFinish}>
           {selectExisting ? (
             <Form.Item noStyle shouldUpdate>
-              {({ getFieldsValue }) => {
+              {({ getFieldValue }) => {
                 return (
                   <>
                     <Form.Item
@@ -278,16 +304,36 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                     <Form.Item name="cost" label="Cost (approx)">
                       <Input type="number" />
                     </Form.Item>
-                    <Form.Item
-                      name="description"
-                      label="One liner about this fixture in 400 chars or less"
-                    >
-                      <TextArea
-                        rows={5}
-                        maxLength={400}
-                        style={{ fontSize: "110%" }}
-                      />
-                    </Form.Item>
+                    <Flex vertical justify="flex-start">
+                      <Form.Item
+                        style={{ marginBottom: 0 }}
+                        name="description"
+                        label="One liner about this fixture in 400 chars or less"
+                      >
+                        <TextArea
+                          rows={5}
+                          maxLength={400}
+                          style={{ fontSize: "110%", margin: 0 }}
+                        />
+                      </Form.Item>
+                      <Button
+                        disabled={!getFieldValue("designName")}
+                        icon={<UngroupOutlined />}
+                        type="link"
+                        style={{
+                          padding: 0,
+                          textAlign: "left",
+                          marginTop: 5,
+                        }}
+                        onClick={() =>
+                          onClickGenerateOneLiner(getFieldValue("designName"))
+                        }
+                      >
+                        {generateOneLinerMutation.isPending
+                          ? "Generating description from designs.."
+                          : "AI Generate"}
+                      </Button>
+                    </Flex>
                   </>
                 );
               }}

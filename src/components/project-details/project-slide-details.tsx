@@ -444,7 +444,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
             setIsSpacesSettingsOpen(false);
           }}
         >
-          <ProjectSpaceDetails projectData={projectData}></ProjectSpaceDetails>{" "}
+          <ProjectSpaceDetails
+            projectData={projectData}
+            slide={selectedSlide}
+          ></ProjectSpaceDetails>
         </Modal>
 
         {/* Project settings modal */}

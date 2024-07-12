@@ -1,36 +1,42 @@
-import React, { useEffect, useState } from "react";
+import { UngroupOutlined } from "@ant-design/icons";
 import {
+  Button,
+  Collapse,
+  Flex,
   Form,
   Input,
-  Button,
-  Modal,
-  Flex,
   message,
-  Spin,
+  Modal,
   Select,
-  Collapse,
+  Spin,
 } from "antd";
-import { Space } from "../interfaces/Space";
+import TextArea from "antd/es/input/TextArea";
+import React, { useEffect, useState } from "react";
+import { useGenerateOneLiner } from "../hooks/use-ai";
 import { getSpaceMeta } from "../hooks/use-meta";
 import { useSaveSpace } from "../hooks/use-spaces";
 import { SpaceMeta } from "../interfaces/Meta";
-import { queryClient } from "../libs/react-query/query-client";
-import { queryKeys } from "../libs/react-query/constants";
-import TextArea from "antd/es/input/TextArea";
+import { Slide } from "../interfaces/Slide";
+import { Space } from "../interfaces/Space";
 import { convertFeetToInch } from "../libs/lvnzy-helper";
+import { queryKeys } from "../libs/react-query/constants";
+import { queryClient } from "../libs/react-query/query-client";
 
 const SpaceDetails: React.FC<{
   spaceData: Space;
   projectId: string;
   showSpaceDialog: boolean;
   spaceDialogClosed: any;
-}> = ({ spaceData, projectId, showSpaceDialog, spaceDialogClosed }) => {
+  slide?: Slide;
+}> = ({ spaceData, projectId, showSpaceDialog, spaceDialogClosed, slide }) => {
   const { data: spaceMetaData, isPending: spaceMetaDataPending } =
     getSpaceMeta();
 
   const saveSpaceMutation = useSaveSpace();
   const [currentSpace, setCurrentSpace] = useState<Space>();
   const [form] = Form.useForm();
+
+  const generateOneLinerMutation = useGenerateOneLiner();
 
   useEffect(() => {
     console.log(projectId);
@@ -85,6 +91,27 @@ const SpaceDetails: React.FC<{
     );
   };
 
+  const onClickGenerateOneLiner = async (designName: string) => {
+    await generateOneLinerMutation.mutateAsync(
+      {
+        designName: designName,
+        projectId: projectId as string,
+        spaceId: spaceData ? spaceData._id : undefined,
+        slideId: spaceData ? undefined : slide?._id,
+      },
+      {
+        onSuccess: (response: any) => {
+          form.setFieldsValue({
+            oneLiner: response,
+          });
+        },
+        onError: () => {
+          message.error("Could not generate description");
+        },
+      }
+    );
+  };
+
   return (
     <>
       <Modal
@@ -98,88 +125,117 @@ const SpaceDetails: React.FC<{
         width={700}
       >
         <Form form={form} onFinish={handleFinish} layout="vertical">
-          <Form.Item
-            name="spaceType"
-            label="Type"
-            rules={[{ required: true, message: "Please input the type!" }]}
-          >
-            {spaceMetaDataPending ? (
-              <Spin />
-            ) : (
-              <Select
-                showSearch
-                placeholder="Select the space"
-                filterOption={(input, option) =>
-                  (`${option?.label}` || "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                onChange={onChangeSpaceType}
-                options={spaceMetaData.map((spaceMeta: SpaceMeta) => {
-                  return {
-                    value: spaceMeta._id,
-                    label: spaceMeta.spaceType,
-                  };
-                })}
-              ></Select>
-            )}
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Unique name for the space"
-            rules={[{ required: true, message: "Please input the name" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="cost" label="Cost">
-            <Input type="number" />
-          </Form.Item>
-          <Collapse
-            items={[
-              {
-                key: "1",
-                label: "More options",
-                children: (
-                  <>
-                    <Flex gap={8}>
-                      <Form.Item
-                        name={["size", "l"]}
-                        label="Length in Feet (Optional)"
-                      >
-                        <Input type="number" width={25} />
-                      </Form.Item>
-                      <Form.Item
-                        name={["size", "w"]}
-                        label="Width in Feet (Optional)"
-                      >
-                        <Input type="number" width={25} />
-                      </Form.Item>
-                    </Flex>
-                    <Form.Item
-                      name="oneLiner"
-                      label="One liner description (400 characters or less)"
-                    >
-                      <TextArea
-                        rows={5}
-                        maxLength={400}
-                        style={{ fontSize: "110%" }}
-                      />
-                    </Form.Item>
-                  </>
-                ),
-              },
-            ]}
-          />
+          <Form.Item noStyle shouldUpdate>
+            {({ getFieldValue }) => {
+              return (
+                <>
+                  <Form.Item
+                    name="spaceType"
+                    label="Type"
+                    rules={[
+                      { required: true, message: "Please input the type!" },
+                    ]}
+                  >
+                    {spaceMetaDataPending ? (
+                      <Spin />
+                    ) : (
+                      <Select
+                        showSearch
+                        placeholder="Select the space"
+                        filterOption={(input, option) =>
+                          (`${option?.label}` || "")
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
+                        }
+                        onChange={onChangeSpaceType}
+                        options={spaceMetaData.map((spaceMeta: SpaceMeta) => {
+                          return {
+                            value: spaceMeta._id,
+                            label: spaceMeta.spaceType,
+                          };
+                        })}
+                      ></Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item
+                    name="name"
+                    label="Unique name for the space"
+                    rules={[
+                      { required: true, message: "Please input the name" },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="cost" label="Cost">
+                    <Input type="number" />
+                  </Form.Item>
+                  <Collapse
+                    items={[
+                      {
+                        key: "1",
+                        label: "More options",
+                        children: (
+                          <>
+                            <Flex gap={8}>
+                              <Form.Item
+                                name={["size", "l"]}
+                                label="Length in Feet (Optional)"
+                              >
+                                <Input type="number" width={25} />
+                              </Form.Item>
+                              <Form.Item
+                                name={["size", "w"]}
+                                label="Width in Feet (Optional)"
+                              >
+                                <Input type="number" width={25} />
+                              </Form.Item>
+                            </Flex>
+                            <Form.Item
+                              name="oneLiner"
+                              label="One liner description (400 characters or less)"
+                            >
+                              <TextArea
+                                rows={5}
+                                maxLength={400}
+                                style={{ fontSize: "110%" }}
+                              />
+                            </Form.Item>
+                            <Button
+                              disabled={!getFieldValue("name")}
+                              icon={<UngroupOutlined />}
+                              type="link"
+                              style={{
+                                padding: 0,
+                                textAlign: "left",
+                                marginTop: 5,
+                              }}
+                              onClick={() =>
+                                onClickGenerateOneLiner(getFieldValue("name"))
+                              }
+                            >
+                              {generateOneLinerMutation.isPending
+                                ? "Generating description from designs.."
+                                : "AI Generate"}
+                            </Button>
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
 
-          <Form.Item>
-            <Button
-              loading={saveSpaceMutation.isPending}
-              type="primary"
-              htmlType="submit"
-              style={{ marginTop: 32 }}
-            >
-              {spaceData && spaceData._id ? "Update" : "Add"}
-            </Button>
+                  <Form.Item>
+                    <Button
+                      loading={saveSpaceMutation.isPending}
+                      type="primary"
+                      htmlType="submit"
+                      style={{ marginTop: 32 }}
+                    >
+                      {spaceData && spaceData._id ? "Update" : "Add"}
+                    </Button>
+                  </Form.Item>
+                </>
+              );
+            }}
           </Form.Item>
         </Form>
       </Modal>

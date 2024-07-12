@@ -1,4 +1,8 @@
-import { CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  PlusOutlined,
+  UngroupOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Collapse,
@@ -7,6 +11,7 @@ import {
   Form,
   Input,
   InputRef,
+  message,
   Modal,
   Select,
   Space,
@@ -16,6 +21,7 @@ import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
+import { useGenerateOneLiner } from "../hooks/use-ai";
 import { useFetchFixturesByProject } from "../hooks/use-fixtures";
 import {
   getFixtureMaterialFinishesMetaByMaterial,
@@ -58,6 +64,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
   const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
+  const generateOneLinerMutation = useGenerateOneLiner();
 
   const [materials, setMaterials] = useState([]);
   const [variations, setVariations] = useState([]);
@@ -142,6 +149,27 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   };
 
+  const onClickGenerateOneLiner = async (designName: string) => {
+    await generateOneLinerMutation.mutateAsync(
+      {
+        designName: designName,
+        projectId: projectId as string,
+        fixtureId: fixture ? fixture._id : null,
+        slideId: fixture ? undefined : slide?._id,
+      },
+      {
+        onSuccess: (response: any) => {
+          form.setFieldsValue({
+            description: response,
+          });
+        },
+        onError: () => {
+          message.error("Could not generate description");
+        },
+      }
+    );
+  };
+
   useEffect(() => {
     setFinishes(materialFinishes);
     setVariations(materialVariations);
@@ -172,7 +200,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         fixtureType: fixture.fixtureType._id,
       });
     } else {
-      form.resetFields();
       setMaterials([]);
     }
     console.log(open);
@@ -240,7 +267,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         <Form form={form} layout="vertical" onFinish={handleFinish}>
           {selectExisting ? (
             <Form.Item noStyle shouldUpdate>
-              {({ getFieldsValue }) => {
+              {({ getFieldValue }) => {
                 return (
                   <>
                     <Flex gap={16}>
@@ -415,6 +442,25 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                   style={{ fontSize: "110%" }}
                                 />
                               </Form.Item>
+                              <Button
+                                disabled={!getFieldValue("designName")}
+                                icon={<UngroupOutlined />}
+                                type="link"
+                                style={{
+                                  padding: 0,
+                                  textAlign: "left",
+                                  marginTop: 5,
+                                }}
+                                onClick={() =>
+                                  onClickGenerateOneLiner(
+                                    getFieldValue("designName")
+                                  )
+                                }
+                              >
+                                {generateOneLinerMutation.isPending
+                                  ? "Generating description from designs.."
+                                  : "AI Generate"}
+                              </Button>
                             </>
                           ),
                         },

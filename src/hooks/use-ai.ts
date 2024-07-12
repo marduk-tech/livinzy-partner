@@ -1,6 +1,7 @@
 // useFetchProjects.ts
 
 import { useMutation } from "@tanstack/react-query";
+
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 
 // Define the fetch function
@@ -62,6 +63,33 @@ export const useDescribeProject = () => {
     mutationFn: async (projectId: string) => {
       const { data } = await axiosApiInstance.post("/ai/projectdescribe", {
         projectId,
+      });
+      return data;
+    },
+  });
+};
+
+export const useGenerateOneLiner = () => {
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      fixtureId,
+      spaceId,
+      designName,
+      slideId,
+    }: {
+      projectId: string;
+      designName: string;
+      fixtureId?: string;
+      spaceId?: string;
+      slideId?: string;
+    }) => {
+      const { data } = await axiosApiInstance.post("/ai/projectoneliner", {
+        projectId: projectId,
+        fixtureId: fixtureId,
+        spaceId: spaceId,
+        designName: designName,
+        slideId: slideId,
       });
       return data;
     },

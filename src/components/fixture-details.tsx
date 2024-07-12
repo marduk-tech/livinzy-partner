@@ -1,5 +1,6 @@
 import {
   CloseCircleOutlined,
+  InfoCircleOutlined,
   PlusOutlined,
   UngroupOutlined,
 } from "@ant-design/icons";
@@ -15,6 +16,7 @@ import {
   Modal,
   Select,
   Space,
+  Tooltip,
   Typography,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -42,6 +44,7 @@ import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
 import { Loader } from "./loader";
 import { filterFixtures } from "./project-details/slide-fixture-mapping";
+import TagInput from "./common/tag-input";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -356,84 +359,112 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                         <Input />
                       </Form.Item>
                     </Flex>
-                    {materials && materials.length ? (
-                      <Flex gap={16}>
-                        <Form.Item
-                          name="material"
-                          style={{ width: 250 }}
-                          label="Material"
-                        >
-                          <Select
-                            placeholder="Select a material"
-                            onChange={handleMaterialChange}
-                            options={materials.map(
-                              (material: MaterialMeta) => ({
-                                label: material.name,
-                                value: material._id,
-                              })
-                            )}
-                          ></Select>
-                        </Form.Item>
-
-                        {variations && variations.length ? (
-                          <Form.Item
-                            name="materialVariation"
-                            label="Sub material"
-                            rules={[{ required: !!selectedMaterial }]}
-                          >
-                            <Select
-                              style={{ width: 250 }}
-                              placeholder="Select sub material"
-                              disabled={!selectedMaterial}
-                              options={variations.map(
-                                (variation: MaterialVariationMeta) => ({
-                                  label: variation.name,
-                                  value: variation._id,
-                                })
-                              )}
-                            ></Select>
-                          </Form.Item>
-                        ) : null}
-                        {finishes && finishes.length ? (
-                          <Form.Item
-                            name="materialFinish"
-                            label="Material finish"
-                            rules={[{ required: !!selectedMaterial }]}
-                          >
-                            <Select
-                              style={{ width: 250 }}
-                              placeholder="Select a finish"
-                              disabled={!selectedMaterial}
-                              options={finishes.map(
-                                (finish: MaterialFinishMeta) => ({
-                                  label: finish.name,
-                                  value: finish._id,
-                                })
-                              )}
-                            ></Select>
-                          </Form.Item>
-                        ) : null}
-                      </Flex>
-                    ) : null}
                     <Form.Item name="cost" label="Cost (approx)">
                       <Input type="number" />
                     </Form.Item>
                     <Collapse
+                      style={{ marginBottom: 16 }}
                       items={[
                         {
                           key: "1",
-                          label: "More options",
+                          label: (
+                            <Typography.Title level={5} style={{ margin: 0 }}>
+                              More Details
+                            </Typography.Title>
+                          ),
                           children: (
                             <>
-                              {/* <SearchHighlights
-                                label="Add a special highlight about this fixture"
-                                fixtureType={fixture.fixtureType.fixtureType}
-                                onChange={(highlights: string[]) => {
-                                  console.log(highlights);
-                                }}
-                              ></SearchHighlights> */}
+                              {materials && materials.length ? (
+                                <Flex gap={16}>
+                                  <Form.Item
+                                    name="material"
+                                    style={{ width: 250 }}
+                                    label="Material"
+                                  >
+                                    <Select
+                                      allowClear={true}
+                                      placeholder="Select a material"
+                                      onChange={handleMaterialChange}
+                                      options={materials.map(
+                                        (material: MaterialMeta) => ({
+                                          label: material.name,
+                                          value: material._id,
+                                        })
+                                      )}
+                                    ></Select>
+                                  </Form.Item>
+
+                                  {variations && variations.length ? (
+                                    <Form.Item
+                                      name="materialVariation"
+                                      label="Sub material"
+                                      rules={[{ required: !!selectedMaterial }]}
+                                    >
+                                      <Select
+                                        style={{ width: 250 }}
+                                        placeholder="Select sub material"
+                                        disabled={!selectedMaterial}
+                                        options={variations.map(
+                                          (
+                                            variation: MaterialVariationMeta
+                                          ) => ({
+                                            label: variation.name,
+                                            value: variation._id,
+                                          })
+                                        )}
+                                      ></Select>
+                                    </Form.Item>
+                                  ) : null}
+                                  {finishes && finishes.length ? (
+                                    <Form.Item
+                                      name="materialFinish"
+                                      label="Material finish"
+                                      rules={[{ required: !!selectedMaterial }]}
+                                    >
+                                      <Select
+                                        style={{ width: 250 }}
+                                        placeholder="Select a finish"
+                                        disabled={!selectedMaterial}
+                                        options={finishes.map(
+                                          (finish: MaterialFinishMeta) => ({
+                                            label: finish.name,
+                                            value: finish._id,
+                                          })
+                                        )}
+                                      ></Select>
+                                    </Form.Item>
+                                  ) : null}
+                                </Flex>
+                              ) : null}
+
                               <Form.Item
-                                name="description"
+                                name="customFittings"
+                                label={
+                                  <Flex gap={4}>
+                                    <Typography.Text>
+                                      Enter any custom fittings or material
+                                    </Typography.Text>{" "}
+                                    <Tooltip title="You can add any type of custom fitting or material not available in the above list.">
+                                      <InfoCircleOutlined></InfoCircleOutlined>
+                                    </Tooltip>
+                                  </Flex>
+                                }
+                                style={{ width: 516 }}
+                              >
+                                <TagInput
+                                  initialTags={
+                                    fixture ? fixture.customFittings : null
+                                  }
+                                  onTagsChange={(tags: String[]) => {
+                                    form.setFieldsValue({
+                                      customFittings: tags,
+                                    });
+                                  }}
+                                ></TagInput>
+                              </Form.Item>
+                              <Form.Item
+                                style={{ margin: 0 }}
+                                name={["description"]}
                                 label="One liner about this fixture in 400 chars or less"
                               >
                                 <TextArea
@@ -449,7 +480,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                 style={{
                                   padding: 0,
                                   textAlign: "left",
-                                  marginTop: 5,
+                                  margin: 0,
                                 }}
                                 onClick={() =>
                                   onClickGenerateOneLiner(

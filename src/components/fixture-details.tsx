@@ -42,9 +42,9 @@ import {
 import { Slide } from "../interfaces/Slide";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
+import TagInput from "./common/tag-input";
 import { Loader } from "./loader";
 import { filterFixtures } from "./project-details/slide-fixture-mapping";
-import TagInput from "./common/tag-input";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -487,6 +487,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                     getFieldValue("designName")
                                   )
                                 }
+                                loading={generateOneLinerMutation.isPending}
                               >
                                 {generateOneLinerMutation.isPending
                                   ? "Generating description from designs.."

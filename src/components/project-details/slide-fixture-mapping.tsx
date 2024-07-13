@@ -5,16 +5,18 @@ import {
   useFetchFixturesByProject,
   useSaveFixture,
 } from "../../hooks/use-fixtures";
-import { useFetchSlidesByProject } from "../../hooks/use-slides";
+import { useFetchSlidesByProject, useSaveSlide } from "../../hooks/use-slides";
 import { Fixture, FixtureFormData } from "../../interfaces/Fixture";
-import { Slide } from "../../interfaces/Slide";
+import { IBoundingBox, Slide } from "../../interfaces/Slide";
 
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { queryKeys } from "../../libs/react-query/constants";
+import { queryClient } from "../../libs/react-query/query-client";
 import { COLORS } from "../../styles/colors";
 import FixtureList from "../common/fixture-list";
 import ImgMapFixture from "../common/img-map-fixture";
 import FixtureDetails from "../fixture-details";
 import { Loader } from "../loader";
-import { InfoCircleOutlined } from "@ant-design/icons";
 
 interface FixtureMappingProps {
   projectId: string;
@@ -65,6 +67,8 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   const { data: projectSlides, isPending: projectSlidesPending } =
     useFetchSlidesByProject(projectId);
 
+  const updateSlideMutation = useSaveSlide();
+
   useEffect(() => {
     if (
       !projectFixtures ||
@@ -87,17 +91,47 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   const saveFixtureMutation = useSaveFixture();
   const deleteFixtureMutation = useDeleteFixture();
 
-  const handleBoundingBoxComplete = (data: {
+  const handleBoundingBoxComplete = async (data: {
     startPoint: { x: number; y: number };
     endPoint: { x: number; y: number };
     imageSize: { width: number; height: number };
   }) => {
-    setIsMapFixtureOpen(false);
-    saveFixtureMutation.mutate(
+    const updatedFixturesMapping =
+      slide?.fixturesMapping?.map((item) => {
+        if (item.fixtureId === editingFixture!._id!) {
+          return {
+            ...item,
+            boundingBox: {
+              startPoint: data.startPoint,
+              endPoint: data.endPoint,
+              imageSize: data.imageSize,
+            },
+          };
+        }
+        return item;
+      }) || [];
+
+    // Check if the fixtureId exists in the fixturesMapping array
+    const fixtureExists = updatedFixturesMapping.some(
+      (item) => item.fixtureId === editingFixture!._id!
+    );
+
+    // If the fixtureId does not exist, add the new fixture object
+    if (!fixtureExists) {
+      updatedFixturesMapping.push({
+        fixtureId: editingFixture!._id!,
+        boundingBox: {
+          startPoint: data.startPoint,
+          endPoint: data.endPoint,
+          imageSize: data.imageSize,
+        },
+      });
+    }
+
+    await updateSlideMutation.mutateAsync(
       {
-        ...editingFixture,
-        imageBounds: data,
-        fixtureType: editingFixture!.fixtureType!._id,
+        _id: slide?._id,
+        fixturesMapping: updatedFixturesMapping,
       },
       {
         onSuccess: () => {
@@ -109,6 +143,12 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
         },
       }
     );
+
+    await queryClient.invalidateQueries({
+      queryKey: [queryKeys.getSlides, projectId],
+    });
+
+    setIsMapFixtureOpen(false);
   };
 
   const onDeleteFixture = (fixtureData: Fixture) => {
@@ -160,94 +200,112 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     setEditingFixture(null);
   };
 
-  if (fixturesDataPending) {
+  //  get initial bounding box
+  const getInitialBoundingBox = (): IBoundingBox | undefined => {
+    if (projectSlides && slide?._id && editingFixture?._id) {
+      const currentSlide = projectSlides.find(
+        (item: any) => item._id === slide._id
+      );
+
+      if (currentSlide?.fixturesMapping) {
+        const fixture = currentSlide.fixturesMapping.find(
+          (item: any) => item.fixtureId === editingFixture._id
+        );
+        return fixture ? fixture.boundingBox : undefined;
+      }
+    }
+
+    return undefined;
+  };
+
+  if (fixturesDataPending || projectSlidesPending) {
     return <Loader />;
   }
 
-  return (
-    <Flex
-      style={{
-        minWidth: "100%",
-        height: 449,
-        overflowY: "scroll",
-      }}
-      vertical
-    >
-      <ImgMapFixture
-        modalClosed={() => {
-          setIsMapFixtureOpen(false);
-        }}
-        imageUrl={mapFixtureImg!}
-        isOpen={!!isMapFixtureOpen}
-        initialBoundingBox={
-          editingFixture && editingFixture.imageBounds
-            ? editingFixture.imageBounds
-            : undefined
-        }
-        onBoundingBoxComplete={handleBoundingBoxComplete}
-      />
+  if (projectFixtures && projectSlides) {
+    const initBoundingBox = getInitialBoundingBox();
 
-      {slide && (
-        <Flex align="center" style={{ marginTop: 8 }}>
-          <Flex align="center" gap={4} style={{ cursor: "pointer" }}>
-            <Typography.Title level={4} style={{ marginTop: 0, margin: 0 }}>
-              Fixtures
-            </Typography.Title>
-            <Tooltip title="Add fixtures in this design">
-              <InfoCircleOutlined></InfoCircleOutlined>
-            </Tooltip>
+    return (
+      <Flex
+        style={{
+          minWidth: "100%",
+          height: 449,
+          overflowY: "scroll",
+        }}
+        vertical
+      >
+        <ImgMapFixture
+          modalClosed={() => {
+            setIsMapFixtureOpen(false);
+          }}
+          imageUrl={mapFixtureImg!}
+          isOpen={!!isMapFixtureOpen}
+          initialBoundingBox={initBoundingBox}
+          onBoundingBoxComplete={handleBoundingBoxComplete}
+        />
+
+        {slide && (
+          <Flex align="center" style={{ marginTop: 8 }}>
+            <Flex align="center" gap={4} style={{ cursor: "pointer" }}>
+              <Typography.Title level={4} style={{ marginTop: 0, margin: 0 }}>
+                Fixtures
+              </Typography.Title>
+              <Tooltip title="Add fixtures in this design">
+                <InfoCircleOutlined></InfoCircleOutlined>
+              </Tooltip>
+            </Flex>
+            <Button
+              type="link"
+              size="small"
+              onClick={() => {
+                setEditingFixture(null);
+                setFixtureModalVisible(true);
+              }}
+              style={{
+                color: COLORS.primaryColor,
+                cursor: "pointer",
+                textAlign: "center",
+                width: 100,
+                padding: 0,
+                marginLeft: "auto",
+              }}
+            >
+              Add Fixture
+            </Button>
           </Flex>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              setEditingFixture(null);
+        )}
+
+        <div style={{ marginTop: slide ? 0 : 10 }}>
+          <FixtureList
+            isModal={slide ? false : true}
+            fixtures={slideFixtures}
+            isPending={fixturesDataPending}
+            onMap={(fixture) => {
+              setEditingFixture(fixture);
+              setMapFixtureImg(slide?.url);
+              setIsMapFixtureOpen(true);
+            }}
+            onEdit={(fixture) => {
+              setEditingFixture(fixture);
               setFixtureModalVisible(true);
             }}
-            style={{
-              color: COLORS.primaryColor,
-              cursor: "pointer",
-              textAlign: "center",
-              width: 100,
-              padding: 0,
-              marginLeft: "auto",
-            }}
-          >
-            Add Fixture
-          </Button>
-        </Flex>
-      )}
+            onDelete={onDeleteFixture}
+          />
+        </div>
 
-      <div style={{ marginTop: slide ? 0 : 10 }}>
-        <FixtureList
-          isModal={slide ? false : true}
-          fixtures={slideFixtures}
-          isPending={fixturesDataPending}
-          onMap={(fixture) => {
-            setEditingFixture(fixture);
-            setMapFixtureImg(slide?.url);
-            setIsMapFixtureOpen(true);
+        <FixtureDetails
+          isOpen={fixtureModalVisible}
+          fixture={editingFixture}
+          slide={slide}
+          onSubmit={onSaveFixture}
+          onCancel={() => {
+            setFixtureModalVisible(false);
+            setEditingFixture(null);
           }}
-          onEdit={(fixture) => {
-            setEditingFixture(fixture);
-            setFixtureModalVisible(true);
-          }}
-          onDelete={onDeleteFixture}
         />
-      </div>
-
-      <FixtureDetails
-        isOpen={fixtureModalVisible}
-        fixture={editingFixture}
-        slide={slide}
-        onSubmit={onSaveFixture}
-        onCancel={() => {
-          setFixtureModalVisible(false);
-          setEditingFixture(null);
-        }}
-      />
-    </Flex>
-  );
+      </Flex>
+    );
+  }
 };
 
 export default SlideFixtureMapping;

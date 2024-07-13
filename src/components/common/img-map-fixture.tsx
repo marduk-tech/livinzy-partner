@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, MouseEvent } from "react";
-import { Button, Flex, Modal, Typography } from "antd";
+import { Button, Modal, Typography } from "antd";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 
 interface Point {
   x: number;
@@ -30,8 +30,11 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [startPoint, setStartPoint] = useState<Point>({ x: 0, y: 0 });
   const [endPoint, setEndPoint] = useState<Point>({ x: 0, y: 0 });
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isInitialBoundingBoxDrawn, setIsInitialBoundingBoxDrawn] =
+    useState(false);
 
   const modalWidth = 640; // Set your desired modal width
   const modalHeight = 480; // Set your desired modal height
@@ -48,10 +51,11 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
       initialBoundingBox.endPoint.x - initialBoundingBox.startPoint.x,
       initialBoundingBox.endPoint.y - initialBoundingBox.startPoint.y
     );
+    setIsInitialBoundingBoxDrawn(true);
   };
 
   useEffect(() => {
-    if (canvasRef.current && imageRef.current) {
+    if (canvasRef.current && imageRef.current && imageLoaded) {
       const ctx = canvasRef.current.getContext("2d");
       const img = imageRef.current;
       if (ctx && img) {
@@ -72,6 +76,10 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
 
         ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
 
+        if (initialBoundingBox && !isInitialBoundingBoxDrawn) {
+          drawInitialBoundingBox(ctx);
+        }
+
         if (
           isDrawing ||
           startPoint.x !== 0 ||
@@ -90,19 +98,26 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
         }
       }
     }
-  }, [isDrawing, startPoint, endPoint, modalWidth, modalHeight]);
+  }, [
+    isDrawing,
+    startPoint,
+    endPoint,
+    modalWidth,
+    modalHeight,
+    imageLoaded,
+    initialBoundingBox,
+  ]);
 
   useEffect(() => {
     if (!isOpen || !initialBoundingBox || !canvasRef) {
       return;
     }
     const canvas = canvasRef.current;
-
     const ctx = canvas!.getContext("2d");
-    if (ctx) {
+    if (ctx && imageLoaded) {
       drawInitialBoundingBox(ctx);
     }
-  }, [isOpen, canvasRef]);
+  }, [isOpen, canvasRef, imageLoaded, initialBoundingBox]);
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
@@ -169,6 +184,7 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
             alt="To be annotated"
             style={{ display: "none" }}
             onLoad={() => {
+              setImageLoaded(true);
               const canvas = canvasRef.current;
               const img = imageRef.current;
               if (canvas && img) {
@@ -188,6 +204,9 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
                 const ctx = canvas.getContext("2d");
                 if (ctx) {
                   ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
+                  if (initialBoundingBox) {
+                    drawInitialBoundingBox(ctx);
+                  }
                 }
               }
             }}
@@ -200,7 +219,7 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
             onMouseUp={handleMouseUp}
           />
         </div>
-        <Flex style={{ marginTop: 16 }}>
+        <div style={{ display: "flex", marginTop: 16 }}>
           <Button
             type="link"
             onClick={handleClearBoundingBox}
@@ -208,7 +227,7 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
           >
             Clear Bounding Box
           </Button>
-          <Flex style={{ marginLeft: "auto" }} gap={16}>
+          <div style={{ marginLeft: "auto", display: "flex", gap: 16 }}>
             <Button
               type="default"
               onClick={() => {
@@ -225,8 +244,8 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
             >
               Save
             </Button>
-          </Flex>
-        </Flex>
+          </div>
+        </div>
       </Modal>
     </div>
   );

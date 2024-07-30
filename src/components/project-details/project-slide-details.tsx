@@ -21,7 +21,7 @@ import {
   message,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { useProcessSpacesInSlides } from "../../hooks/use-ai";
+import { useMapSpacesToSlides } from "../../hooks/use-ai";
 import { useFetchProject, useSaveProject } from "../../hooks/use-projects";
 import {
   useBulkSaveSlides,
@@ -74,7 +74,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
 
   const bulkSaveSlidesMutation = useBulkSaveSlides();
   const updateSlideMutation = useSaveSlide();
-  const processSlidesInSpacesMutation = useProcessSpacesInSlides();
+  const processMapSpacesToSlidesMutation = useMapSpacesToSlides();
   const deleteSlideMutation = useDeleteSlide();
   const updateProjectMutation = useSaveProject();
 
@@ -198,7 +198,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
         if (!selectedSlide) {
           setSelectedSlide(response[0]);
         }
-        processSlidesInSpacesMutation.mutate(
+        processMapSpacesToSlidesMutation.mutate(
           { projectId: projectId! },
           {
             onSuccess: async (response: any) => {
@@ -496,7 +496,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           >
             {projectData!.name}
           </Typography.Title>
-          {processSlidesInSpacesMutation.isPending && (
+          {processMapSpacesToSlidesMutation.isPending && (
             <Tag icon={<SyncOutlined spin />} color="processing">
               Processing designs..
             </Tag>
@@ -652,7 +652,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               onSpacesUpdated={spacesUpdated}
               projectId={projectId!}
               slide={selectedSlide!}
-              processingDesigns={processSlidesInSpacesMutation.isPending}
+              processingDesigns={processMapSpacesToSlidesMutation.isPending}
             ></SlideSpaceMapping>
             <SlideFixtureMapping
               key="slide-fixtures"

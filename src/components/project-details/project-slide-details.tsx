@@ -64,8 +64,11 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     null
   );
 
-  const { data: allSpaces, isLoading: allSpacesLoading } =
-    useFetchSpacesByProject(projectId!);
+  const {
+    data: allSpaces,
+    isLoading: allSpacesLoading,
+    refetch: refetchAllSpaces,
+  } = useFetchSpacesByProject(projectId!);
   const {
     data: projectData,
     isLoading: projectDataLoading,
@@ -303,11 +306,17 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           {
             onSuccess: async (response: any) => {
               refetchProjectData();
+              refetchAllSpaces();
               refetchSlidesData();
             },
             onError: () => {},
           }
         );
+
+        await queryClient.invalidateQueries({
+          queryKey: [queryKeys.getSpaces, projectId],
+        });
+
         message.success("Designs saved successfully!");
       },
       onError: () => {
@@ -662,6 +671,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           >
             {renderSlideThumbnails()}
             <ImgsUpload
+              isMultiple={false}
               imgsUploaded={imgsUploaded}
               confirmProcessing={false}
             ></ImgsUpload>

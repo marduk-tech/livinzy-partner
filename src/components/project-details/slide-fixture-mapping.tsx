@@ -159,7 +159,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
 
           if (index > -1) {
             slide.fixtures!.splice(index, 1);
-            onFixturesUpdated(slide);
+            onFixturesUpdated(slide, fixtureData._id!);
           }
         }
 

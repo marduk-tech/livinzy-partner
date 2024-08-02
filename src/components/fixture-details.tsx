@@ -1,6 +1,5 @@
 import {
   CloseCircleOutlined,
-  InfoCircleOutlined,
   PlusOutlined,
   UngroupOutlined,
 } from "@ant-design/icons";
@@ -16,7 +15,6 @@ import {
   Modal,
   Select,
   Space,
-  Tooltip,
   Typography,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -33,16 +31,10 @@ import {
 } from "../hooks/use-meta";
 import { useFetchSlidesByProject } from "../hooks/use-slides";
 import { Fixture } from "../interfaces/Fixture";
-import {
-  FixtureMeta,
-  MaterialFinishMeta,
-  MaterialMeta,
-  MaterialVariationMeta,
-} from "../interfaces/Meta";
+import { FixtureMeta } from "../interfaces/Meta";
 import { Slide } from "../interfaces/Slide";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
-import TagInput from "./common/tag-input";
 import { Loader } from "./loader";
 import { filterFixtures } from "./project-details/slide-fixture-mapping";
 
@@ -362,6 +354,37 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                     <Form.Item name="cost" label="Cost (approx)">
                       <Input type="number" />
                     </Form.Item>
+                    <>
+                      <Form.Item
+                        style={{ margin: 0 }}
+                        name={["description"]}
+                        label="One liner about this fixture in 400 chars or less"
+                      >
+                        <TextArea
+                          rows={5}
+                          maxLength={400}
+                          style={{ fontSize: "110%" }}
+                        />
+                      </Form.Item>
+                      <Button
+                        disabled={!getFieldValue("designName")}
+                        icon={<UngroupOutlined />}
+                        type="link"
+                        style={{
+                          padding: 0,
+                          textAlign: "left",
+                          margin: 0,
+                        }}
+                        onClick={() =>
+                          onClickGenerateOneLiner(getFieldValue("designName"))
+                        }
+                        loading={generateOneLinerMutation.isPending}
+                      >
+                        {generateOneLinerMutation.isPending
+                          ? "Generating description from designs.."
+                          : "AI Generate"}
+                      </Button>
+                    </>
                     <Collapse
                       style={{ marginBottom: 16 }}
                       items={[
@@ -369,132 +392,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           key: "1",
                           label: (
                             <Typography.Title level={5} style={{ margin: 0 }}>
-                              More Details
+                              Fixture components
                             </Typography.Title>
                           ),
-                          children: (
-                            <>
-                              {materials && materials.length ? (
-                                <Flex gap={16}>
-                                  <Form.Item
-                                    name="material"
-                                    style={{ width: 250 }}
-                                    label="Material"
-                                  >
-                                    <Select
-                                      allowClear={true}
-                                      placeholder="Select a material"
-                                      onChange={handleMaterialChange}
-                                      options={materials.map(
-                                        (material: MaterialMeta) => ({
-                                          label: material.name,
-                                          value: material._id,
-                                        })
-                                      )}
-                                    ></Select>
-                                  </Form.Item>
-
-                                  {variations && variations.length ? (
-                                    <Form.Item
-                                      name="materialVariation"
-                                      label="Sub material"
-                                      rules={[{ required: !!selectedMaterial }]}
-                                    >
-                                      <Select
-                                        style={{ width: 250 }}
-                                        placeholder="Select sub material"
-                                        disabled={!selectedMaterial}
-                                        options={variations.map(
-                                          (
-                                            variation: MaterialVariationMeta
-                                          ) => ({
-                                            label: variation.name,
-                                            value: variation._id,
-                                          })
-                                        )}
-                                      ></Select>
-                                    </Form.Item>
-                                  ) : null}
-                                  {finishes && finishes.length ? (
-                                    <Form.Item
-                                      name="materialFinish"
-                                      label="Material finish"
-                                      rules={[{ required: !!selectedMaterial }]}
-                                    >
-                                      <Select
-                                        style={{ width: 250 }}
-                                        placeholder="Select a finish"
-                                        disabled={!selectedMaterial}
-                                        options={finishes.map(
-                                          (finish: MaterialFinishMeta) => ({
-                                            label: finish.name,
-                                            value: finish._id,
-                                          })
-                                        )}
-                                      ></Select>
-                                    </Form.Item>
-                                  ) : null}
-                                </Flex>
-                              ) : null}
-
-                              <Form.Item
-                                name="customFittings"
-                                label={
-                                  <Flex gap={4}>
-                                    <Typography.Text>
-                                      Enter any custom fittings or material
-                                    </Typography.Text>{" "}
-                                    <Tooltip title="You can add any type of custom fitting or material not available in the above list.">
-                                      <InfoCircleOutlined></InfoCircleOutlined>
-                                    </Tooltip>
-                                  </Flex>
-                                }
-                                style={{ width: 516 }}
-                              >
-                                <TagInput
-                                  initialTags={
-                                    fixture ? fixture.customFittings : null
-                                  }
-                                  onTagsChange={(tags: String[]) => {
-                                    form.setFieldsValue({
-                                      customFittings: tags,
-                                    });
-                                  }}
-                                ></TagInput>
-                              </Form.Item>
-                              <Form.Item
-                                style={{ margin: 0 }}
-                                name={["description"]}
-                                label="One liner about this fixture in 400 chars or less"
-                              >
-                                <TextArea
-                                  rows={5}
-                                  maxLength={400}
-                                  style={{ fontSize: "110%" }}
-                                />
-                              </Form.Item>
-                              <Button
-                                disabled={!getFieldValue("designName")}
-                                icon={<UngroupOutlined />}
-                                type="link"
-                                style={{
-                                  padding: 0,
-                                  textAlign: "left",
-                                  margin: 0,
-                                }}
-                                onClick={() =>
-                                  onClickGenerateOneLiner(
-                                    getFieldValue("designName")
-                                  )
-                                }
-                                loading={generateOneLinerMutation.isPending}
-                              >
-                                {generateOneLinerMutation.isPending
-                                  ? "Generating description from designs.."
-                                  : "AI Generate"}
-                              </Button>
-                            </>
-                          ),
+                          children: <></>,
                         },
                       ]}
                     ></Collapse>

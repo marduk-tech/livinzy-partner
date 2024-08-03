@@ -13,8 +13,8 @@ import {
   InputRef,
   message,
   Modal,
+  Space as AntSpace,
   Select,
-  Space,
   Typography,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -36,7 +36,8 @@ import { Slide } from "../interfaces/Slide";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
 import { Loader } from "./loader";
-import { filterFixtures } from "./project-details/slide-fixture-mapping";
+import { useFetchSpacesByProject } from "../hooks/use-spaces";
+import { Space } from "../interfaces/Space";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -60,6 +61,12 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const { projectId } = useParams();
   const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
   const generateOneLinerMutation = useGenerateOneLiner();
+
+  const {
+    data: allSpaces,
+    isLoading: allSpacesLoading,
+    refetch: refetchAllSpaces,
+  } = useFetchSpacesByProject(projectId!);
 
   const [materials, setMaterials] = useState([]);
   const [variations, setVariations] = useState([]);
@@ -200,29 +207,46 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     console.log(open);
   };
 
-  if (fixturesDataPending || projectSlidesPending || fixtureMetaDataPending) {
+  if (
+    fixturesDataPending ||
+    projectSlidesPending ||
+    fixtureMetaDataPending ||
+    allSpacesLoading
+  ) {
     return <Loader />;
   }
 
   if (projectFixtures && projectSlides && fixtureMetaData) {
-    const existingFixturesOptions = Array.from(
-      new Set(
-        // removes fixtures which are not assigned to any slides
-        filterFixtures(projectFixtures, projectSlides).map(
-          (fixture: Fixture) => fixture._id
-        )
+    const existingFixturesOptions = projectFixtures
+      .filter(
+        // Filter fixtures already mapped to slide
+        (fixture: Fixture) =>
+          slide && !slide.fixtures?.includes(fixture._id as string)
       )
-    )
-      .filter((id) => slide && !slide.fixtures?.includes(id as string))
-      .map((id) => {
-        const fixture = projectFixtures.find((f: Fixture) => f._id === id);
-
+      .map((fix: Fixture) => {
+        const spaceMappedToFixture = allSpaces.find((space: Space) =>
+          space.fixtures.map((sf: Fixture) => sf._id).includes(fix._id)
+        );
         return {
-          value: id,
-          label: fixture.designName || fixture?.fixtureType?.fixtureType,
+          value: fix._id,
+          label: (
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  color: COLORS.textColorLight,
+                  textTransform: "uppercase",
+                }}
+              >
+                {spaceMappedToFixture ? spaceMappedToFixture.name : " "}
+              </Typography.Text>
+              <Typography.Text>
+                {fix.designName || fix?.fixtureType?.fixtureType}
+              </Typography.Text>
+            </Flex>
+          ),
         };
       })
-      .filter((item) => item !== null);
+      .filter((item: any) => item !== null);
 
     return (
       <Modal
@@ -230,7 +254,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         destroyOnClose={true}
         title={
           <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
-            {fixture ? "Edit Fixture" : "Add Fixture"}
+            {fixture ? `Edit Fixture` : "Add Fixture"}
           </Typography.Title>
         }
         footer={null}
@@ -284,7 +308,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                             <>
                               {menu}
                               <Divider style={{ margin: "8px 0" }} />
-                              <Space style={{ padding: "0 8px 4px" }}>
+                              <AntSpace style={{ padding: "0 8px 4px" }}>
                                 <Flex vertical>
                                   <Typography.Text
                                     style={{
@@ -315,7 +339,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                     </Button>
                                   </Flex>
                                 </Flex>
-                              </Space>
+                              </AntSpace>
                             </>
                           )}
                           placeholder="Please select a fixture type"

@@ -127,6 +127,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
         },
       });
     }
+    slide!.fixturesMapping = updatedFixturesMapping;
 
     await updateSlideMutation.mutateAsync(
       {

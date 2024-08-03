@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Slide } from "../interfaces/Slide";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
-import { Slide } from "../interfaces/Slide";
 
 // Custom hook to fetch projects using useQuery
 export const useFetchSlidesByProject = (projectId: string) => {
@@ -29,7 +29,7 @@ export const useBulkSaveSlides = () => {
 // Custom hook to save designer data
 export const useSaveSlide = () => {
   return useMutation({
-    mutationFn: async (slideData: Slide) => {
+    mutationFn: async (slideData: Partial<Slide>) => {
       let response;
       if (slideData._id) {
         response = await axiosApiInstance.put(

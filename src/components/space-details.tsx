@@ -212,6 +212,7 @@ const SpaceDetails: React.FC<{
                               onClick={() =>
                                 onClickGenerateOneLiner(getFieldValue("name"))
                               }
+                              loading={generateOneLinerMutation.isPending}
                             >
                               {generateOneLinerMutation.isPending
                                 ? "Generating description from designs.."

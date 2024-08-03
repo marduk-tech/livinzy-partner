@@ -13,8 +13,8 @@ import {
   InputRef,
   message,
   Modal,
+  Space as AntSpace,
   Select,
-  Space,
   Typography,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -31,17 +31,13 @@ import {
 } from "../hooks/use-meta";
 import { useFetchSlidesByProject } from "../hooks/use-slides";
 import { Fixture } from "../interfaces/Fixture";
-import {
-  FixtureMeta,
-  MaterialFinishMeta,
-  MaterialMeta,
-  MaterialVariationMeta,
-} from "../interfaces/Meta";
+import { FixtureMeta } from "../interfaces/Meta";
 import { Slide } from "../interfaces/Slide";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
 import { Loader } from "./loader";
-import { filterFixtures } from "./project-details/slide-fixture-mapping";
+import { useFetchSpacesByProject } from "../hooks/use-spaces";
+import { Space } from "../interfaces/Space";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -65,6 +61,12 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const { projectId } = useParams();
   const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
   const generateOneLinerMutation = useGenerateOneLiner();
+
+  const {
+    data: allSpaces,
+    isLoading: allSpacesLoading,
+    refetch: refetchAllSpaces,
+  } = useFetchSpacesByProject(projectId!);
 
   const [materials, setMaterials] = useState([]);
   const [variations, setVariations] = useState([]);
@@ -205,29 +207,46 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     console.log(open);
   };
 
-  if (fixturesDataPending || projectSlidesPending || fixtureMetaDataPending) {
+  if (
+    fixturesDataPending ||
+    projectSlidesPending ||
+    fixtureMetaDataPending ||
+    allSpacesLoading
+  ) {
     return <Loader />;
   }
 
   if (projectFixtures && projectSlides && fixtureMetaData) {
-    const existingFixturesOptions = Array.from(
-      new Set(
-        // removes fixtures which are not assigned to any slides
-        filterFixtures(projectFixtures, projectSlides).map(
-          (fixture: Fixture) => fixture._id
-        )
+    const existingFixturesOptions = projectFixtures
+      .filter(
+        // Filter fixtures already mapped to slide
+        (fixture: Fixture) =>
+          slide && !slide.fixtures?.includes(fixture._id as string)
       )
-    )
-      .filter((id) => slide && !slide.fixtures?.includes(id as string))
-      .map((id) => {
-        const fixture = projectFixtures.find((f: Fixture) => f._id === id);
-
+      .map((fix: Fixture) => {
+        const spaceMappedToFixture = allSpaces.find((space: Space) =>
+          space.fixtures.map((sf: Fixture) => sf._id).includes(fix._id)
+        );
         return {
-          value: id,
-          label: fixture.designName || fixture?.fixtureType?.fixtureType,
+          value: fix._id,
+          label: (
+            <Flex vertical>
+              <Typography.Text
+                style={{
+                  color: COLORS.textColorLight,
+                  textTransform: "uppercase",
+                }}
+              >
+                {spaceMappedToFixture ? spaceMappedToFixture.name : " "}
+              </Typography.Text>
+              <Typography.Text>
+                {fix.designName || fix?.fixtureType?.fixtureType}
+              </Typography.Text>
+            </Flex>
+          ),
         };
       })
-      .filter((item) => item !== null);
+      .filter((item: any) => item !== null);
 
     return (
       <Modal
@@ -235,7 +254,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         destroyOnClose={true}
         title={
           <Typography.Title level={4} style={{ margin: 0, marginBottom: 24 }}>
-            {fixture ? "Edit Fixture" : "Add Fixture"}
+            {fixture ? `Edit Fixture` : "Add Fixture"}
           </Typography.Title>
         }
         footer={null}
@@ -289,7 +308,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                             <>
                               {menu}
                               <Divider style={{ margin: "8px 0" }} />
-                              <Space style={{ padding: "0 8px 4px" }}>
+                              <AntSpace style={{ padding: "0 8px 4px" }}>
                                 <Flex vertical>
                                   <Typography.Text
                                     style={{
@@ -320,7 +339,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                                     </Button>
                                   </Flex>
                                 </Flex>
-                              </Space>
+                              </AntSpace>
                             </>
                           )}
                           placeholder="Please select a fixture type"
@@ -356,113 +375,51 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                         <Input />
                       </Form.Item>
                     </Flex>
-                    {materials && materials.length ? (
-                      <Flex gap={16}>
-                        <Form.Item
-                          name="material"
-                          style={{ width: 250 }}
-                          label="Material"
-                        >
-                          <Select
-                            placeholder="Select a material"
-                            onChange={handleMaterialChange}
-                            options={materials.map(
-                              (material: MaterialMeta) => ({
-                                label: material.name,
-                                value: material._id,
-                              })
-                            )}
-                          ></Select>
-                        </Form.Item>
-
-                        {variations && variations.length ? (
-                          <Form.Item
-                            name="materialVariation"
-                            label="Sub material"
-                            rules={[{ required: !!selectedMaterial }]}
-                          >
-                            <Select
-                              style={{ width: 250 }}
-                              placeholder="Select sub material"
-                              disabled={!selectedMaterial}
-                              options={variations.map(
-                                (variation: MaterialVariationMeta) => ({
-                                  label: variation.name,
-                                  value: variation._id,
-                                })
-                              )}
-                            ></Select>
-                          </Form.Item>
-                        ) : null}
-                        {finishes && finishes.length ? (
-                          <Form.Item
-                            name="materialFinish"
-                            label="Material finish"
-                            rules={[{ required: !!selectedMaterial }]}
-                          >
-                            <Select
-                              style={{ width: 250 }}
-                              placeholder="Select a finish"
-                              disabled={!selectedMaterial}
-                              options={finishes.map(
-                                (finish: MaterialFinishMeta) => ({
-                                  label: finish.name,
-                                  value: finish._id,
-                                })
-                              )}
-                            ></Select>
-                          </Form.Item>
-                        ) : null}
-                      </Flex>
-                    ) : null}
                     <Form.Item name="cost" label="Cost (approx)">
                       <Input type="number" />
                     </Form.Item>
+                    <>
+                      <Form.Item
+                        style={{ margin: 0 }}
+                        name={["description"]}
+                        label="One liner about this fixture in 400 chars or less"
+                      >
+                        <TextArea
+                          rows={5}
+                          maxLength={400}
+                          style={{ fontSize: "110%" }}
+                        />
+                      </Form.Item>
+                      <Button
+                        disabled={!getFieldValue("designName")}
+                        icon={<UngroupOutlined />}
+                        type="link"
+                        style={{
+                          padding: 0,
+                          textAlign: "left",
+                          margin: 0,
+                        }}
+                        onClick={() =>
+                          onClickGenerateOneLiner(getFieldValue("designName"))
+                        }
+                        loading={generateOneLinerMutation.isPending}
+                      >
+                        {generateOneLinerMutation.isPending
+                          ? "Generating description from designs.."
+                          : "AI Generate"}
+                      </Button>
+                    </>
                     <Collapse
+                      style={{ marginBottom: 16 }}
                       items={[
                         {
                           key: "1",
-                          label: "More options",
-                          children: (
-                            <>
-                              {/* <SearchHighlights
-                                label="Add a special highlight about this fixture"
-                                fixtureType={fixture.fixtureType.fixtureType}
-                                onChange={(highlights: string[]) => {
-                                  console.log(highlights);
-                                }}
-                              ></SearchHighlights> */}
-                              <Form.Item
-                                name="description"
-                                label="One liner about this fixture in 400 chars or less"
-                              >
-                                <TextArea
-                                  rows={5}
-                                  maxLength={400}
-                                  style={{ fontSize: "110%" }}
-                                />
-                              </Form.Item>
-                              <Button
-                                disabled={!getFieldValue("designName")}
-                                icon={<UngroupOutlined />}
-                                type="link"
-                                style={{
-                                  padding: 0,
-                                  textAlign: "left",
-                                  marginTop: 5,
-                                }}
-                                onClick={() =>
-                                  onClickGenerateOneLiner(
-                                    getFieldValue("designName")
-                                  )
-                                }
-                              >
-                                {generateOneLinerMutation.isPending
-                                  ? "Generating description from designs.."
-                                  : "AI Generate"}
-                              </Button>
-                            </>
+                          label: (
+                            <Typography.Title level={5} style={{ margin: 0 }}>
+                              Fixture components
+                            </Typography.Title>
                           ),
+                          children: <></>,
                         },
                       ]}
                     ></Collapse>

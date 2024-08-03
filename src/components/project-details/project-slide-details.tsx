@@ -21,7 +21,7 @@ import {
   message,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { useProcessSpacesInSlides } from "../../hooks/use-ai";
+import { useMapSpacesToSlides } from "../../hooks/use-ai";
 import { useFetchProject, useSaveProject } from "../../hooks/use-projects";
 import {
   useBulkSaveSlides,
@@ -29,7 +29,7 @@ import {
   useFetchSlidesByProject,
   useSaveSlide,
 } from "../../hooks/use-slides";
-import { useFetchSpacesByProject } from "../../hooks/use-spaces";
+import { useFetchSpacesByProject, useSaveSpace } from "../../hooks/use-spaces";
 import { Project } from "../../interfaces/Project";
 import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
@@ -64,8 +64,11 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     null
   );
 
-  const { data: allSpaces, isLoading: allSpacesLoading } =
-    useFetchSpacesByProject(projectId!);
+  const {
+    data: allSpaces,
+    isLoading: allSpacesLoading,
+    refetch: refetchAllSpaces,
+  } = useFetchSpacesByProject(projectId!);
   const {
     data: projectData,
     isLoading: projectDataLoading,
@@ -74,9 +77,11 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
 
   const bulkSaveSlidesMutation = useBulkSaveSlides();
   const updateSlideMutation = useSaveSlide();
-  const processSlidesInSpacesMutation = useProcessSpacesInSlides();
+  const processMapSpacesToSlidesMutation = useMapSpacesToSlides();
   const deleteSlideMutation = useDeleteSlide();
   const updateProjectMutation = useSaveProject();
+
+  const updateSpaceMutation = useSaveSpace();
 
   const {
     data: slidesData,
@@ -109,27 +114,125 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
   }, [projectData, selectedSlide]);
 
-  const fixturesUpdated = (slide: Slide) => {
-    selectedSlide!.fixtures = slide.fixtures;
-    updateSlideMutation.mutate(selectedSlide!, {
-      onSuccess: async () => {
-        queryClient.invalidateQueries({
-          queryKey: [queryKeys.getSlides, projectId],
-        });
-        message.success("Changes saved");
-      },
-      onError: () => {},
-    });
+  const fixturesUpdated = async (slide: Slide, removedFixtureId?: string) => {
+    try {
+      selectedSlide!.fixtures = slide.fixtures;
+
+      const slideId = selectedSlide!._id;
+
+      const currentSpace = allSpaces.find((space: Space) =>
+        space.slides.some((slide) => slide._id === slideId)
+      ) as Space;
+
+      let uniqueFixtures = Array.from(
+        new Set(
+          [
+            ...(currentSpace.fixtures.map((f) => f._id) || []),
+            ...(selectedSlide?.fixtures || []),
+          ].map(String)
+        )
+      ) as string[];
+
+      // If a removedFixtureId is provided, filter it out from uniqueFixtures
+      if (removedFixtureId) {
+        uniqueFixtures = uniqueFixtures.filter((id) => id !== removedFixtureId);
+      }
+
+      // update slide
+      await updateSlideMutation.mutateAsync(selectedSlide!, {
+        onSuccess: async () => {
+          queryClient.invalidateQueries({
+            queryKey: [queryKeys.getSlides, projectId],
+          });
+        },
+      });
+
+      // update space
+      await updateSpaceMutation.mutateAsync(
+        { _id: currentSpace._id, fixtures: uniqueFixtures },
+        {
+          onSuccess: async () => {
+            message.success("Changes saved");
+          },
+        }
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: [queryKeys.getSpaces, projectId],
+      });
+    } catch (error) {
+      message.error("Something went wrong please try again later");
+    }
   };
 
-  const spacesUpdated = (spaces: string[]) => {
-    selectedSlide!.spaces = spaces;
-    updateSlideMutation.mutate(selectedSlide!, {
-      onSuccess: async () => {
-        message.success("Changes saved");
-      },
-      onError: () => {},
-    });
+  const spacesUpdated = async (spaces: string[]) => {
+    const slideId = selectedSlide!._id;
+
+    // get current space
+    const currentSpace = allSpaces.find((space: Space) =>
+      space.slides.some((slide) => slide._id === slideId)
+    ) as Space;
+
+    // get new space
+    const newSpace = allSpaces.find(
+      (space: Space) => space._id === spaces[0]
+    ) as Space;
+
+    if (slideId && currentSpace && newSpace) {
+      // formatted arrays which removes slide ids and fixture ids
+      const currentSpaceSlideIds = currentSpace.slides
+        .filter((slide: Slide) => slide._id !== slideId)
+        .map((slide: Slide) => slide._id) as string[];
+
+      const selectedSlideFixtureIds = selectedSlide?.fixtures?.map(
+        (fixtureId) => fixtureId
+      ) as string[];
+
+      const currentSpaceFixtureIds = currentSpace.fixtures
+        .filter(
+          (fixture) => !selectedSlideFixtureIds.includes(fixture._id as string)
+        )
+        .map((fixture) => fixture._id) as string[];
+
+      // formatted arrays which adds slide ids and fixture ids
+      const uniqueNewSpaceSlideIds = Array.from(
+        new Set([...newSpace.slides.map((slide: Slide) => slide._id), slideId])
+      ) as string[];
+
+      const uniqueNewSpaceFixtureIds = Array.from(
+        new Set([
+          ...newSpace.fixtures.map((fixture) => fixture._id),
+          ...selectedSlideFixtureIds,
+        ])
+      ) as string[];
+
+      // first remove slide from old space
+      await updateSpaceMutation.mutateAsync({
+        _id: currentSpace._id,
+        slides: currentSpaceSlideIds,
+        fixtures: currentSpaceFixtureIds,
+      });
+
+      // add slide to new space
+      await updateSpaceMutation.mutateAsync(
+        {
+          _id: newSpace._id,
+          slides: uniqueNewSpaceSlideIds,
+          fixtures: uniqueNewSpaceFixtureIds,
+        },
+        {
+          onSuccess: async () => {
+            message.success("Changes saved");
+          },
+        }
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: [queryKeys.getSpaces, projectId],
+      });
+    } else {
+      message.error("Something went wrong please try again later");
+    }
   };
 
   const onClickDelete = (event: any) => {
@@ -198,16 +301,22 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
         if (!selectedSlide) {
           setSelectedSlide(response[0]);
         }
-        processSlidesInSpacesMutation.mutate(
+        processMapSpacesToSlidesMutation.mutate(
           { projectId: projectId! },
           {
             onSuccess: async (response: any) => {
               refetchProjectData();
+              refetchAllSpaces();
               refetchSlidesData();
             },
             onError: () => {},
           }
         );
+
+        await queryClient.invalidateQueries({
+          queryKey: [queryKeys.getSpaces, projectId],
+        });
+
         message.success("Designs saved successfully!");
       },
       onError: () => {
@@ -219,67 +328,70 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   const renderSlideThumbnails = () => {
     let spaceDivider: string,
       toAddDivider = false;
-    return slides.map((slide) => {
-      const slideSpace = allSpaces.find(
-        (s: Space) =>
-          s._id == (slide.spaces && slide.spaces.length ? slide.spaces![0] : "")
-      );
-      if (slideSpace) {
-        if (!spaceDivider || spaceDivider !== slideSpace.name) {
-          spaceDivider = slideSpace.name;
-          toAddDivider = true;
+
+    return allSpaces.map((space: Space) => {
+      return space.slides.map((slide: Slide) => {
+        const slideSpace = space;
+
+        if (slideSpace) {
+          if (!spaceDivider || spaceDivider !== slideSpace.name) {
+            spaceDivider = slideSpace.name;
+            toAddDivider = true;
+          } else {
+            toAddDivider = false;
+          }
         } else {
           toAddDivider = false;
         }
-      } else {
-        toAddDivider = false;
-      }
 
-      return (
-        <Flex
-          style={{
-            width: "100%",
-          }}
-        >
-          <Flex vertical style={{ width: "100%" }}>
-            {toAddDivider && (
-              <Tag
+        return (
+          <Flex
+            style={{
+              width: "100%",
+            }}
+          >
+            <Flex vertical style={{ width: "100%" }}>
+              {toAddDivider && (
+                <Tag
+                  style={{
+                    backgroundColor: COLORS.textColorDark,
+                    borderRadius: 32,
+                    color: COLORS.bgColor,
+                    fontSize: "75%",
+                    margin: "auto",
+                    marginBottom: 8,
+                    textAlign: "center",
+                  }}
+                >
+                  {spaceDivider.toUpperCase()}
+                </Tag>
+              )}
+              <div
+                onClick={() => handleThumbnailClick(slide)}
                 style={{
-                  backgroundColor: COLORS.textColorDark,
-                  borderRadius: 32,
-                  color: COLORS.bgColor,
-                  fontSize: "75%",
-                  margin: "auto",
-                  marginBottom: 8,
-                  textAlign: "center",
+                  cursor: "pointer",
+                  width: "100%",
+                  height: 85,
+                  border:
+                    slide._id == selectedSlide?._id
+                      ? "4px solid"
+                      : "0.5px solid",
+                  borderColor:
+                    slide._id == selectedSlide?._id
+                      ? COLORS.primaryColor
+                      : COLORS.borderColor,
+                  borderRadius: 8,
+                  backgroundImage: `url(${slide.url})`,
+                  backgroundPosition: "center",
+                  backgroundSize: "cover",
+                  backgroundRepeat: "no-repeat",
+                  position: "relative",
                 }}
-              >
-                {spaceDivider.toUpperCase()}
-              </Tag>
-            )}
-            <div
-              onClick={() => handleThumbnailClick(slide)}
-              style={{
-                cursor: "pointer",
-                width: "100%",
-                height: 85,
-                border:
-                  slide._id == selectedSlide?._id ? "4px solid" : "0.5px solid",
-                borderColor:
-                  slide._id == selectedSlide?._id
-                    ? COLORS.primaryColor
-                    : COLORS.borderColor,
-                borderRadius: 8,
-                backgroundImage: `url(${slide.url})`,
-                backgroundPosition: "center",
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-                position: "relative",
-              }}
-            ></div>
+              ></div>
+            </Flex>
           </Flex>
-        </Flex>
-      );
+        );
+      });
     });
   };
 
@@ -496,7 +608,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           >
             {projectData!.name}
           </Typography.Title>
-          {processSlidesInSpacesMutation.isPending && (
+          {processMapSpacesToSlidesMutation.isPending && (
             <Tag icon={<SyncOutlined spin />} color="processing">
               Processing designs..
             </Tag>
@@ -559,6 +671,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           >
             {renderSlideThumbnails()}
             <ImgsUpload
+              isMultiple={false}
               imgsUploaded={imgsUploaded}
               confirmProcessing={false}
             ></ImgsUpload>
@@ -652,7 +765,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               onSpacesUpdated={spacesUpdated}
               projectId={projectId!}
               slide={selectedSlide!}
-              processingDesigns={processSlidesInSpacesMutation.isPending}
+              processingDesigns={processMapSpacesToSlidesMutation.isPending}
             ></SlideSpaceMapping>
             <SlideFixtureMapping
               key="slide-fixtures"

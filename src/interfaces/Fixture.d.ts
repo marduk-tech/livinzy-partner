@@ -8,6 +8,7 @@ export interface Fixture {
   designName?: string;
   description?: string;
   projectId?: string;
+  customFittings?: string[];
   imageBounds?: {
     startPoint: { x: number; y: number };
     endPoint: { x: number; y: number };
@@ -23,6 +24,7 @@ export interface FixtureFormData {
   description?: string;
   material?: string;
   materialVariation?: string;
+  customFittings?: string[];
   materialFinish?: string;
   projectId?: string;
   imageBounds?: {

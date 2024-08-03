@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from "react";
+import { InfoCircleOutlined, SettingFilled } from "@ant-design/icons";
 import { Button, Flex, Image, Select, Tooltip, Typography } from "antd";
+import React, { useEffect, useState } from "react";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
 import { Slide } from "../../interfaces/Slide";
+import { Space } from "../../interfaces/Space";
+import { convertInchToFeet } from "../../libs/lvnzy-helper";
 import { COLORS } from "../../styles/colors";
 import "../../styles/override.scss";
-import { Space } from "../../interfaces/Space";
-import { InfoCircleOutlined, SettingFilled } from "@ant-design/icons";
 import SpaceDetails from "../space-details";
-import { convertInchToFeet } from "../../libs/lvnzy-helper";
 
 interface SlideSpaceMappingProps {
   projectId: string;
-  slide: Slide;
+
   onSpacesUpdated: any;
   processingDesigns: boolean;
+  slide: Slide;
 }
 
 const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   projectId,
-  slide,
+
   onSpacesUpdated,
   processingDesigns,
+  slide,
 }) => {
-  const [selectedSpace, setSelectedSpace] = useState<string>(
-    slide.spaces && slide.spaces.length ? slide.spaces[0] : ""
-  );
+  const [selectedSpace, setSelectedSpace] = useState<string>();
   const [spaceDialogOpen, setSpaceDialogOpen] = useState(false);
 
   const [formattedSpaces, setFormattedSpaces] = useState<Space[]>([]);
@@ -35,12 +35,14 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
     refetch: refetchSpaces,
   } = useFetchSpacesByProject(projectId!);
 
+  const defaultSpace = projectSpaces?.find((space: Space) =>
+    space.slides.some((s) => s._id === slide!._id)
+  );
+
   useEffect(() => {
     refetchSpaces();
-    setSelectedSpace(
-      slide.spaces && slide.spaces.length ? slide.spaces[0] : ""
-    );
-  }, [slide]);
+    setSelectedSpace(defaultSpace && defaultSpace._id ? defaultSpace._id : "");
+  }, [slide, projectSpaces]);
 
   useEffect(() => {
     if (projectSpaces && projectSpaces.length) {

@@ -1,4 +1,5 @@
 import {
+  BorderOuterOutlined,
   DeleteOutlined,
   EditOutlined,
   InfoCircleOutlined,
@@ -81,7 +82,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                 {fixture!.fixtureType!.fixtureType}
               </Typography.Text>
               <Flex>
-                {/* {!isModal && (
+                {!isModal && (
                   <Button
                     type="link"
                     disabled={isPending}
@@ -97,7 +98,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                   >
                     Map
                   </Button>
-                )} */}
+                )}
 
                 <Button
                   type="link"

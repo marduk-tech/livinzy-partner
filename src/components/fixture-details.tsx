@@ -113,7 +113,8 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
       (f: FixtureMeta) => f._id == value
     );
     form.setFieldsValue({
-      designName: fixtureType.fixtureType,
+      designName:
+        fixtureType && fixtureType.fixtureType ? fixtureType.fixtureType : "",
       material: "",
     });
 

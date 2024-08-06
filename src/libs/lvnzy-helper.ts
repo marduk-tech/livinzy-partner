@@ -12,4 +12,15 @@ function convertFeetToInch(size: number | string) {
   return Math.round((typeof size == "string" ? parseFloat(size) : size) * 12);
 }
 
-export { convertInchToFeet, convertFeetToInch };
+const nestedPropertyAccessor = (record: any, keys: string | string[]) => {
+  if (Array.isArray(keys)) {
+    return keys.reduce(
+      (obj, key) => (obj && obj[key] !== undefined ? obj[key] : undefined),
+      record
+    );
+  } else {
+    return record[keys];
+  }
+};
+
+export { convertFeetToInch, convertInchToFeet, nestedPropertyAccessor };

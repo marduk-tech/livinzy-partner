@@ -14,6 +14,18 @@ export interface Fixture {
     endPoint: { x: number; y: number };
     imageSize: { width: number; height: number };
   };
+  components: FixtureComponent[];
+}
+
+interface FixtureComponent {
+  _id?: string;
+  commonName?: string;
+  originalName: string;
+  workType: string;
+  brand?: string;
+  oneLiner?: string;
+  material?: string;
+  cost?: number;
 }
 
 export interface FixtureFormData {
@@ -32,4 +44,5 @@ export interface FixtureFormData {
     endPoint: { x: number; y: number };
     imageSize: { width: number; height: number };
   };
+  components: FixtureComponent[];
 }

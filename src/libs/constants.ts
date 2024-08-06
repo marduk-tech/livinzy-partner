@@ -9,3 +9,10 @@ export enum LAYOUT_AI_STATUS {
   COMPLETED = "Completed",
   ERROR = "Error",
 }
+
+export const WorkTypes = [
+  { value: "wood", label: "Wood" },
+  { value: "stone", label: "Stone" },
+  { value: "lighting", label: "lighting" },
+  { value: "hardware", label: "Hardware" },
+];

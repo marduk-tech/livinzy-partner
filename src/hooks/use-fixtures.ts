@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { FixtureFormData } from "../interfaces/Fixture";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
-import { FixtureFormData } from "../interfaces/Fixture";
 
 // Custom hook to fetch projects using useQuery
 export const useFetchFixturesByProject = (projectId: string) => {
@@ -19,7 +19,7 @@ export const useFetchFixturesByProject = (projectId: string) => {
 // Custom hook to save designer data
 export const useSaveFixture = () => {
   return useMutation({
-    mutationFn: async (fixtureData: FixtureFormData) => {
+    mutationFn: async (fixtureData: Partial<FixtureFormData>) => {
       let response;
       if (fixtureData._id) {
         response = await axiosApiInstance.put(

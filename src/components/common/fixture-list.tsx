@@ -70,7 +70,9 @@ const FixtureList: React.FC<FixtureListProps> = ({
 
             <Flex vertical>
               <Typography.Text style={{ fontSize: 16 }}>
-                {fixture.designName || fixture!.fixtureType!.fixtureType}
+                {fixture.designName || fixture.fixtureType
+                  ? fixture!.fixtureType!.fixtureType
+                  : ""}
               </Typography.Text>
               <Typography.Text
                 style={{

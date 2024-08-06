@@ -23,12 +23,7 @@ import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { useGenerateOneLiner } from "../hooks/use-ai";
 import { useFetchFixturesByProject } from "../hooks/use-fixtures";
-import {
-  getFixtureMaterialFinishesMetaByMaterial,
-  getFixtureMaterialVariationsMetaByMaterial,
-  getFixtureMeta,
-  useSaveFixtureMeta,
-} from "../hooks/use-meta";
+import { getFixtureMeta, useSaveFixtureMeta } from "../hooks/use-meta";
 import { useFetchSlidesByProject } from "../hooks/use-slides";
 import { Fixture } from "../interfaces/Fixture";
 import { FixtureMeta } from "../interfaces/Meta";
@@ -85,10 +80,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     refetch: refetchProjectFixtures,
   } = useFetchFixturesByProject(projectId as string);
 
-  const { data: materialVariations } =
-    getFixtureMaterialVariationsMetaByMaterial(selectedMaterial);
-  const { data: materialFinishes } =
-    getFixtureMaterialFinishesMetaByMaterial(selectedMaterial);
+  // const { data: materialVariations } =
+  //   getFixtureMaterialVariationsMetaByMaterial(selectedMaterial);
+  // const { data: materialFinishes } =
+  //   getFixtureMaterialFinishesMetaByMaterial(selectedMaterial);
 
   const { data: projectSlides, isPending: projectSlidesPending } =
     useFetchSlidesByProject(projectId as string);
@@ -113,7 +108,8 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
       (f: FixtureMeta) => f._id == value
     );
     form.setFieldsValue({
-      designName: fixtureType.fixtureType,
+      designName:
+        fixtureType && fixtureType.fixtureType ? fixtureType.fixtureType : "",
       material: "",
     });
 
@@ -172,10 +168,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     );
   };
 
-  useEffect(() => {
-    setFinishes(materialFinishes);
-    setVariations(materialVariations);
-  }, [materialFinishes, materialVariations]);
+  // useEffect(() => {
+  //   setFinishes(materialFinishes);
+  //   setVariations(materialVariations);
+  // }, [materialFinishes, materialVariations]);
 
   useEffect(() => {
     // Auto select the fixture type once a new fixture meta is added.
@@ -240,7 +236,8 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                 {spaceMappedToFixture ? spaceMappedToFixture.name : " "}
               </Typography.Text>
               <Typography.Text>
-                {fix.designName || fix?.fixtureType?.fixtureType}
+                {fix.designName ||
+                  (!!fix.fixtureType ? fix?.fixtureType?.fixtureType : "")}
               </Typography.Text>
             </Flex>
           ),

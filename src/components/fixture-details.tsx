@@ -236,9 +236,8 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                 {spaceMappedToFixture ? spaceMappedToFixture.name : " "}
               </Typography.Text>
               <Typography.Text>
-                {fix.designName || fix.fixtureType
-                  ? fix?.fixtureType?.fixtureType
-                  : ""}
+                {fix.designName ||
+                  (!!fix.fixtureType ? fix?.fixtureType?.fixtureType : "")}
               </Typography.Text>
             </Flex>
           ),

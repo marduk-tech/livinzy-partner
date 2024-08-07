@@ -4,6 +4,7 @@ import {
   UngroupOutlined,
 } from "@ant-design/icons";
 import {
+  Space as AntSpace,
   Button,
   Collapse,
   Divider,
@@ -13,7 +14,6 @@ import {
   InputRef,
   message,
   Modal,
-  Space as AntSpace,
   Select,
   Typography,
 } from "antd";
@@ -25,14 +25,15 @@ import { useGenerateOneLiner } from "../hooks/use-ai";
 import { useFetchFixturesByProject } from "../hooks/use-fixtures";
 import { getFixtureMeta, useSaveFixtureMeta } from "../hooks/use-meta";
 import { useFetchSlidesByProject } from "../hooks/use-slides";
+import { useFetchSpacesByProject } from "../hooks/use-spaces";
 import { Fixture } from "../interfaces/Fixture";
 import { FixtureMeta } from "../interfaces/Meta";
 import { Slide } from "../interfaces/Slide";
+import { Space } from "../interfaces/Space";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";
+import { FixtureComponents } from "./fixture-components";
 import { Loader } from "./loader";
-import { useFetchSpacesByProject } from "../hooks/use-spaces";
-import { Space } from "../interfaces/Space";
 
 interface FixtureModalProps {
   isOpen: boolean;
@@ -200,7 +201,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     } else {
       setMaterials([]);
     }
-    console.log(open);
   };
 
   if (
@@ -406,20 +406,23 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                           : "AI Generate"}
                       </Button>
                     </>
-                    <Collapse
-                      style={{ marginBottom: 16 }}
-                      items={[
-                        {
-                          key: "1",
-                          label: (
-                            <Typography.Title level={5} style={{ margin: 0 }}>
-                              Fixture components
-                            </Typography.Title>
-                          ),
-                          children: <></>,
-                        },
-                      ]}
-                    ></Collapse>
+
+                    {fixture && (
+                      <Collapse
+                        style={{ marginBottom: 16 }}
+                        items={[
+                          {
+                            key: "1",
+                            label: (
+                              <Typography.Title level={5} style={{ margin: 0 }}>
+                                Fixture components
+                              </Typography.Title>
+                            ),
+                            children: <FixtureComponents fixture={fixture} />,
+                          },
+                        ]}
+                      ></Collapse>
+                    )}
                   </>
                 );
               }}

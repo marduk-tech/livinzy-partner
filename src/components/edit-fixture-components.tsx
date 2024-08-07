@@ -1,6 +1,6 @@
 import { Flex, Form, Input, InputNumber, Modal, Select } from "antd";
 import { useEffect } from "react";
-import { Fixture, FixtureComponent } from "../interfaces/Fixture";
+import { FixtureComponent } from "../interfaces/Fixture";
 import { WorkTypes } from "../libs/constants";
 
 interface EditFixtureComponentsProps {
@@ -76,9 +76,12 @@ export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
           onFinish={handleOk}
         >
           <Flex vertical>
+            <Form.Item name={"commonName"} label="Standard name">
+              <Input disabled={true} />
+            </Form.Item>
             <Form.Item
               name={"originalName"}
-              label="Name"
+              label="Custom name"
               rules={[{ required: true, message: "Please enter the name" }]}
             >
               <Input />

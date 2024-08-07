@@ -96,10 +96,10 @@ export const FixtureComponents: React.FC<FixtureComponentsProps> = ({
 
   const columns: TableColumnType<FixtureComponent>[] = [
     {
-      title: "Name",
-      dataIndex: "originalName",
-      key: "originalName",
-      ...ColumnSearch("originalName"),
+      title: "Standard name",
+      dataIndex: "commonName",
+      key: "commonName",
+      ...ColumnSearch("commonName"),
     },
 
     {

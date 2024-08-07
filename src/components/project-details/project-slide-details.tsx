@@ -705,7 +705,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
                 border: "1px solid",
                 borderColor: "#ddd",
                 position: "absolute",
+                backgroundColor: COLORS.bgColorDark,
                 top: 8,
+                opacity: 0.5,
                 right: 8,
               }}
             >

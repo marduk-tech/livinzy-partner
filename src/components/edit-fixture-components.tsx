@@ -79,13 +79,9 @@ export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
             <Form.Item name={"commonName"} label="Standard name">
               <Input disabled={true} />
             </Form.Item>
-            <Form.Item
-              name={"originalName"}
-              label="Custom name"
-              rules={[{ required: true, message: "Please enter the name" }]}
-            >
+            {/* <Form.Item name={"originalName"} label="Custom name">
               <Input />
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item
               name={"workType"}

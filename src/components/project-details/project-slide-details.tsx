@@ -58,6 +58,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>();
   const [isReplaceSlideOpen, setIsReplaceSlideOpen] = useState<boolean>();
   const [isPreviewImage, setIsPreviewImage] = useState<boolean>();
+  const [orderedSpaces, setOrderedSpaces] = useState<Space[]>([]);
 
   // State to manage the selected slide for replacement
   const [replacementSlideUrl, setReplacementSlideUrl] = useState<string | null>(
@@ -113,6 +114,44 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
       setIsPreviewImage(projectData.previewImageUrl === selectedSlide?.url);
     }
   }, [projectData, selectedSlide]);
+
+  useEffect(() => {
+    if (allSpaces && slides) {
+      if (
+        orderedSpaces.length <= 0 &&
+        slides.length !== 0 &&
+        allSpaces.length !== 0
+      ) {
+        const spaces = [...allSpaces];
+        const selectedSlideId = slides[0]?._id;
+
+        // get the space containing the selected slide
+        const selectedSpaceIndex = spaces.findIndex((space: Space) =>
+          space.slides.some((slide: Slide) => slide._id === selectedSlideId)
+        );
+
+        // shift the selected space to the first position if found
+        if (selectedSpaceIndex > -1) {
+          const [selectedSpace] = spaces.splice(selectedSpaceIndex, 1);
+          spaces.unshift(selectedSpace);
+
+          // move the selected slide to the first position within the selected space
+          const selectedSlideIndex = selectedSpace.slides.findIndex(
+            (slide: Slide) => slide._id === selectedSlideId
+          );
+          if (selectedSlideIndex > -1) {
+            const [_selectedSlide] = selectedSpace.slides.splice(
+              selectedSlideIndex,
+              1
+            );
+            selectedSpace.slides.unshift(_selectedSlide);
+          }
+        }
+
+        setOrderedSpaces(spaces);
+      }
+    }
+  }, [allSpaces, slides]);
 
   const fixturesUpdated = async (slide: Slide, removedFixtureId?: string) => {
     try {
@@ -329,70 +368,74 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     let spaceDivider: string,
       toAddDivider = false;
 
-    return allSpaces.map((space: Space) => {
-      return space.slides.map((slide: Slide) => {
-        const slideSpace = space;
+    if (orderedSpaces) {
+      return orderedSpaces.map((space: Space) => {
+        return space.slides
+          .filter((slide: Slide) => !slide.archived)
+          .map((slide: Slide) => {
+            const slideSpace = space;
 
-        if (slideSpace) {
-          if (!spaceDivider || spaceDivider !== slideSpace.name) {
-            spaceDivider = slideSpace.name;
-            toAddDivider = true;
-          } else {
-            toAddDivider = false;
-          }
-        } else {
-          toAddDivider = false;
-        }
+            if (slideSpace) {
+              if (!spaceDivider || spaceDivider !== slideSpace.name) {
+                spaceDivider = slideSpace.name;
+                toAddDivider = true;
+              } else {
+                toAddDivider = false;
+              }
+            } else {
+              toAddDivider = false;
+            }
 
-        return (
-          <Flex
-            style={{
-              width: "100%",
-            }}
-          >
-            <Flex vertical style={{ width: "100%" }}>
-              {toAddDivider && (
-                <Tag
-                  style={{
-                    backgroundColor: COLORS.textColorDark,
-                    borderRadius: 32,
-                    color: COLORS.bgColor,
-                    fontSize: "75%",
-                    margin: "auto",
-                    marginBottom: 8,
-                    textAlign: "center",
-                  }}
-                >
-                  {spaceDivider.toUpperCase()}
-                </Tag>
-              )}
-              <div
-                onClick={() => handleThumbnailClick(slide)}
+            return (
+              <Flex
                 style={{
-                  cursor: "pointer",
                   width: "100%",
-                  height: 85,
-                  border:
-                    slide._id == selectedSlide?._id
-                      ? "4px solid"
-                      : "0.5px solid",
-                  borderColor:
-                    slide._id == selectedSlide?._id
-                      ? COLORS.primaryColor
-                      : COLORS.borderColor,
-                  borderRadius: 8,
-                  backgroundImage: `url(${slide.url})`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                  position: "relative",
                 }}
-              ></div>
-            </Flex>
-          </Flex>
-        );
+              >
+                <Flex vertical style={{ width: "100%" }}>
+                  {toAddDivider && (
+                    <Tag
+                      style={{
+                        backgroundColor: COLORS.textColorDark,
+                        borderRadius: 32,
+                        color: COLORS.bgColor,
+                        fontSize: "75%",
+                        margin: "auto",
+                        marginBottom: 8,
+                        textAlign: "center",
+                      }}
+                    >
+                      {spaceDivider.toUpperCase()}
+                    </Tag>
+                  )}
+                  <div
+                    onClick={() => handleThumbnailClick(slide)}
+                    style={{
+                      cursor: "pointer",
+                      width: "100%",
+                      height: 85,
+                      border:
+                        slide._id == selectedSlide?._id
+                          ? "4px solid"
+                          : "0.5px solid",
+                      borderColor:
+                        slide._id == selectedSlide?._id
+                          ? COLORS.primaryColor
+                          : COLORS.borderColor,
+                      borderRadius: 8,
+                      backgroundImage: `url(${slide.url})`,
+                      backgroundPosition: "center",
+                      backgroundSize: "cover",
+                      backgroundRepeat: "no-repeat",
+                      position: "relative",
+                    }}
+                  ></div>
+                </Flex>
+              </Flex>
+            );
+          });
       });
-    });
+    }
   };
 
   const handleReplaceSlide = async () => {

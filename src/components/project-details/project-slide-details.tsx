@@ -622,7 +622,18 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               }}
               icon={<FormatPainterOutlined />}
             >
-              Fixtures
+              All Fixtures
+            </Button>
+
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsSpacesSettingsOpen(true);
+              }}
+              icon={<RadiusSettingOutlined />}
+            >
+              All Spaces
             </Button>
             <Button
               style={{ color: COLORS.primaryColor }}
@@ -633,16 +644,6 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               icon={<ExpandOutlined />}
             >
               Preview
-            </Button>
-            <Button
-              style={{ color: COLORS.primaryColor }}
-              type="link"
-              onClick={() => {
-                setIsSpacesSettingsOpen(true);
-              }}
-              icon={<RadiusSettingOutlined />}
-            >
-              Spaces
             </Button>
             <Button
               style={{ color: COLORS.primaryColor }}

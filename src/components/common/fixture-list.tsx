@@ -4,7 +4,7 @@ import {
   EditOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, List, Popconfirm, Tag, Typography } from "antd";
+import { Button, Flex, List, Popconfirm, Tag, Tooltip, Typography } from "antd";
 import React from "react";
 import { Fixture } from "../../interfaces/Fixture";
 import { COLORS } from "../../styles/colors";
@@ -84,40 +84,40 @@ const FixtureList: React.FC<FixtureListProps> = ({
               >
                 {!!fixture.fixtureType ? fixture!.fixtureType!.fixtureType : ""}
               </Typography.Text>
-              <Flex>
+              <Flex gap={16}>
                 {!isModal && (
+                  <Tooltip title="Locate this fixture in slide">
+                    <Button
+                      type="link"
+                      disabled={isPending}
+                      style={{
+                        cursor: "pointer",
+                        padding: 0,
+                        height: 32,
+                        width: 24,
+                        color: COLORS.primaryColor,
+                      }}
+                      icon={<BorderOuterOutlined />}
+                      onClick={() => onMap(fixture)}
+                    ></Button>
+                  </Tooltip>
+                )}
+
+                <Tooltip title="Edit fixture">
                   <Button
                     type="link"
                     disabled={isPending}
                     style={{
                       cursor: "pointer",
                       padding: 0,
-                      marginRight: 16,
                       height: 32,
+                      width: 24,
                       color: COLORS.primaryColor,
                     }}
-                    icon={<BorderOuterOutlined />}
-                    onClick={() => onMap(fixture)}
-                  >
-                    Map
-                  </Button>
-                )}
-
-                <Button
-                  type="link"
-                  disabled={isPending}
-                  style={{
-                    cursor: "pointer",
-                    padding: 0,
-                    marginRight: 16,
-                    height: 32,
-                    color: COLORS.primaryColor,
-                  }}
-                  icon={<EditOutlined />}
-                  onClick={() => onEdit(fixture)}
-                >
-                  Edit
-                </Button>
+                    icon={<EditOutlined />}
+                    onClick={() => onEdit(fixture)}
+                  ></Button>
+                </Tooltip>
 
                 {!isModal && (
                   <Popconfirm
@@ -127,17 +127,18 @@ const FixtureList: React.FC<FixtureListProps> = ({
                     okText="Yes"
                     cancelText="No"
                   >
-                    <Button
-                      style={{
-                        padding: 0,
-                        height: 32,
-                        color: COLORS.primaryColor,
-                      }}
-                      type="link"
-                      icon={<DeleteOutlined />}
-                    >
-                      Delete
-                    </Button>
+                    <Tooltip title="Delete fixture">
+                      <Button
+                        style={{
+                          padding: 0,
+                          width: 24,
+                          height: 32,
+                          color: COLORS.redIdentifier,
+                        }}
+                        type="link"
+                        icon={<DeleteOutlined />}
+                      ></Button>
+                    </Tooltip>
                   </Popconfirm>
                 )}
               </Flex>

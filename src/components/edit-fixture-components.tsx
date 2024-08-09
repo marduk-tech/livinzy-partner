@@ -77,11 +77,11 @@ export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
         >
           <Flex vertical>
             <Form.Item name={"commonName"} label="Standard name">
-              <Input disabled={true} />
-            </Form.Item>
-            {/* <Form.Item name={"originalName"} label="Custom name">
               <Input />
-            </Form.Item> */}
+            </Form.Item>
+            <Form.Item name={"originalName"} label="Custom name">
+              <Input />
+            </Form.Item>
 
             <Form.Item
               name={"workType"}

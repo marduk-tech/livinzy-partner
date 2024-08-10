@@ -663,11 +663,23 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           >
             {projectData!.name}
           </Typography.Title>
-          {processMapSpacesToSlidesMutation.isPending && (
-            <Tag icon={<SyncOutlined spin />} color="processing">
-              Processing designs..
-            </Tag>
-          )}
+
+          <Flex gap={5} align="center">
+            {projectData?.isPublished ? (
+              <Tag color="default" style={{ color: COLORS.primaryColor }}>
+                Published
+              </Tag>
+            ) : (
+              <Tag color="default">Unpublished</Tag>
+            )}
+
+            {processMapSpacesToSlidesMutation.isPending && (
+              <Tag icon={<SyncOutlined spin />} color="processing">
+                Processing designs..
+              </Tag>
+            )}
+          </Flex>
+
           <Flex style={{ marginLeft: "auto" }}>
             <Button
               style={{ color: COLORS.primaryColor }}

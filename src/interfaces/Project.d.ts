@@ -22,6 +22,7 @@ export interface Project {
   highlights: {
     fixtureHighlights: string[];
   };
+  isPublished: boolean;
 }
 
 interface ProjectDetailsProps {

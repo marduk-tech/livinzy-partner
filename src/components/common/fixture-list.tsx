@@ -7,8 +7,8 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import { Button, Flex, List, Popconfirm, Tag, Tooltip, Typography } from "antd";
-import React from "react";
-
+import React, { useState } from "react";
+import { useFetchProject } from "../../hooks/use-projects";
 import { Fixture } from "../../interfaces/Fixture";
 import { COLORS } from "../../styles/colors";
 
@@ -54,8 +54,8 @@ const FixtureList: React.FC<FixtureListProps> = ({
 
         const handleHighlight = () => {
           onHighlight(fixture);
-          // prevent popconfirm instant label update which causes flicker
-          setTimeout(() => {}, 500);
+          // prevent popoconfirm instant label update which causes flicker
+          setTimeout(() => {}, 500); // 500ms delay
         };
 
         return (
@@ -140,7 +140,6 @@ const FixtureList: React.FC<FixtureListProps> = ({
                     ></Button>
                   </Tooltip>
 
-                {!isAllFixturesModal && (
                   <Popconfirm
                     title={
                       isFixtureHighlighted
@@ -173,7 +172,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                       ></Button>
                     </Tooltip>
                   </Popconfirm>
-                  {!isModal && (
+                  {!isAllFixturesModal && (
                     <Popconfirm
                       title="Are you sure to delete this ?"
                       disabled={isPending}

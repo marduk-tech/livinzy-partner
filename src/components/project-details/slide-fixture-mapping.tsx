@@ -10,6 +10,7 @@ import { Fixture, FixtureFormData } from "../../interfaces/Fixture";
 import { IBoundingBox, Slide } from "../../interfaces/Slide";
 
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { Space } from "../../interfaces/Space";
 import { queryKeys } from "../../libs/react-query/constants";
 import { queryClient } from "../../libs/react-query/query-client";
 import { COLORS } from "../../styles/colors";
@@ -22,6 +23,7 @@ interface FixtureMappingProps {
   projectId: string;
   slide?: Slide;
   onFixturesUpdated: any;
+  space?: Space;
 }
 
 export function filterFixtures(
@@ -51,6 +53,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   projectId,
   slide,
   onFixturesUpdated,
+  space,
 }) => {
   const [fixtureModalVisible, setFixtureModalVisible] = useState(false);
   const [editingFixture, setEditingFixture] = useState<Fixture | null>(null);
@@ -303,6 +306,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
             setFixtureModalVisible(false);
             setEditingFixture(null);
           }}
+          space={space}
         />
       </Flex>
     );

@@ -15,7 +15,7 @@ interface FixtureListProps {
   onEdit: (fixture: Fixture) => void;
   onDelete: (fixture: Fixture) => void;
   isPending: boolean;
-  isModal: boolean;
+  isAllFixturesModal: boolean;
 }
 
 const FixtureList: React.FC<FixtureListProps> = ({
@@ -24,7 +24,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
   onEdit,
   onDelete,
   isPending,
-  isModal = false,
+  isAllFixturesModal = false,
 }) => {
   if (!fixtures.length) {
     return (
@@ -85,7 +85,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                 {!!fixture.fixtureType ? fixture!.fixtureType!.fixtureType : ""}
               </Typography.Text>
               <Flex gap={16}>
-                {!isModal && (
+                {!isAllFixturesModal && (
                   <Tooltip title="Locate this fixture in slide">
                     <Button
                       type="link"
@@ -119,7 +119,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                   ></Button>
                 </Tooltip>
 
-                {!isModal && (
+                {!isAllFixturesModal && (
                   <Popconfirm
                     title="Are you sure to delete this ?"
                     disabled={isPending}

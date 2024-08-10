@@ -3,9 +3,12 @@ import {
   DeleteOutlined,
   EditOutlined,
   InfoCircleOutlined,
+  StarFilled,
+  StarOutlined,
 } from "@ant-design/icons";
 import { Button, Flex, List, Popconfirm, Tag, Tooltip, Typography } from "antd";
 import React from "react";
+
 import { Fixture } from "../../interfaces/Fixture";
 import { COLORS } from "../../styles/colors";
 
@@ -14,6 +17,8 @@ interface FixtureListProps {
   onMap: (fixture: Fixture) => void;
   onEdit: (fixture: Fixture) => void;
   onDelete: (fixture: Fixture) => void;
+  onHighlight: (fixture: Fixture) => void;
+  highlightedFixtures: string[];
   isPending: boolean;
   isModal: boolean;
 }
@@ -25,6 +30,8 @@ const FixtureList: React.FC<FixtureListProps> = ({
   onDelete,
   isPending,
   isModal = false,
+  onHighlight,
+  highlightedFixtures,
 }) => {
   if (!fixtures.length) {
     return (
@@ -38,55 +45,86 @@ const FixtureList: React.FC<FixtureListProps> = ({
     <List
       style={{ width: "100%" }}
       dataSource={fixtures}
-      renderItem={(fixture: Fixture, index: number) => (
-        <Flex
-          vertical
-          style={{
-            padding: 16,
-            marginBottom: 8,
-            borderRadius: 8,
-            backgroundColor: "white",
-            border: "1px solid",
-            borderColor: COLORS.borderColor,
-          }}
-        >
-          <Flex justify="flex-start">
-            <Typography.Text
-              style={{
-                color: "white",
-                textAlign: "center",
-                fontSize: 14,
-                backgroundColor: COLORS.textColorDark,
-                height: 20,
-                width: 20,
-                marginTop: 4,
-                borderRadius: "50%",
-                lineHeight: "140%",
-                marginRight: 8,
-              }}
-            >
-              {index + 1}
-            </Typography.Text>
+      renderItem={(fixture: Fixture, index: number) => {
+        const isFixtureHighlighted = highlightedFixtures.some(
+          (item) => item === fixture._id
+        )
+          ? true
+          : false;
 
-            <Flex vertical>
-              <Typography.Text style={{ fontSize: 16 }}>
-                {fixture.designName ||
-                  (!!fixture.fixtureType
-                    ? fixture!.fixtureType!.fixtureType
-                    : "")}
-              </Typography.Text>
+        const handleHighlight = () => {
+          onHighlight(fixture);
+          // prevent popconfirm instant label update which causes flicker
+          setTimeout(() => {}, 500);
+        };
+
+        return (
+          <Flex
+            vertical
+            style={{
+              padding: 16,
+              marginBottom: 8,
+              borderRadius: 8,
+              backgroundColor: "white",
+              border: "1px solid",
+              borderColor: COLORS.borderColor,
+            }}
+          >
+            <Flex justify="flex-start">
               <Typography.Text
                 style={{
-                  color: COLORS.textColorLight,
-                  marginBottom: 8,
-                  fontSize: 12,
+                  color: "white",
+                  textAlign: "center",
+                  fontSize: 14,
+                  backgroundColor: COLORS.textColorDark,
+                  height: 20,
+                  width: 20,
+                  marginTop: 4,
+                  borderRadius: "50%",
+                  lineHeight: "140%",
+                  marginRight: 8,
                 }}
               >
-                {!!fixture.fixtureType ? fixture!.fixtureType!.fixtureType : ""}
+                {index + 1}
               </Typography.Text>
-              <Flex gap={16}>
-                {!isModal && (
-                  <Tooltip title="Locate this fixture in slide">
+
+              <Flex vertical>
+                <Typography.Text style={{ fontSize: 16 }}>
+                  {fixture.designName ||
+                    (!!fixture.fixtureType
+                      ? fixture!.fixtureType!.fixtureType
+                      : "")}
+                </Typography.Text>
+                <Typography.Text
+                  style={{
+                    color: COLORS.textColorLight,
+                    marginBottom: 8,
+                    fontSize: 12,
+                  }}
+                >
+                  {!!fixture.fixtureType
+                    ? fixture!.fixtureType!.fixtureType
+                    : ""}
+                </Typography.Text>
+                <Flex gap={16}>
+                  {!isModal && (
+                    <Tooltip title="Locate this fixture in slide">
+                      <Button
+                        type="link"
+                        disabled={isPending}
+                        style={{
+                          cursor: "pointer",
+                          padding: 0,
+                          height: 32,
+                          width: 24,
+                          color: COLORS.primaryColor,
+                        }}
+                        icon={<BorderOuterOutlined />}
+                        onClick={() => onMap(fixture)}
+                      ></Button>
+                    </Tooltip>
+                  )}
+                  <Tooltip title="Edit fixture">
                     <Button
                       type="link"
                       disabled={isPending}
@@ -97,55 +135,71 @@ const FixtureList: React.FC<FixtureListProps> = ({
                         width: 24,
                         color: COLORS.primaryColor,
                       }}
-                      icon={<BorderOuterOutlined />}
-                      onClick={() => onMap(fixture)}
+                      icon={<EditOutlined />}
+                      onClick={() => onEdit(fixture)}
                     ></Button>
                   </Tooltip>
-                )}
 
-                <Tooltip title="Edit fixture">
-                  <Button
-                    type="link"
-                    disabled={isPending}
-                    style={{
-                      cursor: "pointer",
-                      padding: 0,
-                      height: 32,
-                      width: 24,
-                      color: COLORS.primaryColor,
-                    }}
-                    icon={<EditOutlined />}
-                    onClick={() => onEdit(fixture)}
-                  ></Button>
-                </Tooltip>
-
-                {!isModal && (
                   <Popconfirm
-                    title="Are you sure to delete this ?"
+                    title={
+                      isFixtureHighlighted
+                        ? "Are you sure you want to remove this as a project highlight?"
+                        : "Are you sure you want to highlight this fixture?"
+                    }
                     disabled={isPending}
-                    onConfirm={() => onDelete(fixture)}
+                    onConfirm={handleHighlight}
                     okText="Yes"
                     cancelText="No"
                   >
-                    <Tooltip title="Delete fixture">
+                    <Tooltip title="Highlight fixture">
                       <Button
-                        style={{
-                          padding: 0,
-                          width: 24,
-                          height: 32,
-                          color: COLORS.redIdentifier,
-                        }}
                         type="link"
-                        icon={<DeleteOutlined />}
+                        disabled={isPending}
+                        style={{
+                          cursor: "pointer",
+                          padding: 0,
+                          height: 32,
+                          width: 24,
+                          color: COLORS.primaryColor,
+                        }}
+                        icon={
+                          isFixtureHighlighted ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )
+                        }
                       ></Button>
                     </Tooltip>
                   </Popconfirm>
-                )}
+                  {!isModal && (
+                    <Popconfirm
+                      title="Are you sure to delete this ?"
+                      disabled={isPending}
+                      onConfirm={() => onDelete(fixture)}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Tooltip title="Delete fixture">
+                        <Button
+                          style={{
+                            padding: 0,
+                            width: 24,
+                            height: 32,
+                            color: COLORS.redIdentifier,
+                          }}
+                          type="link"
+                          icon={<DeleteOutlined />}
+                        ></Button>
+                      </Tooltip>
+                    </Popconfirm>
+                  )}
+                </Flex>
               </Flex>
             </Flex>
           </Flex>
-        </Flex>
-      )}
+        );
+      }}
     />
   );
 };

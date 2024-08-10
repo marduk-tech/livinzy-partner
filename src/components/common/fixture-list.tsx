@@ -20,7 +20,7 @@ interface FixtureListProps {
   onHighlight: (fixture: Fixture) => void;
   highlightedFixtures: string[];
   isPending: boolean;
-  isModal: boolean;
+  isAllFixturesModal: boolean;
 }
 
 const FixtureList: React.FC<FixtureListProps> = ({
@@ -29,7 +29,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
   onEdit,
   onDelete,
   isPending,
-  isModal = false,
+  isAllFixturesModal = false,
   onHighlight,
   highlightedFixtures,
 }) => {
@@ -107,7 +107,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                     : ""}
                 </Typography.Text>
                 <Flex gap={16}>
-                  {!isModal && (
+                  {!isAllFixturesModal && (
                     <Tooltip title="Locate this fixture in slide">
                       <Button
                         type="link"
@@ -140,6 +140,7 @@ const FixtureList: React.FC<FixtureListProps> = ({
                     ></Button>
                   </Tooltip>
 
+                {!isAllFixturesModal && (
                   <Popconfirm
                     title={
                       isFixtureHighlighted

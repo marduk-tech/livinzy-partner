@@ -76,12 +76,12 @@ export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
           onFinish={handleOk}
         >
           <Flex vertical>
-            <Form.Item name={"commonName"} label="Standard name">
-              <Input />
+            <Form.Item name={"commonName"} label="Component name">
+              <Input placeholder="Enter the name for this component" />
             </Form.Item>
-            <Form.Item name={"originalName"} label="Custom name">
-              <Input />
-            </Form.Item>
+            {/* <Form.Item name={"originalName"} label="Custom name">
+              <Input placeholder="Custom name for the component to reflect" />
+            </Form.Item> */}
 
             <Form.Item
               name={"workType"}

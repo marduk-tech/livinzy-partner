@@ -59,6 +59,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   const [isReplaceSlideOpen, setIsReplaceSlideOpen] = useState<boolean>();
   const [isPreviewImage, setIsPreviewImage] = useState<boolean>();
   const [orderedSpaces, setOrderedSpaces] = useState<Space[]>([]);
+  const [selectedSpace, setSelectedSpace] = useState<Space>();
 
   // State to manage the selected slide for replacement
   const [replacementSlideUrl, setReplacementSlideUrl] = useState<string | null>(
@@ -152,6 +153,17 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
       }
     }
   }, [allSpaces, slides]);
+
+  // Set selected space
+  useEffect(() => {
+    if (allSpaces && selectedSlide) {
+      const selectedSpace = allSpaces.find((space: Space) =>
+        space.slides.some((slide: Slide) => slide._id === selectedSlide._id)
+      );
+
+      setSelectedSpace(selectedSpace);
+    }
+  }, [allSpaces, selectedSlide]);
 
   const fixturesUpdated = async (slide: Slide, removedFixtureId?: string) => {
     try {
@@ -818,6 +830,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               onFixturesUpdated={fixturesUpdated}
               projectId={projectId!}
               slide={selectedSlide!}
+              space={selectedSpace}
             ></SlideFixtureMapping>
           </Flex>
         </Flex>

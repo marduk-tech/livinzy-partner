@@ -281,7 +281,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
 
         <div style={{ marginTop: slide ? 0 : 10 }}>
           <FixtureList
-            isModal={slide ? false : true}
+            isAllFixturesModal={slide ? false : true}
             fixtures={slideFixtures}
             isPending={fixturesDataPending}
             onMap={(fixture) => {

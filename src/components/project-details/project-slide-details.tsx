@@ -118,11 +118,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
 
   useEffect(() => {
     if (allSpaces && slides) {
-      if (
-        orderedSpaces.length <= 0 &&
-        slides.length !== 0 &&
-        allSpaces.length !== 0
-      ) {
+      if (slides.length !== 0 && allSpaces.length !== 0) {
         const spaces = [...allSpaces];
         const selectedSlideId = slides[0]?._id;
 
@@ -273,6 +269,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
         },
         {
           onSuccess: async () => {
+            await queryClient.invalidateQueries({
+              queryKey: [queryKeys.getSpaces],
+            });
             message.success("Changes saved");
           },
         }

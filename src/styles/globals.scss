@@ -10,3 +10,10 @@ body {
   background-color: #fafbfb;
   /* Add any other styles you want to reset or modify */
 }
+
+.auto-flex {
+  &:after {
+    content: "";
+    flex: auto;
+  }
+}

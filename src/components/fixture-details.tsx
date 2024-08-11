@@ -57,7 +57,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
-  const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
+  const [selectExisting, setSelectExisting] = useState<boolean>(true);
   const generateOneLinerMutation = useGenerateOneLiner();
 
   const {
@@ -67,8 +67,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   } = useFetchSpacesByProject(projectId!);
 
   const [materials, setMaterials] = useState([]);
-  const [variations, setVariations] = useState([]);
-  const [finishes, setFinishes] = useState([]);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
 
   const {
@@ -187,6 +185,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   }, [fixtureMetaData]);
 
+  useEffect(() => {
+    setSelectExisting(false);
+  }, [isOpen]);
+
   const onModalToggle = (open: boolean) => {
     if (open && fixture) {
       const fixtureType = fixtureMetaData.find(
@@ -285,7 +287,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                   setSelectExisting(!selectExisting);
                 }}
               >
-                {!selectExisting
+                {selectExisting
                   ? "I want to add a new fixture"
                   : "I want to select an existing added fixture"}
               </Button>
@@ -294,7 +296,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         )}
 
         <Form form={form} layout="vertical" onFinish={handleFinish}>
-          {selectExisting ? (
+          {!selectExisting ? (
             <Form.Item noStyle shouldUpdate>
               {({ getFieldValue }) => {
                 return (

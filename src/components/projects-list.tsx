@@ -30,13 +30,14 @@ const ProjectsList: React.FC = () => {
   if (projects) {
     return (
       <Flex
+        className="auto-flex"
         style={{ width: "100%", flexWrap: "wrap" }}
-        justify="center"
-        gap={32}
+        justify="space-between"
+        gap={20}
       >
         {!isMobile ? (
           <Card
-            style={{ width: isMobile ? "100%" : 240 }}
+            style={{ width: isMobile ? "100%" : 240, marginBottom: 24 }}
             hoverable
             cover={
               <div
@@ -92,7 +93,11 @@ const ProjectsList: React.FC = () => {
                   navigate(`/projects/new/${project._id}`);
                 }
               }}
-              style={{ width: isMobile ? "100%" : 240, borderRadius: 16 }}
+              style={{
+                width: isMobile ? "100%" : 240,
+                borderRadius: 16,
+                marginBottom: 24,
+              }}
               cover={
                 <div
                   style={{

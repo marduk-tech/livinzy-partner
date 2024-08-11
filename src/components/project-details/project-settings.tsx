@@ -1,15 +1,25 @@
 import { ExclamationCircleFilled, UngroupOutlined } from "@ant-design/icons";
-import { Button, Flex, Form, Input, message, Modal, Select, Spin } from "antd";
+import {
+  Button,
+  Flex,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  Spin,
+  Switch,
+} from "antd";
+import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDescribeProject } from "../../hooks/use-ai";
 import { getHomeMeta } from "../../hooks/use-meta";
 import { useDeleteProject, useSaveProject } from "../../hooks/use-projects";
 import { HomeMeta } from "../../interfaces/Meta";
 import { Project } from "../../interfaces/Project";
-import { queryClient } from "../../libs/react-query/query-client";
 import { queryKeys } from "../../libs/react-query/constants";
-import TextArea from "antd/es/input/TextArea";
-import { useDescribeProject } from "../../hooks/use-ai";
+import { queryClient } from "../../libs/react-query/query-client";
 const { confirm } = Modal;
 
 const { Option } = Select;
@@ -192,6 +202,14 @@ const ProjectSettings: React.FC<{
         >
           I want to delete this project
         </Button> */}
+
+        <Form.Item
+          name={"isPublished"}
+          style={{ margin: 0, marginTop: 15 }}
+          label="Publish Project"
+        >
+          <Switch />
+        </Form.Item>
 
         <Form.Item>
           <Button

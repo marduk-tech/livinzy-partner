@@ -10,6 +10,8 @@ import { Fixture, FixtureFormData } from "../../interfaces/Fixture";
 import { IBoundingBox, Slide } from "../../interfaces/Slide";
 
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { useFetchProject, useSaveProject } from "../../hooks/use-projects";
+import { Space } from "../../interfaces/Space";
 import { queryKeys } from "../../libs/react-query/constants";
 import { queryClient } from "../../libs/react-query/query-client";
 import { COLORS } from "../../styles/colors";
@@ -22,6 +24,7 @@ interface FixtureMappingProps {
   projectId: string;
   slide?: Slide;
   onFixturesUpdated: any;
+  space?: Space;
 }
 
 export function filterFixtures(
@@ -51,6 +54,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   projectId,
   slide,
   onFixturesUpdated,
+  space,
 }) => {
   const [fixtureModalVisible, setFixtureModalVisible] = useState(false);
   const [editingFixture, setEditingFixture] = useState<Fixture | null>(null);
@@ -66,6 +70,11 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
 
   const { data: projectSlides, isPending: projectSlidesPending } =
     useFetchSlidesByProject(projectId);
+
+  const { data: projectData, isLoading: projectDataIsLoading } =
+    useFetchProject(projectId as string);
+
+  const updateProjectMutation = useSaveProject();
 
   const updateSlideMutation = useSaveSlide();
 
@@ -201,6 +210,45 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     setEditingFixture(null);
   };
 
+  const onHighlightFixture = async (fixtureData: Fixture) => {
+    if (!projectData) {
+      message.error("Error");
+      return;
+    }
+
+    const highlightFixtureId = fixtureData._id;
+    const fixtureHighlights = projectData.highlights.fixtureHighlights || [];
+
+    // if the fixture id is already in the array
+    const index = fixtureHighlights.indexOf(highlightFixtureId as string);
+
+    if (index > -1) {
+      // id is already in the array, remove it
+      fixtureHighlights.splice(index, 1);
+    } else {
+      // id is not in the array, add it
+      fixtureHighlights.push(highlightFixtureId as string);
+    }
+
+    try {
+      await updateProjectMutation.mutateAsync({
+        _id: projectData._id,
+        highlights: {
+          ...projectData.highlights,
+          fixtureHighlights: fixtureHighlights,
+        },
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: [queryKeys.getProject, projectData._id],
+      });
+
+      message.success("Changes saved");
+    } catch (error) {
+      message.error("Something bad happened please try again later");
+    }
+  };
+
   //  get initial bounding box
   const getInitialBoundingBox = (): IBoundingBox | undefined => {
     if (projectSlides && slide?._id && editingFixture?._id) {
@@ -219,11 +267,11 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     return undefined;
   };
 
-  if (fixturesDataPending || projectSlidesPending) {
+  if (fixturesDataPending || projectSlidesPending || projectDataIsLoading) {
     return <Loader />;
   }
 
-  if (projectFixtures && projectSlides) {
+  if (projectFixtures && projectSlides && projectData) {
     const initBoundingBox = getInitialBoundingBox();
 
     return (
@@ -278,9 +326,9 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
 
         <div style={{ marginTop: slide ? 0 : 10 }}>
           <FixtureList
-            isModal={slide ? false : true}
+            isAllFixturesModal={slide ? false : true}
             fixtures={slideFixtures}
-            isPending={fixturesDataPending}
+            isPending={fixturesDataPending || projectDataIsLoading}
             onMap={(fixture) => {
               setEditingFixture(fixture);
               setMapFixtureImg(slide?.url);
@@ -291,6 +339,10 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
               setFixtureModalVisible(true);
             }}
             onDelete={onDeleteFixture}
+            onHighlight={onHighlightFixture}
+            highlightedFixtures={
+              projectData?.highlights.fixtureHighlights || []
+            }
           />
         </div>
 
@@ -303,6 +355,7 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
             setFixtureModalVisible(false);
             setEditingFixture(null);
           }}
+          space={space}
         />
       </Flex>
     );

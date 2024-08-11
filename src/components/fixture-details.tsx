@@ -41,6 +41,7 @@ interface FixtureModalProps {
   onSubmit: (fixture: any) => void;
   fixture?: any;
   slide?: Slide;
+  space?: Space;
 }
 
 const FixtureDetails: React.FC<FixtureModalProps> = ({
@@ -49,13 +50,14 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   onSubmit,
   fixture,
   slide,
+  space,
 }) => {
   const inputRef = useRef<InputRef>(null);
   const saveFixtureMetaMutation = useSaveFixtureMeta();
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
-  const [selectExisting, setSelectExisting] = useState<boolean>(!fixture);
+  const [selectExisting, setSelectExisting] = useState<boolean>(true);
   const generateOneLinerMutation = useGenerateOneLiner();
 
   const {
@@ -65,8 +67,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
   } = useFetchSpacesByProject(projectId!);
 
   const [materials, setMaterials] = useState([]);
-  const [variations, setVariations] = useState([]);
-  const [finishes, setFinishes] = useState([]);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
 
   const {
@@ -185,6 +185,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   }, [fixtureMetaData]);
 
+  useEffect(() => {
+    setSelectExisting(false);
+  }, [isOpen]);
+
   const onModalToggle = (open: boolean) => {
     if (open && fixture) {
       const fixtureType = fixtureMetaData.find(
@@ -212,10 +216,21 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     return <Loader />;
   }
 
-  if (projectFixtures && projectSlides && fixtureMetaData) {
-    const existingFixturesOptions = projectFixtures
+  function filterFixturesBySpace(space: Space, fixtures: Fixture[]) {
+    const fixtureIdsInSpace = space.fixtures.map((fixture) => fixture._id);
+
+    return fixtures.filter((fixture) =>
+      fixtureIdsInSpace.includes(fixture._id)
+    );
+  }
+
+  if (projectFixtures && projectSlides && fixtureMetaData && space) {
+    const formattedFixtures = filterFixturesBySpace(space, projectFixtures);
+
+    const existingFixturesOptions = formattedFixtures
+
       .filter(
-        // Filter fixtures already mapped to slide
+        // Filter fixtures that are mapped to the space and not already mapped to the slide
         (fixture: Fixture) =>
           slide && !slide.fixtures?.includes(fixture._id as string)
       )
@@ -272,7 +287,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
                   setSelectExisting(!selectExisting);
                 }}
               >
-                {!selectExisting
+                {selectExisting
                   ? "I want to add a new fixture"
                   : "I want to select an existing added fixture"}
               </Button>
@@ -281,7 +296,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
         )}
 
         <Form form={form} layout="vertical" onFinish={handleFinish}>
-          {selectExisting ? (
+          {!selectExisting ? (
             <Form.Item noStyle shouldUpdate>
               {({ getFieldValue }) => {
                 return (

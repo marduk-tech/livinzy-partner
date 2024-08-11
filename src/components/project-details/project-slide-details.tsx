@@ -58,6 +58,8 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>();
   const [isReplaceSlideOpen, setIsReplaceSlideOpen] = useState<boolean>();
   const [isPreviewImage, setIsPreviewImage] = useState<boolean>();
+  const [orderedSpaces, setOrderedSpaces] = useState<Space[]>([]);
+  const [selectedSpace, setSelectedSpace] = useState<Space>();
 
   // State to manage the selected slide for replacement
   const [replacementSlideUrl, setReplacementSlideUrl] = useState<string | null>(
@@ -113,6 +115,51 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
       setIsPreviewImage(projectData.previewImageUrl === selectedSlide?.url);
     }
   }, [projectData, selectedSlide]);
+
+  useEffect(() => {
+    if (allSpaces && slides) {
+      if (slides.length !== 0 && allSpaces.length !== 0) {
+        const spaces = [...allSpaces];
+        const selectedSlideId = slides[0]?._id;
+
+        // get the space containing the selected slide
+        const selectedSpaceIndex = spaces.findIndex((space: Space) =>
+          space.slides.some((slide: Slide) => slide._id === selectedSlideId)
+        );
+
+        // shift the selected space to the first position if found
+        if (selectedSpaceIndex > -1) {
+          const [selectedSpace] = spaces.splice(selectedSpaceIndex, 1);
+          spaces.unshift(selectedSpace);
+
+          // move the selected slide to the first position within the selected space
+          const selectedSlideIndex = selectedSpace.slides.findIndex(
+            (slide: Slide) => slide._id === selectedSlideId
+          );
+          if (selectedSlideIndex > -1) {
+            const [_selectedSlide] = selectedSpace.slides.splice(
+              selectedSlideIndex,
+              1
+            );
+            selectedSpace.slides.unshift(_selectedSlide);
+          }
+        }
+
+        setOrderedSpaces(spaces);
+      }
+    }
+  }, [allSpaces, slides]);
+
+  // Set selected space
+  useEffect(() => {
+    if (allSpaces && selectedSlide) {
+      const selectedSpace = allSpaces.find((space: Space) =>
+        space.slides.some((slide: Slide) => slide._id === selectedSlide._id)
+      );
+
+      setSelectedSpace(selectedSpace);
+    }
+  }, [allSpaces, selectedSlide]);
 
   const fixturesUpdated = async (slide: Slide, removedFixtureId?: string) => {
     try {
@@ -222,6 +269,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
         },
         {
           onSuccess: async () => {
+            await queryClient.invalidateQueries({
+              queryKey: [queryKeys.getSpaces],
+            });
             message.success("Changes saved");
           },
         }
@@ -329,70 +379,74 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     let spaceDivider: string,
       toAddDivider = false;
 
-    return allSpaces.map((space: Space) => {
-      return space.slides.map((slide: Slide) => {
-        const slideSpace = space;
+    if (orderedSpaces) {
+      return orderedSpaces.map((space: Space) => {
+        return space.slides
+          .filter((slide: Slide) => !slide.archived)
+          .map((slide: Slide) => {
+            const slideSpace = space;
 
-        if (slideSpace) {
-          if (!spaceDivider || spaceDivider !== slideSpace.name) {
-            spaceDivider = slideSpace.name;
-            toAddDivider = true;
-          } else {
-            toAddDivider = false;
-          }
-        } else {
-          toAddDivider = false;
-        }
+            if (slideSpace) {
+              if (!spaceDivider || spaceDivider !== slideSpace.name) {
+                spaceDivider = slideSpace.name;
+                toAddDivider = true;
+              } else {
+                toAddDivider = false;
+              }
+            } else {
+              toAddDivider = false;
+            }
 
-        return (
-          <Flex
-            style={{
-              width: "100%",
-            }}
-          >
-            <Flex vertical style={{ width: "100%" }}>
-              {toAddDivider && (
-                <Tag
-                  style={{
-                    backgroundColor: COLORS.textColorDark,
-                    borderRadius: 32,
-                    color: COLORS.bgColor,
-                    fontSize: "75%",
-                    margin: "auto",
-                    marginBottom: 8,
-                    textAlign: "center",
-                  }}
-                >
-                  {spaceDivider.toUpperCase()}
-                </Tag>
-              )}
-              <div
-                onClick={() => handleThumbnailClick(slide)}
+            return (
+              <Flex
                 style={{
-                  cursor: "pointer",
                   width: "100%",
-                  height: 85,
-                  border:
-                    slide._id == selectedSlide?._id
-                      ? "4px solid"
-                      : "0.5px solid",
-                  borderColor:
-                    slide._id == selectedSlide?._id
-                      ? COLORS.primaryColor
-                      : COLORS.borderColor,
-                  borderRadius: 8,
-                  backgroundImage: `url(${slide.url})`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                  position: "relative",
                 }}
-              ></div>
-            </Flex>
-          </Flex>
-        );
+              >
+                <Flex vertical style={{ width: "100%" }}>
+                  {toAddDivider && (
+                    <Tag
+                      style={{
+                        backgroundColor: COLORS.textColorDark,
+                        borderRadius: 32,
+                        color: COLORS.bgColor,
+                        fontSize: "75%",
+                        margin: "auto",
+                        marginBottom: 8,
+                        textAlign: "center",
+                      }}
+                    >
+                      {spaceDivider.toUpperCase()}
+                    </Tag>
+                  )}
+                  <div
+                    onClick={() => handleThumbnailClick(slide)}
+                    style={{
+                      cursor: "pointer",
+                      width: "100%",
+                      height: 85,
+                      border:
+                        slide._id == selectedSlide?._id
+                          ? "4px solid"
+                          : "0.5px solid",
+                      borderColor:
+                        slide._id == selectedSlide?._id
+                          ? COLORS.primaryColor
+                          : COLORS.borderColor,
+                      borderRadius: 8,
+                      backgroundImage: `url(${slide.url})`,
+                      backgroundPosition: "center",
+                      backgroundSize: "cover",
+                      backgroundRepeat: "no-repeat",
+                      position: "relative",
+                    }}
+                  ></div>
+                </Flex>
+              </Flex>
+            );
+          });
       });
-    });
+    }
   };
 
   const handleReplaceSlide = async () => {
@@ -608,11 +662,23 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
           >
             {projectData!.name}
           </Typography.Title>
-          {processMapSpacesToSlidesMutation.isPending && (
-            <Tag icon={<SyncOutlined spin />} color="processing">
-              Processing designs..
-            </Tag>
-          )}
+
+          <Flex gap={5} align="center">
+            {projectData?.isPublished ? (
+              <Tag color="default" style={{ color: COLORS.primaryColor }}>
+                Published
+              </Tag>
+            ) : (
+              <Tag color="default">Unpublished</Tag>
+            )}
+
+            {processMapSpacesToSlidesMutation.isPending && (
+              <Tag icon={<SyncOutlined spin />} color="processing">
+                Processing designs..
+              </Tag>
+            )}
+          </Flex>
+
           <Flex style={{ marginLeft: "auto" }}>
             <Button
               style={{ color: COLORS.primaryColor }}
@@ -622,7 +688,18 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               }}
               icon={<FormatPainterOutlined />}
             >
-              Fixtures
+              All Fixtures
+            </Button>
+
+            <Button
+              style={{ color: COLORS.primaryColor }}
+              type="link"
+              onClick={() => {
+                setIsSpacesSettingsOpen(true);
+              }}
+              icon={<RadiusSettingOutlined />}
+            >
+              All Spaces
             </Button>
             <Button
               style={{ color: COLORS.primaryColor }}
@@ -633,16 +710,6 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               icon={<ExpandOutlined />}
             >
               Preview
-            </Button>
-            <Button
-              style={{ color: COLORS.primaryColor }}
-              type="link"
-              onClick={() => {
-                setIsSpacesSettingsOpen(true);
-              }}
-              icon={<RadiusSettingOutlined />}
-            >
-              Spaces
             </Button>
             <Button
               style={{ color: COLORS.primaryColor }}
@@ -774,6 +841,7 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               onFixturesUpdated={fixturesUpdated}
               projectId={projectId!}
               slide={selectedSlide!}
+              space={selectedSpace}
             ></SlideFixtureMapping>
           </Flex>
         </Flex>

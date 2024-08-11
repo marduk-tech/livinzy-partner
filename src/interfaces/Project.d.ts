@@ -19,6 +19,10 @@ export interface Project {
   previewImageUrl?: string;
   designerId: string;
   archived: boolean;
+  highlights: {
+    fixtureHighlights: string[];
+  };
+  isPublished: boolean;
 }
 
 interface ProjectDetailsProps {

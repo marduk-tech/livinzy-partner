@@ -117,35 +117,37 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   }, [projectData, selectedSlide]);
 
   useEffect(() => {
-    if (allSpaces && slides) {
-      if (slides.length !== 0 && allSpaces.length !== 0) {
-        const spaces = [...allSpaces];
-        const selectedSlideId = slides[0]?._id;
+    if (allSpaces && slides && slides.length !== 0 && allSpaces.length !== 0) {
+      const selectedSlideId = slides[0]?._id;
 
-        // get the space containing the selected slide
-        const selectedSpaceIndex = spaces.findIndex((space: Space) =>
-          space.slides.some((slide: Slide) => slide._id === selectedSlideId)
+      const selectedSpaceIndex = allSpaces.findIndex((space: Space) =>
+        space.slides.some((slide: Slide) => slide._id === selectedSlideId)
+      );
+      // shift the selected space to the first position if found
+      if (selectedSpaceIndex > -1) {
+        const spacesCopy = [...allSpaces];
+        const selectedSpace = { ...spacesCopy[selectedSpaceIndex] };
+
+        spacesCopy.splice(selectedSpaceIndex, 1);
+        spacesCopy.unshift(selectedSpace);
+
+        // move the selected slide to the first position within the selected space
+
+        const selectedSlideIndex = selectedSpace.slides.findIndex(
+          (slide: Slide) => slide._id === selectedSlideId
         );
 
-        // shift the selected space to the first position if found
-        if (selectedSpaceIndex > -1) {
-          const [selectedSpace] = spaces.splice(selectedSpaceIndex, 1);
-          spaces.unshift(selectedSpace);
-
-          // move the selected slide to the first position within the selected space
-          const selectedSlideIndex = selectedSpace.slides.findIndex(
-            (slide: Slide) => slide._id === selectedSlideId
-          );
-          if (selectedSlideIndex > -1) {
-            const [_selectedSlide] = selectedSpace.slides.splice(
-              selectedSlideIndex,
-              1
-            );
-            selectedSpace.slides.unshift(_selectedSlide);
-          }
+        if (selectedSlideIndex > -1) {
+          const slidesCopy = [...selectedSpace.slides];
+          const [selectedSlide] = slidesCopy.splice(selectedSlideIndex, 1);
+          slidesCopy.unshift(selectedSlide);
+          selectedSpace.slides = slidesCopy;
         }
 
-        setOrderedSpaces(spaces);
+        // Only update state if the order has changed
+        if (JSON.stringify(spacesCopy) !== JSON.stringify(allSpaces)) {
+          setOrderedSpaces(spacesCopy);
+        }
       }
     }
   }, [allSpaces, slides]);

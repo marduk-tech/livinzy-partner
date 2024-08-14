@@ -338,6 +338,20 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     setSelectedSlide(slide);
   };
 
+  const mapSlidesToSpaces = () => {
+    processMapSpacesToSlidesMutation.mutate(
+      { projectId: projectId! },
+      {
+        onSuccess: async (response: any) => {
+          refetchProjectData();
+          refetchAllSpaces();
+          refetchSlidesData();
+        },
+        onError: () => {},
+      }
+    );
+  };
+
   /** When slide images are uploaded */
   const imgsUploaded = (imgs: string[]) => {
     const slidesData = imgs.map((img: string) => {
@@ -353,18 +367,8 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
         if (!selectedSlide) {
           setSelectedSlide(response[0]);
         }
-        processMapSpacesToSlidesMutation.mutate(
-          { projectId: projectId! },
-          {
-            onSuccess: async (response: any) => {
-              refetchProjectData();
-              refetchAllSpaces();
-              refetchSlidesData();
-            },
-            onError: () => {},
-          }
-        );
 
+        mapSlidesToSpaces();
         await queryClient.invalidateQueries({
           queryKey: [queryKeys.getSpaces, projectId],
         });
@@ -377,78 +381,103 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     });
   };
 
+  const renderSingleSlideThumbnail = (slide: Slide) => {
+    return (
+      <div
+        onClick={() => handleThumbnailClick(slide)}
+        style={{
+          cursor: "pointer",
+          width: "100%",
+          height: 85,
+          border: slide._id == selectedSlide?._id ? "4px solid" : "0.5px solid",
+          borderColor:
+            slide._id == selectedSlide?._id
+              ? COLORS.primaryColor
+              : COLORS.borderColor,
+          borderRadius: 8,
+          backgroundImage: `url(${slide.url})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          position: "relative",
+        }}
+      ></div>
+    );
+  };
+
   const renderSlideThumbnails = () => {
     let spaceDivider: string,
       toAddDivider = false;
 
-    if (orderedSpaces) {
-      return orderedSpaces.map((space: Space) => {
+    let slideIdsMappedToSpaces: string[] = [],
+      spaceSlides,
+      slidesWithoutMapping;
+    if (allSpaces) {
+      spaceSlides = allSpaces.map((space: Space) => {
         return space.slides
           .filter((slide: Slide) => !slide.archived)
-          .map((slide: Slide) => {
+          .map((slide: Slide, index: number) => {
             const slideSpace = space;
-
-            if (slideSpace) {
-              if (!spaceDivider || spaceDivider !== slideSpace.name) {
-                spaceDivider = slideSpace.name;
-                toAddDivider = true;
-              } else {
-                toAddDivider = false;
-              }
-            } else {
-              toAddDivider = false;
-            }
+            slideIdsMappedToSpaces.push(slide._id!);
 
             return (
-              <Flex
-                style={{
-                  width: "100%",
-                }}
-              >
-                <Flex vertical style={{ width: "100%" }}>
-                  {toAddDivider && (
-                    <Tag
-                      style={{
-                        backgroundColor: COLORS.textColorDark,
-                        borderRadius: 32,
-                        color: COLORS.bgColor,
-                        fontSize: "75%",
-                        margin: "auto",
-                        marginBottom: 8,
-                        textAlign: "center",
-                      }}
-                    >
-                      {spaceDivider.toUpperCase()}
-                    </Tag>
-                  )}
-                  <div
-                    onClick={() => handleThumbnailClick(slide)}
+              <Flex vertical style={{ width: "100%" }}>
+                {index == 0 && (
+                  <Tag
                     style={{
-                      cursor: "pointer",
-                      width: "100%",
-                      height: 85,
-                      border:
-                        slide._id == selectedSlide?._id
-                          ? "4px solid"
-                          : "0.5px solid",
-                      borderColor:
-                        slide._id == selectedSlide?._id
-                          ? COLORS.primaryColor
-                          : COLORS.borderColor,
-                      borderRadius: 8,
-                      backgroundImage: `url(${slide.url})`,
-                      backgroundPosition: "center",
-                      backgroundSize: "cover",
-                      backgroundRepeat: "no-repeat",
-                      position: "relative",
+                      backgroundColor: COLORS.textColorDark,
+                      borderRadius: 32,
+                      color: COLORS.bgColor,
+                      fontSize: "75%",
+                      margin: "auto",
+                      marginBottom: 8,
+                      textAlign: "center",
                     }}
-                  ></div>
-                </Flex>
+                  >
+                    {space.name.toUpperCase()}
+                  </Tag>
+                )}
+                {renderSingleSlideThumbnail(slide)}
               </Flex>
             );
           });
       });
     }
+
+    const slidesNotMapped = slidesData.filter(
+      (slide: Slide) => !slideIdsMappedToSpaces.includes(slide._id!)
+    );
+    slidesWithoutMapping = slidesNotMapped.map(
+      (slide: Slide, index: number) => {
+        return (
+          <Flex vertical style={{ width: "100%" }}>
+            {index == 0 && (
+              <Tag
+                style={{
+                  backgroundColor: COLORS.textColorDark,
+                  borderRadius: 32,
+                  color: COLORS.bgColor,
+                  fontSize: "75%",
+                  margin: "auto",
+                  marginBottom: 8,
+                  textAlign: "center",
+                }}
+              >
+                {"Not Mapped"}
+              </Tag>
+            )}
+            {renderSingleSlideThumbnail(slide)}
+          </Flex>
+        );
+      }
+    );
+
+    return (
+      <Flex vertical gap={16}>
+        {spaceSlides}
+        {slidesWithoutMapping}
+      </Flex>
+    );
   };
 
   const handleReplaceSlide = async () => {
@@ -673,6 +702,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
             ) : (
               <Tag color="default">Unpublished</Tag>
             )}
+            <Button type="link" onClick={mapSlidesToSpaces}>
+              Process
+            </Button>
 
             {processMapSpacesToSlidesMutation.isPending && (
               <Tag icon={<SyncOutlined spin />} color="processing">
@@ -760,12 +792,25 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
               position: "relative",
             }}
           >
-            <Image
+            {/* <Image
               preview={false}
               src={selectedSlide!.url}
               height={540}
               style={{ borderRadius: 16 }}
-            ></Image>
+            ></Image> */}
+            <div
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                height: 540,
+                borderRadius: 8,
+                backgroundImage: `url(${selectedSlide!.url})`,
+                backgroundPosition: "center",
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                position: "relative",
+              }}
+            ></div>
 
             <Flex
               style={{

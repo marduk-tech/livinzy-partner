@@ -19,7 +19,6 @@ interface SlideSpaceMappingProps {
 
 const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   projectId,
-
   onSpacesUpdated,
   processingDesigns,
   slide,
@@ -36,7 +35,7 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   } = useFetchSpacesByProject(projectId!);
 
   const defaultSpace = projectSpaces?.find((space: Space) =>
-    space.slides.some((s) => s._id === slide!._id)
+    space.slides.map((s) => s._id).includes(slide._id)
   );
 
   useEffect(() => {

@@ -445,7 +445,8 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
 
     const slidesNotMapped = slidesData.filter(
-      (slide: Slide) => !slideIdsMappedToSpaces.includes(slide._id!)
+      (slide: Slide) =>
+        !slide.archived && !slideIdsMappedToSpaces.includes(slide._id!)
     );
     slidesWithoutMapping = slidesNotMapped.map(
       (slide: Slide, index: number) => {
@@ -702,9 +703,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
             ) : (
               <Tag color="default">Unpublished</Tag>
             )}
-            <Button type="link" onClick={mapSlidesToSpaces}>
+            {/* <Button type="link" onClick={mapSlidesToSpaces}>
               Process
-            </Button>
+            </Button> */}
 
             {processMapSpacesToSlidesMutation.isPending && (
               <Tag icon={<SyncOutlined spin />} color="processing">

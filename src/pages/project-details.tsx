@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import { Loader } from "../components/loader";
+import { Loader } from "../components/common/loader";
+import ProjectSlideDetails from "../components/project-details/project-details";
 import { useFetchProject } from "../hooks/use-projects";
-import ProjectSlideDetails from "../components/project-details/project-slide-details";
 
 export function ProjectDetails() {
   const { projectId } = useParams();

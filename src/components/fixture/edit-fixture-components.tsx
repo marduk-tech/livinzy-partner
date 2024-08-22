@@ -1,7 +1,7 @@
 import { Flex, Form, Input, InputNumber, Modal, Select } from "antd";
 import { useEffect } from "react";
-import { FixtureComponent } from "../interfaces/Fixture";
-import { WorkTypes } from "../libs/constants";
+import { FixtureComponent } from "../../interfaces/Fixture";
+import { WorkTypes } from "../../libs/constants";
 
 interface EditFixtureComponentsProps {
   component?: FixtureComponent;

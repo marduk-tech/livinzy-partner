@@ -9,7 +9,7 @@ import { Button, Dropdown, Flex, Image, Layout, Popconfirm } from "antd";
 import React, { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { Outlet, useNavigate } from "react-router-dom";
-import { Loader } from "../components/loader";
+import { Loader } from "../components/common/loader";
 import { useGetDesignerByEmail } from "../hooks/use-designers";
 import { cookieKeys } from "../libs/react-query/constants";
 import { COLORS } from "../styles/colors";

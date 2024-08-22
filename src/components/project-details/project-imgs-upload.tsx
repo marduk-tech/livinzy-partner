@@ -1,8 +1,8 @@
 import { Button, Flex, Image, message, Typography, Upload } from "antd";
 import type { UploadFile, UploadProps } from "antd/es/upload/interface";
 import React, { useEffect, useState } from "react";
-import { baseApiUrl } from "../libs/constants";
-import { COLORS } from "../styles/colors";
+import { baseApiUrl } from "../../libs/constants";
+import { COLORS } from "../../styles/colors";
 
 const MAX_IMAGE_SIZE_MB = 5;
 

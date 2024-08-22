@@ -7,7 +7,7 @@ import { useFetchProjectsByDesigner } from "../hooks/use-projects";
 import { Project } from "../interfaces/Project";
 import { useDevice } from "../libs/device";
 import { cookieKeys } from "../libs/react-query/constants";
-import { Loader } from "./loader";
+import { Loader } from "./common/loader";
 
 const ProjectsList: React.FC = () => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);

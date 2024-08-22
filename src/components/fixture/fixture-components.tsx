@@ -5,13 +5,13 @@ import { useParams } from "react-router-dom";
 import {
   useFetchFixturesByProject,
   useSaveFixture,
-} from "../hooks/use-fixtures";
-import { Fixture, FixtureComponent } from "../interfaces/Fixture";
-import { useDevice } from "../libs/device";
-import { queryKeys } from "../libs/react-query/constants";
-import { queryClient } from "../libs/react-query/query-client";
-import { ColumnSearch } from "./common/column-search";
-import { DeletePopconfirm } from "./delete-popconfirm";
+} from "../../hooks/use-fixtures";
+import { Fixture, FixtureComponent } from "../../interfaces/Fixture";
+import { useDevice } from "../../libs/device";
+import { queryKeys } from "../../libs/react-query/constants";
+import { queryClient } from "../../libs/react-query/query-client";
+import { ColumnSearch } from "../common/column-search";
+import { DeletePopconfirm } from "../common/delete-popconfirm";
 import { EditFixtureComponents } from "./edit-fixture-components";
 
 interface FixtureComponentsProps {

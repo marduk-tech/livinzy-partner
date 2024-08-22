@@ -17,8 +17,8 @@ import { queryClient } from "../../libs/react-query/query-client";
 import { COLORS } from "../../styles/colors";
 import FixtureList from "../common/fixture-list";
 import ImgMapFixture from "../common/img-map-fixture";
-import FixtureDetails from "../fixture-details";
-import { Loader } from "../loader";
+import { Loader } from "../common/loader";
+import FixtureDetails from "../fixture/fixture-details";
 
 interface FixtureMappingProps {
   projectId: string;

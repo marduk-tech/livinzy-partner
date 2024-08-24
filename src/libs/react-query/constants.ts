@@ -11,8 +11,5 @@ export const queryKeys: { [key: string]: string } = {
   getLayoutDetails: "getLayoutDetails",
   getMaterialVariatonByMaterial: "getMaterialVariatonByMaterial",
   getMaterialFinishByMaterial: "getMaterialFinishByMaterial",
-};
-
-export const cookieKeys = {
-  userId: "userId",
+  user: "user",
 };

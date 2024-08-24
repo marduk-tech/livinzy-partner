@@ -1,9 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { cookieKeys, queryKeys } from "../libs/react-query/constants";
-import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { Designer } from "../interfaces/Designer";
-import { useCookies } from "react-cookie";
-import { useEffect, useState } from "react";
+import { axiosApiInstance } from "../libs/axios-api-Instance";
+import { queryKeys } from "../libs/react-query/constants";
 
 // Custom hook to fetch designer by id
 export const useGetDesigner = (id: string) => {
@@ -17,32 +15,32 @@ export const useGetDesigner = (id: string) => {
 };
 
 // Custom hook to fetch designer by email
-export const useGetDesignerByEmail = (email: string) => {
-  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
-  const [data, setData] = useState<Designer | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+// export const useGetDesignerByEmail = (email: string) => {
+//   const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
+//   const [data, setData] = useState<Designer | null>(null);
+//   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosApiInstance.get(
-          `/designers/email/${email}`
-        );
-        setCookie(cookieKeys.userId, response.data._id, { path: "/" });
-        setData(response.data);
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-      }
-    };
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       setIsLoading(true);
+//       try {
+//         const response = await axiosApiInstance.get(
+//           `/designers/email/${email}`
+//         );
+//         setCookie(cookieKeys.userId, response.data._id, { path: "/" });
+//         setData(response.data);
+//         setIsLoading(false);
+//       } catch (err) {
+//         setIsLoading(false);
+//       }
+//     };
 
-    if (email) {
-      fetchData();
-    }
-  }, [email]);
-  return { data, isLoading };
-};
+//     if (email) {
+//       fetchData();
+//     }
+//   }, [email]);
+//   return { data, isLoading };
+// };
 
 // Custom hook to save designer data
 export const useSaveDesigner = () => {

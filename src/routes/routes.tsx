@@ -4,18 +4,19 @@ import { Route, Routes } from "react-router-dom";
 import { DashboardLayout } from "../layouts/dashboard-layout";
 
 // Pages
+import { AuthenticationGuard } from "../components/auth/authentication-guard";
 import AccountPage from "../pages/account";
 import ChatPage from "../pages/chat";
 import HomePage from "../pages/home";
 import Landing from "../pages/landing";
+import { ProjectAdd } from "../pages/project-add";
 import { ProjectDetails } from "../pages/project-details";
 import WalletPage from "../pages/wallet";
-import { ProjectAdd } from "../pages/project-add";
 
 export const Router = () => {
   return (
     <Routes>
-      <Route element={<DashboardLayout />}>
+      <Route element={<AuthenticationGuard component={DashboardLayout} />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/account" element={<AccountPage />} />

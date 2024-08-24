@@ -1,10 +1,9 @@
-import React from "react";
-import { Layout, Flex, Typography, Table, Tag } from "antd";
-import { COLORS } from "../styles/colors";
-import { useDevice } from "../libs/device";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useGetDesignerByEmail } from "../hooks/use-designers";
+import { Flex, Layout, Table, Tag, Typography } from "antd";
 import moment from "moment";
+import React from "react";
+import { useUser } from "../hooks/use-user";
+import { useDevice } from "../libs/device";
+import { COLORS } from "../styles/colors";
 
 const { Content } = Layout;
 
@@ -16,8 +15,7 @@ interface Transaction {
 }
 
 const WalletDetails: React.FC = () => {
-  const { user } = useAuth0();
-  const { data: designerData } = useGetDesignerByEmail(user?.email || "");
+  const { user: designerData } = useUser();
   const walletBalance: number = 5000; // Static wallet balance
 
   const transactionData: Transaction[] = [

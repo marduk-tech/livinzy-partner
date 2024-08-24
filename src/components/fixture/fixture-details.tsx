@@ -19,18 +19,17 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
-import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { useGenerateOneLiner } from "../../hooks/use-ai";
 import { useFetchFixturesByProject } from "../../hooks/use-fixtures";
 import { getFixtureMeta, useSaveFixtureMeta } from "../../hooks/use-meta";
 import { useFetchSlidesByProject } from "../../hooks/use-slides";
 import { useFetchSpacesByProject } from "../../hooks/use-spaces";
+import { useUser } from "../../hooks/use-user";
 import { Fixture } from "../../interfaces/Fixture";
 import { FixtureMeta } from "../../interfaces/Meta";
 import { Slide } from "../../interfaces/Slide";
 import { Space } from "../../interfaces/Space";
-import { cookieKeys } from "../../libs/react-query/constants";
 import { COLORS } from "../../styles/colors";
 import { Loader } from "../common/loader";
 import { FixtureComponents } from "./fixture-components";
@@ -54,7 +53,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
 }) => {
   const inputRef = useRef<InputRef>(null);
   const saveFixtureMetaMutation = useSaveFixtureMeta();
-  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
+  const { user } = useUser();
   const [autoSelectFixtureMeta, setAutoSelectFixtureMeta] = useState<string>();
   const { projectId } = useParams();
   const [selectExisting, setSelectExisting] = useState<boolean>(true);
@@ -135,7 +134,7 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
       saveFixtureMetaMutation.mutate(
         {
           fixtureType: inputRef.current.input.value,
-          addedByDesignerId: cookies[cookieKeys.userId],
+          addedByDesignerId: user._id,
         },
         {
           onSuccess: async (response: FixtureMeta) => {

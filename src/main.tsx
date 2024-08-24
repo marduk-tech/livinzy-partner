@@ -2,20 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./app.tsx";
-import { Auth0Provider } from "@auth0/auth0-react";
+import { CustomAuth0Provider } from "./components/auth/auth0-provider.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Auth0Provider
-        domain="livinzy.us.auth0.com"
-        clientId="bp7PEBYWGwSdMyoWJST2aBbJ7X63sPdy"
-        authorizationParams={{
-          redirect_uri: window.location.origin,
-        }}
-      >
+      <CustomAuth0Provider>
         <App />
-      </Auth0Provider>
+      </CustomAuth0Provider>
     </BrowserRouter>
   </React.StrictMode>
 );

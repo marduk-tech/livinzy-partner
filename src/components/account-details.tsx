@@ -20,7 +20,8 @@ import ImgCrop from "antd-img-crop";
 import TabPane from "antd/es/tabs/TabPane";
 import { UploadChangeParam, UploadFile } from "antd/lib/upload/interface";
 import React, { useEffect, useState } from "react";
-import { useGetDesignerByEmail, useSaveDesigner } from "../hooks/use-designers";
+import { useSaveDesigner } from "../hooks/use-designers";
+import { useUser } from "../hooks/use-user";
 import { Designer } from "../interfaces/Designer";
 import { baseApiUrl } from "../libs/constants";
 import { useDevice } from "../libs/device";
@@ -39,7 +40,7 @@ const AccountDetails: React.FC = () => {
   const { isMobile } = useDevice();
 
   const [form] = Form.useForm();
-  const { data, isLoading } = useGetDesignerByEmail(user?.email || "");
+  const { user: data, isLoading } = useUser();
   const saveDesignerMutation = useSaveDesigner();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 

@@ -1,4 +1,5 @@
 export interface Designer {
+  _id: string;
   designerName: string;
   websiteUrl?: string;
   email?: string;

@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Upload,
-  message,
-  Spin,
-  Select,
-  Flex,
-  Tag,
-  Typography,
-} from "antd";
-import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
-import { useSaveProject } from "../../hooks/use-projects";
-import { Project, ProjectDetailsProps } from "../../interfaces/Project";
-import { useCookies } from "react-cookie";
-import { cookieKeys } from "../../libs/react-query/constants";
-import { getHomeMeta } from "../../hooks/use-meta";
-import { HomeMeta } from "../../interfaces/Meta";
-import { LAYOUT_AI_STATUS, baseApiUrl } from "../../libs/constants";
-import { COLORS } from "../../styles/colors";
-import { fetchLayoutDetails, useProcessSpacesLayout } from "../../hooks/use-ai";
 import {
   CheckCircleOutlined,
-  SyncOutlined,
   CloseCircleOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
+import {
+  Button,
+  Flex,
+  Form,
+  Input,
+  Select,
+  Spin,
+  Tag,
+  Typography,
+  Upload,
+  message,
+} from "antd";
+import { UploadChangeParam, UploadFile } from "antd/lib/upload/interface";
+import React, { useEffect, useState } from "react";
+import { fetchLayoutDetails, useProcessSpacesLayout } from "../../hooks/use-ai";
+import { getHomeMeta } from "../../hooks/use-meta";
+import { useSaveProject } from "../../hooks/use-projects";
+import { HomeMeta } from "../../interfaces/Meta";
+import { Project, ProjectDetailsProps } from "../../interfaces/Project";
+import { LAYOUT_AI_STATUS, baseApiUrl } from "../../libs/constants";
+import { COLORS } from "../../styles/colors";
 
 const { Option } = Select;
 
@@ -38,7 +36,6 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
   const [form] = Form.useForm();
   const saveProjectMutation = useSaveProject();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
   const [layoutUploadSkipped, setLayoutUploadSkipped] = useState(false);
 
   const { data: homeMetaData, isPending: homeMetaDataPending } = getHomeMeta();

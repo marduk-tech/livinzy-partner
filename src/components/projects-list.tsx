@@ -1,27 +1,20 @@
 import { Alert, Card, Col, Flex, Row, Typography, message } from "antd";
 import Meta from "antd/es/card/Meta";
 import React from "react";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useFetchProjectsByDesigner } from "../hooks/use-projects";
+import { useUser } from "../hooks/use-user";
 import { Project } from "../interfaces/Project";
 import { useDevice } from "../libs/device";
-import { cookieKeys } from "../libs/react-query/constants";
 import { Loader } from "./common/loader";
 
 const ProjectsList: React.FC = () => {
-  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
+  const { user } = useUser();
 
-  const { data: projects, isLoading } = useFetchProjectsByDesigner(
-    cookies[cookieKeys.userId]
-  );
+  const { data: projects, isLoading } = useFetchProjectsByDesigner(user._id);
   const { isMobile } = useDevice();
 
   const navigate = useNavigate();
-
-  if (!cookies || !cookies[cookieKeys.userId]) {
-    return;
-  }
 
   if (isLoading) {
     return <Loader />;

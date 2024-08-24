@@ -1,17 +1,17 @@
 import { Button, Flex, Input, Typography, message } from "antd";
 import React, { ChangeEvent, useState } from "react";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useSaveProject } from "../../hooks/use-projects";
+import { useUser } from "../../hooks/use-user";
 import { Project, ProjectDetailsProps } from "../../interfaces/Project";
-import { cookieKeys } from "../../libs/react-query/constants";
 import ProjectBasicDetails from "./project-layout";
 
 const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const [currentProject, setCurrentProject] = useState<Project | undefined>(
     projectData
   );
-  const [cookies, setCookie, removeCookie] = useCookies([cookieKeys.userId]);
+
+  const { user } = useUser();
 
   const [projectName, setProjectName] = useState<string>();
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const handleNameSubmit = () => {
     const projectData: Partial<Project> = {
       name: projectName!,
-      designerId: cookies[cookieKeys.userId],
+      designerId: user._id,
     };
 
     saveProjectMutation.mutate(projectData, {

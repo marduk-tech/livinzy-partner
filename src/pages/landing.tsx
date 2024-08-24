@@ -1,7 +1,7 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Flex, Image, Typography } from "antd";
 import React from "react";
 import { useDevice } from "../libs/device";
-import { useAuth0 } from "@auth0/auth0-react";
 
 const Landing: React.FC = () => {
   const { isMobile } = useDevice();

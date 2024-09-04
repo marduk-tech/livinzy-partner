@@ -14,6 +14,9 @@ interface Transaction {
   amount: number;
 }
 
+/**
+ * WalletDetails component for displaying user's wallet information and transaction history
+ */
 const WalletDetails: React.FC = () => {
   const { user: designerData } = useUser();
   const walletBalance: number = 5000; // Static wallet balance

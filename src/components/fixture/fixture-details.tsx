@@ -43,6 +43,15 @@ interface FixtureModalProps {
   space?: Space;
 }
 
+/**
+ * Component for displaying and editing fixture details
+ * @param isOpen Boolean to control the visibility of the modal
+ * @param onCancel Function to call when the modal is cancelled
+ * @param onSubmit Function to call when the form is submitted
+ * @param fixture The fixture data, if editing an existing fixture
+ * @param slide The current slide data
+ * @param space The current space data
+ */
 const FixtureDetails: React.FC<FixtureModalProps> = ({
   isOpen,
   onCancel,
@@ -80,16 +89,15 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     refetch: refetchProjectFixtures,
   } = useFetchFixturesByProject(projectId as string);
 
-  // const { data: materialVariations } =
-  //   getFixtureMaterialVariationsMetaByMaterial(selectedMaterial);
-  // const { data: materialFinishes } =
-  //   getFixtureMaterialFinishesMetaByMaterial(selectedMaterial);
-
   const { data: projectSlides, isPending: projectSlidesPending } =
     useFetchSlidesByProject(projectId as string);
 
   const [form] = Form.useForm();
 
+  /**
+   * Handles the form submission
+   * @param values The form values
+   */
   const handleFinish = (values: any) => {
     if (values.existingFixtureId) {
       const existingFixture = projectFixtures.find(
@@ -103,6 +111,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   };
 
+  /**
+   * Handles the change of fixture type
+   * @param value The selected fixture type ID
+   */
   const onChangeFixtureType = (value: string) => {
     const fixtureType = fixtureMetaData.find(
       (f: FixtureMeta) => f._id == value
@@ -117,13 +129,17 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     setMaterials(fixtureType.materials);
   };
 
+  /**
+   * Handles the change of material
+   * @param value The selected material
+   */
   const handleMaterialChange = async (value: string) => {
     setSelectedMaterial(value);
     form.resetFields(["materialVariation", "materialFinish"]);
   };
 
   /**
-   * When a new fixture is added by the designer
+   * Handles adding a new fixture type
    */
   const onClickAddNewFixture = () => {
     if (
@@ -147,6 +163,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     }
   };
 
+  /**
+   * Generates a one-liner description for the fixture
+   * @param designName The design name of the fixture
+   */
   const onClickGenerateOneLiner = async (designName: string) => {
     await generateOneLinerMutation.mutateAsync(
       {
@@ -168,11 +188,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     );
   };
 
-  // useEffect(() => {
-  //   setFinishes(materialFinishes);
-  //   setVariations(materialVariations);
-  // }, [materialFinishes, materialVariations]);
-
   useEffect(() => {
     // Auto select the fixture type once a new fixture meta is added.
     if (autoSelectFixtureMeta) {
@@ -188,6 +203,10 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     setSelectExisting(false);
   }, [isOpen]);
 
+  /**
+   * Handles the opening and closing of the modal
+   * @param open Boolean indicating if the modal is open
+   */
   const onModalToggle = (open: boolean) => {
     if (open && fixture) {
       const fixtureType = fixtureMetaData.find(
@@ -215,6 +234,12 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     return <Loader />;
   }
 
+  /**
+   * Filters fixtures by space
+   * @param space The space to filter by
+   * @param fixtures The list of all fixtures
+   * @returns Filtered list of fixtures
+   */
   function filterFixturesBySpace(space: Space, fixtures: Fixture[]) {
     const fixtureIdsInSpace = space.fixtures.map((fixture) => fixture._id);
 
@@ -227,7 +252,6 @@ const FixtureDetails: React.FC<FixtureModalProps> = ({
     const formattedFixtures = filterFixturesBySpace(space, projectFixtures);
 
     const existingFixturesOptions = formattedFixtures
-
       .filter(
         // Filter fixtures that are mapped to the space and not already mapped to the slide
         (fixture: Fixture) =>

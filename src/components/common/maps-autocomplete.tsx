@@ -1,6 +1,6 @@
-import React, { useState } from "react";
 import { Select } from "antd";
 import axios from "axios";
+import React, { useState } from "react";
 
 const { Option } = Select;
 
@@ -9,9 +9,16 @@ type Prediction = {
   description: string;
 };
 
+/**
+ * Component for address autocomplete using Google Maps API
+ */
 const AddressAutocomplete: React.FC = () => {
   const [options, setOptions] = useState<any>([]);
 
+  /**
+   * Handles search input change
+   * @param value Search input value
+   */
   const handleSearch = async (value: string) => {
     if (!value) {
       setOptions([]);
@@ -37,6 +44,10 @@ const AddressAutocomplete: React.FC = () => {
     }
   };
 
+  /**
+   * Handles selection of an address
+   * @param value Selected address value
+   */
   const handleChange = (value: string) => {
     console.log(`Selected address: ${value}`);
   };

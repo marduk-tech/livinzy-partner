@@ -22,6 +22,9 @@ import { convertFeetToInch } from "../libs/lvnzy-helper";
 import { queryKeys } from "../libs/react-query/constants";
 import { queryClient } from "../libs/react-query/query-client";
 
+/**
+ * SpaceDetails component for displaying and editing space information
+ */
 const SpaceDetails: React.FC<{
   spaceData: Space;
   projectId: string;
@@ -49,20 +52,28 @@ const SpaceDetails: React.FC<{
     });
   }, [showSpaceDialog, spaceData]);
 
+  /**
+   * Handles dialog cancellation
+   */
   const handleCancel = () => {
     form.resetFields();
     spaceDialogClosed();
   };
 
+  /**
+   * Handles space type change
+   * @param value - The selected space type value
+   */
   const onChangeSpaceType = (value: string) => {
     const spaceType = spaceMetaData.find((s: SpaceMeta) => s._id == value);
     form.setFieldsValue({
       name: spaceType.spaceType,
     });
   };
+
   /**
-   * When form is submitted.
-   * @param updatedSpaceData
+   * Handles form submission
+   * @param updatedSpaceData - The updated space data
    */
   const handleFinish = (updatedSpaceData: Space) => {
     updatedSpaceData.projectId = projectId;
@@ -91,6 +102,10 @@ const SpaceDetails: React.FC<{
     );
   };
 
+  /**
+   * Generates a one-liner description for the space
+   * @param designName - The name of the design
+   */
   const onClickGenerateOneLiner = async (designName: string) => {
     await generateOneLinerMutation.mutateAsync(
       {

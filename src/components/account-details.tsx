@@ -30,6 +30,9 @@ const { TextArea } = Input;
 
 const INPUT_WIDTH = 400;
 
+/**
+ * AccountDetails component for displaying and editing user account information
+ */
 const AccountDetails: React.FC = () => {
   const { user } = useAuth0();
 
@@ -62,6 +65,10 @@ const AccountDetails: React.FC = () => {
     }
   }, [data, form]);
 
+  /**
+   * Handles form submission
+   * @param designerData - The updated designer data
+   */
   const handleFinish = (designerData: Designer) => {
     // Append profilePicture URL if exists
     if (fileList.length > 0 && fileList[0].response) {
@@ -79,10 +86,17 @@ const AccountDetails: React.FC = () => {
     });
   };
 
+  /**
+   * Handles form changes
+   */
   const handleFormChange = () => {
     setIsFormChanged(true); // Indicate form has changed
   };
 
+  /**
+   * Handles profile picture upload changes
+   * @param info - Upload change information
+   */
   const handleUploadChange = (info: UploadChangeParam<UploadFile>) => {
     let newFileList = [...info.fileList];
 

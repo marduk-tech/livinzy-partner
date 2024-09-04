@@ -1,9 +1,9 @@
 // useFetchProjects.ts
 
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { FixtureMeta } from "../interfaces/Meta";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
-import { FixtureMeta } from "../interfaces/Meta";
 
 // Custom hook to fetch projects using useQuery
 export const getHomeMeta = () => {

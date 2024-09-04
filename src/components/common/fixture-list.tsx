@@ -7,8 +7,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import { Button, Flex, List, Popconfirm, Tag, Tooltip, Typography } from "antd";
-import React, { useState } from "react";
-import { useFetchProject } from "../../hooks/use-projects";
+import React from "react";
 import { Fixture } from "../../interfaces/Fixture";
 import { COLORS } from "../../styles/colors";
 
@@ -23,6 +22,17 @@ interface FixtureListProps {
   isAllFixturesModal: boolean;
 }
 
+/**
+ * Component for rendering a list of fixtures
+ * @param fixtures Array of fixtures to display
+ * @param onMap Function to call when mapping a fixture
+ * @param onEdit Function to call when editing a fixture
+ * @param onDelete Function to call when deleting a fixture
+ * @param onHighlight Function to call when highlighting a fixture
+ * @param highlightedFixtures Array of highlighted fixture IDs
+ * @param isPending Boolean to indicate if actions are pending
+ * @param isAllFixturesModal Boolean to indicate if this is in the all fixtures modal
+ */
 const FixtureList: React.FC<FixtureListProps> = ({
   fixtures,
   onMap,

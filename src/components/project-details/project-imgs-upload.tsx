@@ -12,6 +12,12 @@ interface ImgsUploadProps {
   isMultiple?: boolean;
 }
 
+/**
+ * Component for uploading project images
+ * @param imgsUploaded Callback function when images are uploaded
+ * @param confirmProcessing Flag to indicate if confirmation processing is required
+ * @param isMultiple Flag to allow multiple image uploads
+ */
 const ImgsUpload: React.FC<ImgsUploadProps> = ({
   imgsUploaded,
   confirmProcessing,
@@ -21,12 +27,19 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
   const [uploadPending, setUploadPending] = useState<boolean>(false);
   const [totalImagesToUpload, setTotalImagesToUpload] = useState<number>(0);
 
+  /**
+   * Handles changes in the file list
+   * @param param0 Object containing the new file list
+   */
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
     const urls: string[] = [];
     setUploadPending(!!newFileList.find((file) => file.status !== "done"));
   };
 
+  /**
+   * Processes uploaded images and calls the imgsUploaded callback
+   */
   const handleProcessImages = () => {
     const urls: string[] = [];
     // Read from response and show file link
@@ -45,6 +58,12 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
     }
   }, [uploadPending]);
 
+  /**
+   * Validates file before upload
+   * @param file File to be uploaded
+   * @param fileList List of files
+   * @returns Boolean indicating if the file is valid for upload
+   */
   const beforeUpload = (file: UploadFile, fileList: UploadFile[]) => {
     setTotalImagesToUpload(fileList.length);
     const isLt3M = file.size! / 1024 / 1024 < MAX_IMAGE_SIZE_MB;
@@ -54,6 +73,10 @@ const ImgsUpload: React.FC<ImgsUploadProps> = ({
     return isLt3M;
   };
 
+  /**
+   * Renders the upload button
+   * @returns JSX for the upload button
+   */
   const renderUploadBtn = () => {
     return (
       <Upload

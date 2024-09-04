@@ -1,4 +1,5 @@
 import { Flex, Form, Input, InputNumber, Modal, Select } from "antd";
+
 import { useEffect } from "react";
 import { FixtureComponent } from "../../interfaces/Fixture";
 import { WorkTypes } from "../../libs/constants";
@@ -17,6 +18,14 @@ interface EditFixtureComponentsProps {
   confirmLoading: boolean;
 }
 
+/**
+ * Component for editing fixture components
+ * @param component The fixture component to edit, if any
+ * @param open Boolean to control the visibility of the modal
+ * @param setOpen Function to set the visibility of the modal
+ * @param updateFixture Function to update the fixture
+ * @param confirmLoading Boolean to indicate if the confirmation is loading
+ */
 export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
   component,
   open,
@@ -36,6 +45,9 @@ export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
     }
   }, [component, form]);
 
+  /**
+   * Handles the submission of the form
+   */
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
@@ -53,6 +65,9 @@ export const EditFixtureComponents: React.FC<EditFixtureComponentsProps> = ({
     } catch (error: unknown) {}
   };
 
+  /**
+   * Handles the cancellation of the form
+   */
   const handleCancel = () => {
     setOpen(false);
   };

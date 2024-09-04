@@ -27,6 +27,12 @@ interface FixtureMappingProps {
   space?: Space;
 }
 
+/**
+ * Filters fixtures based on non-archived slides
+ * @param projectFixtures Array of all project fixtures
+ * @param projectSlides Array of all project slides
+ * @returns Filtered array of fixtures
+ */
 export function filterFixtures(
   projectFixtures: Fixture[],
   projectSlides: Slide[]
@@ -50,6 +56,13 @@ export function filterFixtures(
   return filteredProjectFixtures;
 }
 
+/**
+ * Component for mapping fixtures to slides
+ * @param projectId ID of the current project
+ * @param slide Current slide data
+ * @param onFixturesUpdated Callback function when fixtures are updated
+ * @param space Current space data
+ */
 const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   projectId,
   slide,
@@ -100,6 +113,10 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
   const saveFixtureMutation = useSaveFixture();
   const deleteFixtureMutation = useDeleteFixture();
 
+  /**
+   * Handles the completion of bounding box drawing
+   * @param data Object containing bounding box data
+   */
   const handleBoundingBoxComplete = async (data: {
     startPoint: { x: number; y: number };
     endPoint: { x: number; y: number };
@@ -161,6 +178,10 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     setIsMapFixtureOpen(false);
   };
 
+  /**
+   * Handles the deletion of a fixture
+   * @param fixtureData Fixture to be deleted
+   */
   const onDeleteFixture = (fixtureData: Fixture) => {
     deleteFixtureMutation.mutate(fixtureData._id!, {
       onSuccess: async () => {
@@ -181,6 +202,10 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     });
   };
 
+  /**
+   * Handles saving a fixture
+   * @param fixtureData Fixture data to be saved
+   */
   const onSaveFixture = (fixtureData: FixtureFormData) => {
     fixtureData.projectId = projectId;
     fixtureData._id = fixtureData._id || editingFixture?._id;
@@ -210,6 +235,10 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     setEditingFixture(null);
   };
 
+  /**
+   * Handles highlighting a fixture
+   * @param fixtureData Fixture to be highlighted
+   */
   const onHighlightFixture = async (fixtureData: Fixture) => {
     if (!projectData) {
       message.error("Error");
@@ -249,7 +278,10 @@ const SlideFixtureMapping: React.FC<FixtureMappingProps> = ({
     }
   };
 
-  //  get initial bounding box
+  /**
+   * Gets the initial bounding box for a fixture
+   * @returns Initial bounding box or undefined
+   */
   const getInitialBoundingBox = (): IBoundingBox | undefined => {
     if (projectSlides && slide?._id && editingFixture?._id) {
       const currentSlide = projectSlides.find(

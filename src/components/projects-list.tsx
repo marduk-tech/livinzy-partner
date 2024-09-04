@@ -8,6 +8,9 @@ import { Project } from "../interfaces/Project";
 import { useDevice } from "../libs/device";
 import { Loader } from "./common/loader";
 
+/**
+ * ProjectsList component for displaying a list of projects
+ */
 const ProjectsList: React.FC = () => {
   const { user } = useUser();
 

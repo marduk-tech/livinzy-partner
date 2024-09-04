@@ -25,6 +25,11 @@ import { queryClient } from "../../libs/react-query/query-client";
 import { COLORS } from "../../styles/colors";
 import SpaceDetails from "../space-details";
 
+/**
+ * Component for managing project space details
+ * @param projectData The data of the current project
+ * @param slide The current slide
+ */
 const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
   projectData,
   slide,
@@ -46,10 +51,19 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
 
   const [processingSpaces, setProcessingSpaces] = useState<boolean>(false);
 
+  /**
+   * Shows the modal for adding or editing a space
+   * @param space The space to edit, or undefined for adding a new space
+   */
   const showModal = (space: Space | undefined) => {
     setCurrentSpace(space);
     setSpaceDialogOpen(true);
   };
+
+  /**
+   * Handles the deletion of a space
+   * @param id The ID of the space to delete
+   */
   const handleDelete = (id: string) => {
     deleteSpaceMutation.mutate(id, {
       onSuccess: async () => {
@@ -64,15 +78,20 @@ const ProjectSpaceDetails: React.FC<ProjectDetailsProps> = ({
     });
   };
 
+  /**
+   * Handles the change of space type
+   * @param value The ID of the selected space type
+   */
   const onChangeSpaceType = (value: string) => {
     const spaceType = spaceMetaData.find((s: SpaceMeta) => s._id == value);
     form.setFieldsValue({
       name: spaceType.spaceType,
     });
   };
+
   /**
-   * When form is submitted.
-   * @param updatedSpaceData
+   * Handles the form submission for saving a space
+   * @param updatedSpaceData The updated space data from the form
    */
   const handleFinish = (updatedSpaceData: Space) => {
     updatedSpaceData.projectId = projectData!._id!;

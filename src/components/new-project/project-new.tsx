@@ -6,6 +6,10 @@ import { useUser } from "../../hooks/use-user";
 import { Project, ProjectDetailsProps } from "../../interfaces/Project";
 import ProjectBasicDetails from "./project-layout";
 
+/**
+ * Component for creating a new project
+ * @param projectData Initial project data, if any
+ */
 const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const [currentProject, setCurrentProject] = useState<Project | undefined>(
     projectData
@@ -17,6 +21,10 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
   const navigate = useNavigate();
 
   const saveProjectMutation = useSaveProject();
+
+  /**
+   * Handles the submission of the project name
+   */
   const handleNameSubmit = () => {
     const projectData: Partial<Project> = {
       name: projectName!,
@@ -34,6 +42,10 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
     });
   };
 
+  /**
+   * Handles updates to the project's basic details
+   * @param updatedProject The updated project data
+   */
   const basicDetailsUpdated = (updatedProject: Project) => {
     setCurrentProject(updatedProject);
 
@@ -46,10 +58,18 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
     }
   };
 
-  const onChangeProjectNmae = (e: ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Handles changes to the project name input
+   * @param e The change event from the input field
+   */
+  const onChangeProjectName = (e: ChangeEvent<HTMLInputElement>) => {
     setProjectName(e.target.value);
   };
 
+  /**
+   * Renders the form for entering the project name
+   * @returns JSX for the project name form
+   */
   const renderProjectNameForm = () => {
     return (
       <Flex align="center" style={{ width: "100%", height: "100%" }}>
@@ -59,7 +79,7 @@ const ProjectNew: React.FC<ProjectDetailsProps> = ({ projectData }) => {
             What do you want to name this project ?
           </Typography.Title>
           <Input
-            onChange={onChangeProjectNmae}
+            onChange={onChangeProjectName}
             style={{ width: 400, height: 75, fontSize: 24 }}
           />
           <Button

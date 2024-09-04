@@ -20,6 +20,14 @@ interface ImgMapFixtureProps {
   isOpen: boolean;
 }
 
+/**
+ * Component for mapping fixtures on an image
+ * @param imageUrl URL of the image to map
+ * @param onBoundingBoxComplete Function to call when bounding box is complete
+ * @param initialBoundingBox Initial bounding box data, if any
+ * @param modalClosed Function to call when modal is closed
+ * @param isOpen Boolean to control modal visibility
+ */
 const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
   imageUrl,
   onBoundingBoxComplete,
@@ -39,6 +47,10 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
   const modalWidth = 640; // Set your desired modal width
   const modalHeight = 480; // Set your desired modal height
 
+  /**
+   * Draws the initial bounding box on the canvas
+   * @param ctx The 2D rendering context of the canvas
+   */
   const drawInitialBoundingBox = (ctx: CanvasRenderingContext2D) => {
     if (!initialBoundingBox) {
       return;
@@ -119,6 +131,10 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
     }
   }, [isOpen, canvasRef, imageLoaded, initialBoundingBox]);
 
+  /**
+   * Handles the mouse down event on the canvas
+   * @param e The mouse event
+   */
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -126,16 +142,26 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
     setEndPoint({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
+  /**
+   * Handles the mouse move event on the canvas
+   * @param e The mouse event
+   */
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const rect = canvasRef.current!.getBoundingClientRect();
     setEndPoint({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
+  /**
+   * Handles the mouse up event on the canvas
+   */
   const handleMouseUp = () => {
     setIsDrawing(false);
   };
 
+  /**
+   * Handles the save action for the bounding box
+   */
   const onClickSave = () => {
     if (imageRef.current && canvasRef.current) {
       handleClearBoundingBox();
@@ -150,6 +176,9 @@ const ImgMapFixture: React.FC<ImgMapFixtureProps> = ({
     }
   };
 
+  /**
+   * Clears the current bounding box
+   */
   const handleClearBoundingBox = () => {
     setStartPoint({ x: 0, y: 0 });
     setEndPoint({ x: 0, y: 0 });

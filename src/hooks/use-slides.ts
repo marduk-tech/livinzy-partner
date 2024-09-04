@@ -3,7 +3,11 @@ import { Slide } from "../interfaces/Slide";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
 
-// Custom hook to fetch projects using useQuery
+/**
+ * Custom hook to fetch slides by project using useQuery
+ * @param {string} projectId - The ID of the project
+ * @returns {UseQueryResult} The result of the useQuery hook
+ */
 export const useFetchSlidesByProject = (projectId: string) => {
   return useQuery({
     queryKey: [queryKeys.getSlides, projectId],
@@ -16,7 +20,10 @@ export const useFetchSlidesByProject = (projectId: string) => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to bulk save slides
+ * @returns {UseMutationResult} The result of the useMutation hook
+ */
 export const useBulkSaveSlides = () => {
   return useMutation({
     mutationFn: async (slidesData: Slide[]) => {
@@ -26,7 +33,10 @@ export const useBulkSaveSlides = () => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to save a single slide
+ * @returns {UseMutationResult} The result of the useMutation hook
+ */
 export const useSaveSlide = () => {
   return useMutation({
     mutationFn: async (slideData: Partial<Slide>) => {
@@ -44,7 +54,10 @@ export const useSaveSlide = () => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to delete a slide
+ * @returns {UseMutationResult} The result of the useMutation hook
+ */
 export const useDeleteSlide = () => {
   return useMutation({
     mutationFn: async (slideId: string) => {

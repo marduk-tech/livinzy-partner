@@ -3,7 +3,11 @@ import { Designer } from "../interfaces/Designer";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
 
-// Custom hook to fetch designer by id
+/**
+ * Custom hook to fetch designer by id
+ * @param {string} id - The ID of the designer
+ * @returns {UseQueryResult<Designer, Error>} The result of the useQuery hook
+ */
 export const useGetDesigner = (id: string) => {
   return useQuery<Designer, Error>({
     queryKey: [queryKeys.getDesigner],
@@ -42,7 +46,10 @@ export const useGetDesigner = (id: string) => {
 //   return { data, isLoading };
 // };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to save designer data
+ * @returns {UseMutationResult} The result of the useMutation hook
+ */
 export const useSaveDesigner = () => {
   return useMutation({
     mutationFn: async (designerData: Designer) => {

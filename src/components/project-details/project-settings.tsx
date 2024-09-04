@@ -26,6 +26,11 @@ const { Option } = Select;
 
 const INPUT_WIDTH = 500;
 
+/**
+ * Component for managing project settings
+ * @param projectData The data of the current project
+ * @param onProjectSaved Callback function when project is saved
+ */
 const ProjectSettings: React.FC<{
   projectData: Project;
   onProjectSaved: any;
@@ -38,7 +43,9 @@ const ProjectSettings: React.FC<{
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
 
   /**
-   * When the form values are changed
+   * Handles changes in form values
+   * @param changedValues Object containing changed form values
+   * @param allValues Object containing all form values
    */
   const onFormValuesChange = (changedValues: any, allValues: any) => {
     console.log(changedValues);
@@ -67,6 +74,10 @@ const ProjectSettings: React.FC<{
     }
   }, [projectData, form]);
 
+  /**
+   * Saves the project with updated data
+   * @param projectUpdatedData Updated project data
+   */
   const saveProject = (projectUpdatedData: Project) => {
     if (projectData) {
       projectUpdatedData._id = projectData._id;
@@ -82,6 +93,11 @@ const ProjectSettings: React.FC<{
       onError: () => {},
     });
   };
+
+  /**
+   * Handles form submission
+   * @param projectUpdatedData Updated project data from the form
+   */
   const handleFinish = (projectUpdatedData: Project) => {
     saveProject(projectUpdatedData);
   };
@@ -89,6 +105,9 @@ const ProjectSettings: React.FC<{
   const deleteProjectMutation = useDeleteProject();
   const navigate = useNavigate();
 
+  /**
+   * Shows confirmation dialog for project deletion
+   */
   const showDeleteConfirm = () => {
     confirm({
       title: `Delete This Project`,

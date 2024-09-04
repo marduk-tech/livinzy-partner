@@ -5,6 +5,10 @@ import { Designer } from "../interfaces/Designer";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
 
+/**
+ * Custom hook to fetch and manage user data
+ * @returns {Object} Object containing user data, loading state, error state, and refetch function
+ */
 export function useUser() {
   const { user, isAuthenticated } = useAuth0();
 

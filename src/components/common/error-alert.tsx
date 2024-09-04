@@ -1,10 +1,13 @@
 import { Alert } from "antd";
-import { useState } from "react";
 
 interface ErrorAlertProps {
   error: unknown;
 }
 
+/**
+ * Component for displaying an error message
+ * @param error The error to display
+ */
 export function ErrorAlert({ error }: ErrorAlertProps) {
   return (
     <Alert

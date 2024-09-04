@@ -6,6 +6,10 @@ interface MobileFrameProps {
   url: string;
 }
 
+/**
+ * Component for displaying content in a mobile frame
+ * @param url URL of the content to display
+ */
 const MobileFrame: React.FC<MobileFrameProps> = ({ url }) => {
   const [device, setDevice] = useState<string>("mobile");
   return (

@@ -1,12 +1,17 @@
-import React, { useState } from "react";
-import { Flex, Input, Tag } from "antd";
 import { BorderOuterOutlined, CloseOutlined } from "@ant-design/icons";
+import { Flex, Input, Tag } from "antd";
+import React, { useState } from "react";
 
 interface TagInputProps {
   initialTags?: string[];
   onTagsChange: (tags: string[]) => void;
 }
 
+/**
+ * Component for inputting and displaying tags
+ * @param initialTags Initial array of tags
+ * @param onTagsChange Function to call when tags change
+ */
 const TagInput: React.FC<TagInputProps> = ({
   initialTags = [],
   onTagsChange,
@@ -14,10 +19,17 @@ const TagInput: React.FC<TagInputProps> = ({
   const [tags, setTags] = useState<string[]>(initialTags || []);
   const [inputValue, setInputValue] = useState<string>("");
 
+  /**
+   * Handles input change
+   * @param e Input change event
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
+  /**
+   * Handles input confirmation (adding a new tag)
+   */
   const handleInputConfirm = () => {
     if (inputValue && !tags.includes(inputValue)) {
       setTags([...tags, inputValue]);
@@ -26,10 +38,18 @@ const TagInput: React.FC<TagInputProps> = ({
     setInputValue("");
   };
 
+  /**
+   * Handles removal of a tag
+   * @param removedTag Tag to remove
+   */
   const handleClose = (removedTag: string) => {
     setTags(tags.filter((tag) => tag !== removedTag));
   };
 
+  /**
+   * Handles key press in the input
+   * @param e Keyboard event
+   */
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission

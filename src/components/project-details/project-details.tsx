@@ -163,6 +163,11 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
   }, [allSpaces, selectedSlide]);
 
+  /**
+   * Updates fixtures for the selected slide and associated space
+   * @param slide The slide with updated fixtures
+   * @param removedFixtureId Optional ID of a fixture to be removed
+   */
   const fixturesUpdated = async (slide: Slide, removedFixtureId?: string) => {
     try {
       selectedSlide!.fixtures = slide.fixtures;
@@ -214,6 +219,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
   };
 
+  /**
+   * Updates spaces associated with the selected slide
+   * @param spaces Array of space IDs
+   */
   const spacesUpdated = async (spaces: string[]) => {
     const slideId = selectedSlide!._id;
 
@@ -287,6 +296,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
   };
 
+  /**
+   * Handles the click event for deleting a slide
+   * @param event The click event
+   */
   const onClickDelete = (event: any) => {
     event.stopPropagation();
 
@@ -321,6 +334,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     });
   };
 
+  /**
+   * Handles the click event for replacing a slide
+   * @param event The click event
+   */
   const onClickReplace = (event: any) => {
     event.stopPropagation();
     if (isPreviewImage) {
@@ -331,13 +348,16 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
   };
 
   /**
-   * When thumbnail is clicked
-   * @param slide
+   * Handles the click event on a slide thumbnail
+   * @param slide The clicked slide
    */
   const handleThumbnailClick = (slide: Slide) => {
     setSelectedSlide(slide);
   };
 
+  /**
+   * Initiates the process of mapping slides to spaces
+   */
   const mapSlidesToSpaces = () => {
     processMapSpacesToSlidesMutation.mutate(
       { projectId: projectId! },
@@ -352,7 +372,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     );
   };
 
-  /** When slide images are uploaded */
+  /**
+   * Handles the upload of new slide images
+   * @param imgs Array of uploaded image URLs
+   */
   const imgsUploaded = (imgs: string[]) => {
     const slidesData = imgs.map((img: string) => {
       return {
@@ -381,6 +404,11 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     });
   };
 
+  /**
+   * Renders a single slide thumbnail
+   * @param slide The slide to render
+   * @returns JSX for the slide thumbnail
+   */
   const renderSingleSlideThumbnail = (slide: Slide) => {
     return (
       <div
@@ -405,6 +433,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     );
   };
 
+  /**
+   * Renders all slide thumbnails grouped by spaces
+   * @returns JSX for all slide thumbnails
+   */
   const renderSlideThumbnails = () => {
     let spaceDivider: string,
       toAddDivider = false;
@@ -481,6 +513,9 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     );
   };
 
+  /**
+   * Handles the replacement of a slide with a new image
+   */
   const handleReplaceSlide = async () => {
     if (selectedSlide) {
       const updateData = {
@@ -501,6 +536,10 @@ const ProjectSlideDetails: React.FC<{ projectId: string }> = ({
     }
   };
 
+  /**
+   * Handles the click event for updating the project preview image
+   * @param event The click event
+   */
   const onClickUpdatePreviewImage = (event: any) => {
     event.stopPropagation();
 

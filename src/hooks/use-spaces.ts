@@ -3,7 +3,11 @@ import { Space, SpaceUpdateBody } from "../interfaces/Space";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
 
-// Custom hook to fetch projects using useQuery
+/**
+ * Custom hook to fetch spaces by project using useQuery
+ * @param {string} projectId - The ID of the project
+ * @returns {UseQueryResult} The result of the useQuery hook
+ */
 export const useFetchSpacesByProject = (projectId: string) => {
   return useQuery({
     queryKey: [queryKeys.getSpaces, projectId],
@@ -16,7 +20,10 @@ export const useFetchSpacesByProject = (projectId: string) => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to save space data
+ * @returns {UseMutationResult} The result of the useMutation hook
+ */
 export const useSaveSpace = () => {
   return useMutation({
     mutationFn: async (spaceData: Partial<SpaceUpdateBody | Space>) => {
@@ -34,7 +41,10 @@ export const useSaveSpace = () => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to delete a space
+ * @returns {UseMutationResult} The result of the useMutation hook
+ */
 export const useDeleteSpace = () => {
   return useMutation({
     mutationFn: async (spaceId: string) => {

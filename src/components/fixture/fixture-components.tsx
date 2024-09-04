@@ -18,6 +18,10 @@ interface FixtureComponentsProps {
   fixture: Fixture;
 }
 
+/**
+ * Component for displaying and managing fixture components
+ * @param fixture The fixture data
+ */
 export const FixtureComponents: React.FC<FixtureComponentsProps> = ({
   fixture,
 }) => {
@@ -44,6 +48,10 @@ export const FixtureComponents: React.FC<FixtureComponentsProps> = ({
     setSelectedFixture(selectedFixture);
   }, [projectFixtures, openEditFixture]);
 
+  /**
+   * Updates a fixture component
+   * @param param0 Object containing the fixture component and the action to perform
+   */
   const updateFixtureComponent = async ({
     fixtureComponent,
     action,
@@ -94,6 +102,9 @@ export const FixtureComponents: React.FC<FixtureComponentsProps> = ({
     setSelectedFixtureComponent(undefined);
   };
 
+  /**
+   * Defines the columns for the fixture components table
+   */
   const columns: TableColumnType<FixtureComponent>[] = [
     {
       title: "Standard name",
@@ -101,41 +112,35 @@ export const FixtureComponents: React.FC<FixtureComponentsProps> = ({
       key: "commonName",
       ...ColumnSearch("commonName"),
     },
-
     {
       title: "Work Type",
       dataIndex: "workType",
       key: "workType",
       ...ColumnSearch("workType"),
     },
-
     {
       title: "Brand",
       dataIndex: "brand",
       key: "brand",
       ...ColumnSearch("brand"),
     },
-
     {
       title: "Material",
       dataIndex: "material",
       key: "material",
       ...ColumnSearch("material"),
     },
-
     {
       title: "Cost",
       dataIndex: "cost",
       key: "cost",
       ...ColumnSearch("cost"),
     },
-
     {
       title: "",
       align: "right",
       dataIndex: "_id",
       key: "_id",
-
       render: (id: string, record) => {
         const fixture = selectedFixture.components.find(
           (component) => component._id === id

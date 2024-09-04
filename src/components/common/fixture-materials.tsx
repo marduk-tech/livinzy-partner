@@ -1,14 +1,22 @@
+import { PlusOutlined } from "@ant-design/icons";
+import { Button, Flex, Select } from "antd";
 import React, { useState } from "react";
-import { Select, Flex, Button } from "antd";
 import {
   MaterialFinishMeta,
   MaterialMeta,
   MaterialVariationMeta,
 } from "../../interfaces/Meta";
-import { PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
+/**
+ * Component for selecting fixture materials
+ * @param materials Array of available materials
+ * @param variations Array of available variations
+ * @param finishes Array of available finishes
+ * @param onSave Function to call when saving
+ * @param onSaveAndAdd Function to call when saving and adding
+ */
 const FixtureMaterials: React.FC<any> = ({
   materials,
   variations,

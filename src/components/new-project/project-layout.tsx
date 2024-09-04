@@ -29,6 +29,11 @@ const { Option } = Select;
 
 const INPUT_WIDTH = 400;
 
+/**
+ * Component for managing project layout
+ * @param projectData The data of the current project
+ * @param basicDetailsUpdated Callback function when basic details are updated
+ */
 const ProjectLayout: React.FC<ProjectDetailsProps> = ({
   projectData,
   basicDetailsUpdated,
@@ -47,6 +52,8 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
 
   /**
    * When the form values are changed
+   * @param changedValues Object containing changed form values
+   * @param allValues Object containing all form values
    */
   const onFormValuesChange = (changedValues: any, allValues: any) => {
     console.log(changedValues);
@@ -60,6 +67,10 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
     setIsSubmitDisabled(hasErrors || !allRequiredFieldsFilled);
   };
 
+  /**
+   * Handles changes in the uploaded layout image
+   * @param info Object containing information about the uploaded file
+   */
   const handleUploadChange = async (info: UploadChangeParam<UploadFile>) => {
     if (info.file.status === "uploading") {
       setLayoutImageStatus(LAYOUT_AI_STATUS.UPLOADING);
@@ -117,6 +128,10 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
     }
   }, [projectData, form, layoutUploadSkipped]);
 
+  /**
+   * Saves the project with updated data
+   * @param projectUpdatedData Updated project data
+   */
   const saveProject = (projectUpdatedData: Project) => {
     saveProjectMutation.mutate(
       { ...projectData, ...projectUpdatedData },
@@ -147,10 +162,19 @@ const ProjectLayout: React.FC<ProjectDetailsProps> = ({
       }
     );
   };
+
+  /**
+   * Handles form submission
+   * @param projectUpdatedData Updated project data from the form
+   */
   const handleFinish = (projectUpdatedData: Project) => {
     saveProject(projectUpdatedData);
   };
 
+  /**
+   * Renders the status of the layout image processing
+   * @returns JSX element representing the status
+   */
   const renderImgStatus = () => {
     switch (layoutImageStatus) {
       case LAYOUT_AI_STATUS.UPLOADING:

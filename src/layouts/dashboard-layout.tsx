@@ -6,7 +6,7 @@ import {
 import { useAuth0 } from "@auth0/auth0-react";
 import type { MenuProps } from "antd";
 import { Button, Dropdown, Flex, Image, Layout, Popconfirm } from "antd";
-import React, { useEffect } from "react";
+import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Loader } from "../components/common/loader";
 import { useUser } from "../hooks/use-user";
@@ -16,6 +16,14 @@ const { Header, Content } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
 
+/**
+ * Creates a menu item object
+ * @param {React.ReactNode} label - The label for the menu item
+ * @param {React.Key} key - The key for the menu item
+ * @param {React.ReactNode} icon - The icon for the menu item
+ * @param {MenuItem[]} children - The child menu items
+ * @returns {MenuItem} The created menu item object
+ */
 function getItem(
   label: React.ReactNode,
   key: React.Key,
@@ -30,6 +38,10 @@ function getItem(
   } as MenuItem;
 }
 
+/**
+ * Dashboard layout component
+ * @returns {JSX.Element} The rendered dashboard layout
+ */
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth0();

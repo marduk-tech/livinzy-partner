@@ -3,7 +3,10 @@ import { FixtureFormData } from "../interfaces/Fixture";
 import { axiosApiInstance } from "../libs/axios-api-Instance";
 import { queryKeys } from "../libs/react-query/constants";
 
-// Custom hook to fetch projects using useQuery
+/**
+ * Custom hook to fetch fixtures by project using useQuery
+ * @param projectId - The ID of the project
+ */
 export const useFetchFixturesByProject = (projectId: string) => {
   return useQuery({
     queryKey: [queryKeys.getFixtures, projectId],
@@ -16,7 +19,9 @@ export const useFetchFixturesByProject = (projectId: string) => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to save fixture data
+ */
 export const useSaveFixture = () => {
   return useMutation({
     mutationFn: async (fixtureData: Partial<FixtureFormData>) => {
@@ -34,7 +39,9 @@ export const useSaveFixture = () => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to search fixture highlights
+ */
 export const useSearchFixtureHighlights = () => {
   return useMutation({
     mutationFn: async (searchData: any) => {
@@ -47,7 +54,9 @@ export const useSearchFixtureHighlights = () => {
   });
 };
 
-// Custom hook to save designer data
+/**
+ * Custom hook to delete a fixture
+ */
 export const useDeleteFixture = () => {
   return useMutation({
     mutationFn: async (fixtureId: string) => {

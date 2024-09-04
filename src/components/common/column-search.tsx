@@ -3,6 +3,12 @@ import { Button, Input, Space } from "antd";
 import { FilterDropdownProps } from "antd/es/table/interface";
 import { nestedPropertyAccessor } from "../../libs/lvnzy-helper";
 
+/**
+ * Resets the filter, clears selected keys, and confirms the change
+ * @param clearFilters Function to clear filters
+ * @param setSelectedKeys Function to set selected keys
+ * @param confirm Function to confirm changes
+ */
 export const handleReset = (
   clearFilters: () => void,
   setSelectedKeys: (arr: any) => void,
@@ -13,6 +19,11 @@ export const handleReset = (
   confirm();
 };
 
+/**
+ * Creates a column search configuration for Ant Design Table
+ * @param dataIndex The data index to search on
+ * @returns An object with filter dropdown, icon, and filter function
+ */
 export const ColumnSearch = (dataIndex: any) => ({
   filterDropdown: ({
     setSelectedKeys,

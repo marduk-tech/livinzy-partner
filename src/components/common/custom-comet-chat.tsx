@@ -1,8 +1,8 @@
-import { UIKitSettingsBuilder } from "@cometchat/uikit-shared";
 import {
   CometChatUIKit,
   CometChatUsersWithMessages,
 } from "@cometchat/chat-uikit-react";
+import { UIKitSettingsBuilder } from "@cometchat/uikit-shared";
 import React, { useEffect, useState } from "react";
 
 const COMETCHAT_CONSTANTS = {
@@ -19,9 +19,15 @@ const UIKitSettings = new UIKitSettingsBuilder()
   .subscribePresenceForAllUsers()
   .build();
 
+/**
+ * Component for initializing and rendering CometChat UI
+ */
 const CustomCometChat: React.FC = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
+  /**
+   * Initializes CometChat and logs in the user
+   */
   useEffect(() => {
     //Initialize CometChat UI Kit
     CometChatUIKit.init(UIKitSettings)!

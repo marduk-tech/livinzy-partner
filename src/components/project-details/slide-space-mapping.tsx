@@ -17,6 +17,13 @@ interface SlideSpaceMappingProps {
   slide: Slide;
 }
 
+/**
+ * Component for mapping slides to spaces
+ * @param projectId ID of the current project
+ * @param onSpacesUpdated Callback function when spaces are updated
+ * @param processingDesigns Flag indicating if designs are being processed
+ * @param slide Current slide data
+ */
 const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
   projectId,
   onSpacesUpdated,
@@ -34,6 +41,9 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
     refetch: refetchSpaces,
   } = useFetchSpacesByProject(projectId!);
 
+  /**
+   * Finds the default space for the current slide
+   */
   const defaultSpace = projectSpaces?.find((space: Space) =>
     space.slides.map((s) => s._id).includes(slide._id)
   );
@@ -62,6 +72,10 @@ const SlideSpaceMapping: React.FC<SlideSpaceMappingProps> = ({
     }
   }, [projectSpaces]);
 
+  /**
+   * Handles the change of selected space
+   * @param value ID of the selected space
+   */
   const handleSpacesChange = (value: string) => {
     setSelectedSpace(value);
     onSpacesUpdated([value]);

@@ -6,6 +6,7 @@ import { DashboardLayout } from "../layouts/dashboard-layout";
 // Pages
 import { AuthenticationGuard } from "../components/auth/authentication-guard";
 import AccountPage from "../pages/account";
+import AskPage from "../pages/ask";
 import ChatPage from "../pages/chat";
 import HomePage from "../pages/home";
 import Landing from "../pages/landing";
@@ -27,6 +28,8 @@ export const Router = () => {
           element={<ProjectDetails />}
         />
         <Route path="/projects/new/:projectId?" element={<ProjectAdd />} />
+
+        <Route path="/ask" element={<AskPage />} />
       </Route>
 
       <Route path="/*" element={<div>404</div>} />
